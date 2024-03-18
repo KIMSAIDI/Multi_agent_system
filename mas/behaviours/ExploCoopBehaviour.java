@@ -118,10 +118,30 @@ public class ExploCoopBehaviour extends SimpleBehaviour {
 			}
 
 			//3) while openNodes is not empty, continues.
-			if (!this.myMap.hasOpenNode()){
+			if (!this.myMap.hasOpenNode()) {
 				//Explo finished
 				finished=true;
 				System.out.println(this.myAgent.getLocalName()+" - Exploration successufully done, behaviour removed.");
+				
+				// Si je ne suis pas le dernier agent
+				
+				ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
+				// set the protocol of the message
+				msg.setProtocol("SHARE-TOPO");
+				msg.setSender(this.myAgent.getAID());
+				for (String agentName : list_agentNames) {
+					msg.addReceiver(new AID(agentName,AID.ISLOCALNAME));
+				}
+				
+				SerializableSimpleGraph<String, MapAttribute> sg=this.myMap.getSerializableGraph();
+				try {					
+					msg.setContentObject(sg);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				
+				((AbstractDedaleAgent)this.myAgent).sendMessage(msg);
+				
 			}else{
 				//4) select next move.
 				//4.1 If there exist one open node directly reachable, go for it,
@@ -139,7 +159,7 @@ public class ExploCoopBehaviour extends SimpleBehaviour {
 				// If it was written properly, this sharing action should be in a dedicated behaviour set.
 				
 				
-				
+			    // je merge ma map avec celle que j'ai recu
 				
 				MessageTemplate msgTemplate2=MessageTemplate.and(
 						MessageTemplate.MatchProtocol("SHARE-TOPO"),
@@ -153,8 +173,7 @@ public class ExploCoopBehaviour extends SimpleBehaviour {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-					System.out.println("je suis "+this.myAgent.getLocalName());
-					System.out.println("je merge ma map");
+					
 					this.myMap.mergeMap(sgreceived);
 				}
 				
@@ -180,9 +199,7 @@ public class ExploCoopBehaviour extends SimpleBehaviour {
 					} catch (IOException e) {
 						e.printStackTrace();
 					}
-					System.out.println("Je suis "+this.myAgent.getLocalName());
-					System.out.println("J'ai recu un message : "+msgReceived.getContent());
-					System.out.println("-------------------------------");
+					
 					((AbstractDedaleAgent)this.myAgent).sendMessage(msg);
 
 					
@@ -198,9 +215,12 @@ public class ExploCoopBehaviour extends SimpleBehaviour {
 
 		}
 	}
-
+	
+	
 	@Override
 	public boolean done() {
+		System.out.println("End of behaviour");
+
 		return finished;
 	}
 

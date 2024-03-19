@@ -11,7 +11,8 @@ import eu.su.mas.dedaleEtu.mas.knowledge.MapRepresentation.MapAttribute;
 
 import jade.core.AID;
 import jade.core.Agent;
-import jade.core.behaviours.TickerBehaviour;
+import jade.core.behaviours.SimpleBehaviour;
+
 import jade.lang.acl.ACLMessage;
 
 /**
@@ -22,7 +23,7 @@ import jade.lang.acl.ACLMessage;
  * @author hc
  *
  */
-public class ShareMapBehaviour {
+public class ShareMapBehaviour extends SimpleBehaviour {
 	
 	private MapRepresentation myMap;
 	private List<String> receivers;
@@ -41,6 +42,7 @@ public class ShareMapBehaviour {
 	public ShareMapBehaviour(Agent a,MapRepresentation mymap, List<String> receivers) {
 		this.myMap=mymap;
 		this.receivers=receivers;	
+		this.myAgent=a;
 	}
 
 	/**
@@ -68,6 +70,12 @@ public class ShareMapBehaviour {
 		((AbstractDedaleAgent)this.myAgent).sendMessage(msg);
 
 		
+	}
+
+	@Override
+	public boolean done() {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 }

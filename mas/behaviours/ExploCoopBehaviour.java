@@ -185,23 +185,8 @@ public class ExploCoopBehaviour extends SimpleBehaviour {
 				ACLMessage msgReceived = this.myAgent.receive(msgTemplate);
 				if (msgReceived != null) {
 					// create a new message
-					ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
-					// set the protocol of the message
-					msg.setProtocol("SHARE-TOPO");
-					msg.setSender(this.myAgent.getAID());
-					for (String agentName : list_agentNames) {
-						msg.addReceiver(new AID(agentName,AID.ISLOCALNAME));
-					}
-						
-					SerializableSimpleGraph<String, MapAttribute> sg=this.myMap.getSerializableGraph();
-					try {					
-						msg.setContentObject(sg);
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-					
-					((AbstractDedaleAgent)this.myAgent).sendMessage(msg);
-
+					System.out.println("on share la map");
+					this.myAgent.addBehaviour(new ShareMapBehaviour(this.myAgent, this.myMap, list_agentNames));
 					
 				}
 				

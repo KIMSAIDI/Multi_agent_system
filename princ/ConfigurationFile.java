@@ -152,9 +152,8 @@ public final class ConfigurationFile {
 	 */
 	//public static String INSTANCE_CONFIGURATION_ENTITIES=null;
 	//public static String INSTANCE_CONFIGURATION_ENTITIES="resources/agentExplo.json";
-	public static String INSTANCE_CONFIGURATION_ENTITIES="resources/agentExplo-2.json";
-	//public static String INSTANCE_CONFIGURATION_ENTITIES="resources/agentExploCoop-2";
-	//public static String INSTANCE_CONFIGURATION_ENTITIES="resources/agentExploCoop-2.json";
+	//public static String INSTANCE_CONFIGURATION_ENTITIES="resources/agentExplo-2.json";
+	public static String INSTANCE_CONFIGURATION_ENTITIES="resources/agentExploCoop-2.json";
 	//public static String INSTANCE_CONFIGURATION_ENTITIES="resources/treasureHunt/map2023-entities.json";
 	//public static String INSTANCE_CONFIGURATION_ENTITIES="resources/treasureHunt/agentTankerCollect.json";
 	//public static String INSTANCE_CONFIGURATION_ENTITIES="resources/agentKeyboardControlled";
@@ -176,7 +175,7 @@ public final class ConfigurationFile {
 	//public static String INSTANCE_CONFIGURATION_ENTITIES="src/test/java/resources/map2018-agentTanker";
 	//public static String INSTANCE_CONFIGURATION_ENTITIES="src/test/java/resources/map2018-agentCollect";
 	//public static String INSTANCE_CONFIGURATION_ENTITIES="src/test/java/resources/map2018-entities";
-	//public static String INSTANCE_CONFIGURATION_ENTITIES="src/test/java/resources/map2018-agentGolem";
+	//public static String INSTANCE_CONFIGURATION_ENTITIES1="src/test/java/resources/map2018-agentGolem";
 	//public static String INSTANCE_CONFIGURATION_ENTITIES="src/test/java/resources/map2018-agentTankerCollect";
 	//public static String INSTANCE_CONFIGURATION_ENTITIES="src/test/java/resources/map2019-entitiesExam1";
 

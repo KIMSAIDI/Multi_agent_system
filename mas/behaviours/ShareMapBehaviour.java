@@ -27,7 +27,7 @@ public class ShareMapBehaviour extends SimpleBehaviour {
 	
 	private MapRepresentation myMap;
 	private List<String> receivers;
-	private Agent myAgent;
+	private boolean finished = false;
 
 	/**
 	 * The agent periodically share its map.
@@ -40,9 +40,11 @@ public class ShareMapBehaviour extends SimpleBehaviour {
 	 * @param receivers the list of agents to send the map to
 	 */
 	public ShareMapBehaviour(Agent a,MapRepresentation mymap, List<String> receivers) {
+		super(a);
 		this.myMap=mymap;
 		this.receivers=receivers;	
-		this.myAgent=a;
+
+
 	}
 
 	/**
@@ -75,7 +77,7 @@ public class ShareMapBehaviour extends SimpleBehaviour {
 	@Override
 	public boolean done() {
 		// TODO Auto-generated method stub
-		return false;
+		return !finished;
 	}
 
 }

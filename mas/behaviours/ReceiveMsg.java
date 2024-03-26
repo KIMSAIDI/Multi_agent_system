@@ -52,7 +52,7 @@ public class ReceiveMsg extends SimpleBehaviour {
 	    	// Si je recois un Ping, je partage ma map
 	    	
 	    	MessageTemplate msgTemplate = MessageTemplate.and(
-					MessageTemplate.MatchProtocol("Ping"),
+					MessageTemplate.MatchProtocol("HelloProtocol"),
 					MessageTemplate.MatchPerformative(ACLMessage.INFORM));
 			ACLMessage msgReceived = this.myAgent.receive(msgTemplate);
 			

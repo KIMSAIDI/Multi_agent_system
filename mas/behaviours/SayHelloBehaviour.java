@@ -21,7 +21,7 @@ import jade.lang.acl.ACLMessage;
 public class SayHelloBehaviour extends TickerBehaviour{
 	
 	private List<String> receivers;
-	private MapRepresentation myMap;
+	private String protocol;
 	
 
 	/**
@@ -34,10 +34,10 @@ public class SayHelloBehaviour extends TickerBehaviour{
 	 * @param myagent the agent who posses the behaviour
 	 *  
 	 */
-	public SayHelloBehaviour (final Agent myagent, long period, List<String> receivers, MapRepresentation mymap) {
+	public SayHelloBehaviour (final Agent myagent, long period, List<String> receivers, String protocol) {
 		super(myagent, period);
 		this.receivers=receivers;
-		this.myMap=mymap;
+		this.protocol=protocol;
 		
 		//super(myagent);
 	}
@@ -49,7 +49,7 @@ public class SayHelloBehaviour extends TickerBehaviour{
 		
             
 		ACLMessage msg=new ACLMessage(ACLMessage.INFORM);
-		msg.setProtocol("Ping");
+		msg.setProtocol(protocol);
 		msg.setSender(this.myAgent.getAID());
 		
 		
@@ -59,16 +59,17 @@ public class SayHelloBehaviour extends TickerBehaviour{
 		}
 		
 		
-		
-		try {
-			msg.setContentObject("Hello World, I'm at "+myPosition + " I am "+this.myAgent.getAID()) ;
-		
-			((AbstractDedaleAgent)this.myAgent).sendMessage(msg);
-		
-
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		if (protocol == "HelloProtocol") {
+			try {
+				msg.setContentObject("Hello World, I'm at "+myPosition + " I am "+this.myAgent.getAID()) ;
+			
+				((AbstractDedaleAgent)this.myAgent).sendMessage(msg);
+			
+	
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 			
 		

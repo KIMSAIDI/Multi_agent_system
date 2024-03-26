@@ -69,7 +69,7 @@ public class ExploCoopBehaviour extends SimpleBehaviour {
 		if(this.myMap==null) {
 			this.myMap= new MapRepresentation();
 			//this.myAgent.addBehaviour(new ShareMapBehaviour(this.myAgent,500,this.myMap,list_agentNames));
-			this.myAgent.addBehaviour(new SayHelloBehaviour(this.myAgent, 500, list_agentNames));
+			this.myAgent.addBehaviour(new SayHelloBehaviour(this.myAgent, 500, list_agentNames, this.myMap));
 			
 		}
 		
@@ -122,9 +122,12 @@ public class ExploCoopBehaviour extends SimpleBehaviour {
 				//Explo finished
 				finished=true;
 				System.out.println(this.myAgent.getLocalName()+" - Exploration successufully done, behaviour removed.");
+				System.out.println("ON A FINIT");
+				
 				
 				// Si je ne suis pas le dernier agent
 				
+				System.out.println("Liste des agents manquants : "+list_agentNames);
 				ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
 				// set the protocol of the message
 				msg.setProtocol("SHARE-TOPO");
@@ -159,39 +162,10 @@ public class ExploCoopBehaviour extends SimpleBehaviour {
 				// If it was written properly, this sharing action should be in a dedicated behaviour set.
 				
 				
-			    // je merge ma map avec celle que j'ai recu
+			    
+			    this.myAgent.addBehaviour(new ReceiveMsg(this.myAgent, this.myMap, list_agentNames));
 				
-				MessageTemplate msgTemplate2=MessageTemplate.and(
-						MessageTemplate.MatchProtocol("SHARE-TOPO"),
-						MessageTemplate.MatchPerformative(ACLMessage.INFORM));
-				ACLMessage msgReceived2=this.myAgent.receive(msgTemplate2);
-				if (msgReceived2!=null) {
-					SerializableSimpleGraph<String, MapAttribute> sgreceived=null;
-					try {
-						sgreceived = (SerializableSimpleGraph<String, MapAttribute>)msgReceived2.getContentObject();
-					} catch (UnreadableException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-					
-					this.myMap.mergeMap(sgreceived);
-				}
-				
-				
-				
-				MessageTemplate msgTemplate = MessageTemplate.and(
-						MessageTemplate.MatchProtocol("UselessProtocol"),
-						MessageTemplate.MatchPerformative(ACLMessage.INFORM));
-				ACLMessage msgReceived = this.myAgent.receive(msgTemplate);
-				if (msgReceived != null) {
-					// create a new message
-					System.out.println("on share la map");
-					this.myAgent.addBehaviour(new ShareMapBehaviour(this.myAgent, this.myMap, list_agentNames));
-					
-				}
-				
-				
-				
+			    
 				((AbstractDedaleAgent)this.myAgent).moveTo(new gsLocation(nextNodeId));
 				
 				
@@ -202,10 +176,12 @@ public class ExploCoopBehaviour extends SimpleBehaviour {
 	}
 	
 	
+
+	
+	
 	@Override
 	public boolean done() {
 		System.out.println("End of behaviour");
-
 		return finished;
 	}
 

@@ -21,7 +21,6 @@ import jade.lang.acl.ACLMessage;
 public class SayHelloBehaviour extends TickerBehaviour{
 	
 	private List<String> receivers;
-	
 
 	/**
 	 * 
@@ -33,7 +32,7 @@ public class SayHelloBehaviour extends TickerBehaviour{
 	 * @param myagent the agent who posses the behaviour
 	 *  
 	 */
-	public SayHelloBehaviour (final Agent myagent, long period, List<String> receivers, String protocol) {
+	public SayHelloBehaviour (final Agent myagent, long period, List<String> receivers) {
 		super(myagent, period);
 		this.receivers=receivers;
 		this.protocol = protocol;

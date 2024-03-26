@@ -1,6 +1,7 @@
 package eu.su.mas.dedaleEtu.mas.behaviours;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -81,10 +82,8 @@ public class ExploCoopBehaviour extends SimpleBehaviour {
 		if (myPosition!=null){
 			//List of observable from the agent's current position
 			List<Couple<Location,List<Couple<Observation,Integer>>>> lobs=((AbstractDedaleAgent)this.myAgent).observe();//myPosition
-
 			
 			
-		
 			/**
 			 * Just added here to let you see what the agent is doing, otherwise he will be too quick
 			 */
@@ -99,20 +98,23 @@ public class ExploCoopBehaviour extends SimpleBehaviour {
 
 			//2) get the surrounding nodes and, if not in closedNodes, add them to open nodes.
 			String nextNodeId=null;
-			Iterator<Couple<Location, List<Couple<Observation.AGENTNAME, Integer>>>> iter=lobs.iterator();
+			Iterator<Couple<Location, List<Couple<Observation, Integer>>>> iter=lobs.iterator();
 			
 			
+			ArrayList<String> lobsString = new ArrayList<String>();
+			for (Couple<Location, List<Couple<Observation, Integer>>> couple : lobs) {
+				lobsString.add(couple.getLeft().toString());
+				
+			}
+			//System.out.println("-------------------------------");
+//			System.out.println(this.myAgent.getLocalName()+" - Exploration in progress");
+//			System.out.println("Liste des observables : "+lobsString);			
+//			System.out.println("Position actuelle : "+myPosition);
 			
-			//System.out.println("Liste des observables : "+lobs);
-			
-			
-			
-			
-			System.out.println("Liste des observables : "+lobs);
-			System.out.println("Position actuelle : "+myPosition);
-			System.out.println("-------------------------------");
 			while(iter.hasNext()){
 				Location accessibleNode=iter.next().getLeft();
+				//System.out.println("Noeud accessible : "+accessibleNode);
+				
 				boolean isNewNode=this.myMap.addNewNode(accessibleNode.getLocationId());
 				//the node may exist, but not necessarily the edge
 				if (myPosition.getLocationId()!=accessibleNode.getLocationId()) {
@@ -121,12 +123,12 @@ public class ExploCoopBehaviour extends SimpleBehaviour {
 				}
 			}
 			
-			if (this.myMap.hasOpenNode()) {
-				System.out.println(this.myAgent.getLocalName()+" - Exploration in progress");
-				 // log les noeuds qui manquent
-				//System.out.println("Noeuds manquants : "+this.myMap.getOpenNodes());
-				//System.out.println("-------------------------------");
-			}
+//			if (this.myMap.hasOpenNode()) {
+//				//System.out.println(this.myAgent.getLocalName()+" - Exploration in progress");
+//				 // log les noeuds qui manquent
+//				//System.out.println("Noeuds manquants : "+this.myMap.getOpenNodes());
+//				//System.out.println("-------------------------------");
+//			}
 
 			//3) while openNodes is not empty, continues.
 			if (!this.myMap.hasOpenNode()) {
@@ -138,7 +140,7 @@ public class ExploCoopBehaviour extends SimpleBehaviour {
 				
 				// Si je ne suis pas le dernier agent
 				
-				System.out.println("Liste des agents manquants : "+list_agentNames);
+				//System.out.println("Liste des agents manquants : "+list_agentNames);
 				ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
 				// set the protocol of the message
 				msg.setProtocol("SHARE-TOPO");

@@ -59,6 +59,7 @@ public class SayHelloBehaviour extends TickerBehaviour{
 			msg.addReceiver(new AID(agentName,AID.ISLOCALNAME));
 		}
 		
+		
 		if (protocol == "HelloProtocol") {
 			
 			try {

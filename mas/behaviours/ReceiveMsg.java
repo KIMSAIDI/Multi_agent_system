@@ -59,7 +59,7 @@ public class ReceiveMsg extends SimpleBehaviour {
 			
 			if (msgReceived != null) {
 				// create a new message
-				System.out.println("J ai recu un bonjour");
+				//System.out.println("J ai recu un bonjour");
 				this.myAgent.addBehaviour(new ShareMapBehaviour(this.myAgent, this.myMap, list_agentNames));
 				
 			}
@@ -79,12 +79,12 @@ public class ReceiveMsg extends SimpleBehaviour {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-				System.out.println("on share la map");
+				System.out.println("on merge les map");
 				this.myMap.mergeMap(sgreceived);
 			}
         
 		} else {
-			System.out.println("-----------------Exploration terminée pour "+this.myAgent.getLocalName()+"------------------");
+			//System.out.println("-----------------Exploration terminée pour "+this.myAgent.getLocalName()+"------------------");
 			finished = true;
 		}
     	
@@ -93,16 +93,17 @@ public class ReceiveMsg extends SimpleBehaviour {
     	MessageTemplate msgTemplate = MessageTemplate.and(
 				MessageTemplate.MatchProtocol("Ping"),
 				MessageTemplate.MatchPerformative(ACLMessage.INFORM));
-		ACLMessage msgReceived = this.myAgent.receive(msgTemplate);
-		
-		if (msgReceived != null) {
+        ACLMessage msgReceived4 = this.myAgent.receive(msgTemplate);
+        
+		if (msgReceived4 != null) {
 			// create a new message
 			System.out.println("J ai recu un ping");
 			ACLMessage msg=new ACLMessage(ACLMessage.INFORM);
 			msg.setProtocol("ACK_Ping");
 			msg.setSender(this.myAgent.getAID());
-			msg.addReceiver(msgReceived.getSender());
+			msg.addReceiver(msgReceived4.getSender());
 			try {
+				
 				msg.setContentObject(myPosition);
 			} catch (Exception e) {
 				e.printStackTrace();

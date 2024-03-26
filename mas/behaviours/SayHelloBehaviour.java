@@ -50,6 +50,7 @@ public class SayHelloBehaviour extends TickerBehaviour{
             
 		ACLMessage msg=new ACLMessage(ACLMessage.INFORM);
 		msg.setProtocol(protocol);
+		msg.setProtocol(protocol);
 		msg.setSender(this.myAgent.getAID());
 		
 		

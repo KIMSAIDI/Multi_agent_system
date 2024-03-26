@@ -1,5 +1,6 @@
 package eu.su.mas.dedaleEtu.mas.behaviours;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -49,14 +50,19 @@ public class FollowGolemBehaviour extends SimpleBehaviour {
 			// pas d'observation on suit l'odeur si il y en a une
         	return;
         }
+        // faire un ping 
+        // lobs en list de string
+        ArrayList<String> lobsString = new ArrayList<String>();
+		for (Couple<Location, List<Couple<Observation, Integer>>> couple : lobs) {
+			lobsString.add(couple.getLeft().toString());
+		}
+    	this.myAgent.addBehaviour(new SayHelloBehaviour(this.myAgent, 500, lobsString));
+		
+    	
         Iterator<Couple<Location, List<Couple<Observation, Integer>>>> iter=lobs.iterator();
         while (iter.hasNext()) {
-        	Couple<Location, List<Couple<Observation, Integer>>> golem = iter.next();
+        	Couple<Location, List<Couple<Observation, Integer>>> agent = iter.next();
   
-        	
-        	// faire un ping 
-        	this.myAgent.addBehaviour(new SayHelloBehaviour(this.myAgent, 500, lobs));
-			
         	// si il recoit une rep, on le calcule pas
         	// si il reçoit rien , alors on hunt
         	

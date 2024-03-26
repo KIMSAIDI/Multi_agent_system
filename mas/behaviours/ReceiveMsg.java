@@ -47,10 +47,11 @@ public class ReceiveMsg extends SimpleBehaviour {
     @Override
     public void action() {
     	
+		Location myPosition=((AbstractDedaleAgent)this.myAgent).getCurrentPosition();
+		
     	if(this.myMap.hasOpenNode()) { // Vérifie si l'exploration n'est pas finie)
         
-	    	// Si je recois un Ping, je partage ma map
-	    	
+	    	// Si je recois un HelloProtocol, je partage ma map
 	    	MessageTemplate msgTemplate = MessageTemplate.and(
 					MessageTemplate.MatchProtocol("HelloProtocol"),
 					MessageTemplate.MatchPerformative(ACLMessage.INFORM));
@@ -85,6 +86,29 @@ public class ReceiveMsg extends SimpleBehaviour {
 		} else {
 			System.out.println("-----------------Exploration terminée pour "+this.myAgent.getLocalName()+"------------------");
 			finished = true;
+		}
+    	
+    	
+    	// Si je recois un Ping, j'envoie mon identifiant
+    	MessageTemplate msgTemplate = MessageTemplate.and(
+				MessageTemplate.MatchProtocol("Ping"),
+				MessageTemplate.MatchPerformative(ACLMessage.INFORM));
+		ACLMessage msgReceived = this.myAgent.receive(msgTemplate);
+		
+		if (msgReceived != null) {
+			// create a new message
+			System.out.println("J ai recu un ping");
+			ACLMessage msg=new ACLMessage(ACLMessage.INFORM);
+			msg.setProtocol("ACK_Ping");
+			msg.setSender(this.myAgent.getAID());
+			msg.addReceiver(msgReceived.getSender());
+			try {
+				msg.setContentObject(myPosition);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			((AbstractDedaleAgent) this.myAgent).sendMessage(msg);
+			
 		}
     }
     

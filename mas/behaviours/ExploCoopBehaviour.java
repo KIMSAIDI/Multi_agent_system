@@ -99,7 +99,18 @@ public class ExploCoopBehaviour extends SimpleBehaviour {
 
 			//2) get the surrounding nodes and, if not in closedNodes, add them to open nodes.
 			String nextNodeId=null;
-			Iterator<Couple<Location, List<Couple<Observation, Integer>>>> iter=lobs.iterator();
+			Iterator<Couple<Location, List<Couple<Observation.AGENTNAME, Integer>>>> iter=lobs.iterator();
+			
+			
+			
+			//System.out.println("Liste des observables : "+lobs);
+			
+			
+			
+			
+			System.out.println("Liste des observables : "+lobs);
+			System.out.println("Position actuelle : "+myPosition);
+			System.out.println("-------------------------------");
 			while(iter.hasNext()){
 				Location accessibleNode=iter.next().getLeft();
 				boolean isNewNode=this.myMap.addNewNode(accessibleNode.getLocationId());
@@ -113,8 +124,8 @@ public class ExploCoopBehaviour extends SimpleBehaviour {
 			if (this.myMap.hasOpenNode()) {
 				System.out.println(this.myAgent.getLocalName()+" - Exploration in progress");
 				 // log les noeuds qui manquent
-				System.out.println("Noeuds manquants : "+this.myMap.getOpenNodes());
-				System.out.println("-------------------------------");
+				//System.out.println("Noeuds manquants : "+this.myMap.getOpenNodes());
+				//System.out.println("-------------------------------");
 			}
 
 			//3) while openNodes is not empty, continues.
@@ -122,7 +133,7 @@ public class ExploCoopBehaviour extends SimpleBehaviour {
 				//Explo finished
 				finished=true;
 				System.out.println(this.myAgent.getLocalName()+" - Exploration successufully done, behaviour removed.");
-				System.out.println("ON A FINIT");
+				//System.out.println("ON A FINIT");
 				
 				
 				// Si je ne suis pas le dernier agent

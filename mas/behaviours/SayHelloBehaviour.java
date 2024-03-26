@@ -50,17 +50,17 @@ public class SayHelloBehaviour extends TickerBehaviour{
             
 		ACLMessage msg=new ACLMessage(ACLMessage.INFORM);
 		msg.setProtocol(protocol);
-		msg.setProtocol(protocol);
 		msg.setSender(this.myAgent.getAID());
 		
 		
 		// liste des receivers
+		
 		for (String agentName : receivers) {
 			msg.addReceiver(new AID(agentName,AID.ISLOCALNAME));
 		}
 		
-		
 		if (protocol == "HelloProtocol") {
+			
 			try {
 				msg.setContentObject("Hello World, I'm at "+myPosition + " I am "+this.myAgent.getAID()) ;
 			
@@ -71,6 +71,18 @@ public class SayHelloBehaviour extends TickerBehaviour{
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+		}
+		if (protocol == "Ping") {
+			try {
+				msg.setContentObject("Ping");
+
+				((AbstractDedaleAgent) this.myAgent).sendMessage(msg);
+
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
 		}
 			
 		

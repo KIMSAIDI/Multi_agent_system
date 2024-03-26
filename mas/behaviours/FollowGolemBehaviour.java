@@ -33,9 +33,7 @@ public class FollowGolemBehaviour extends SimpleBehaviour {
 	
 	//private boolean busy; // si l'agent est occupé à suivre un golem
 	private List<String> list_agentNames;
-	List<Location> liste_noeuds_agents = new ArrayList<Location>();
-	List<Location> liste_noeuds_accessibles = new ArrayList<Location>();
-	
+
 	
 	
 	public FollowGolemBehaviour(final AbstractDedaleAgent myagent, List<String> list_agentNames ) {
@@ -54,6 +52,9 @@ public class FollowGolemBehaviour extends SimpleBehaviour {
 		if (myPosition!=null) {
 			
 			System.out.println("---------------------------------------------");
+			List<Location> liste_noeuds_agents = new ArrayList<Location>();
+			List<Location> liste_noeuds_accessibles = new ArrayList<Location>();
+			
 	        // Liste des observables
 	        List<Couple<Location, List<Couple<Observation, Integer>>>> lobs=((AbstractDedaleAgent)this.myAgent).observe();
 	        // liste des positions observables
@@ -61,7 +62,7 @@ public class FollowGolemBehaviour extends SimpleBehaviour {
 	        for (Couple<Location, List<Couple<Observation, Integer>>> observable : lobs) {
 	            locations.add(observable.getLeft()); 
 	        }
-	        
+	        System.out.println("locations observable : " + locations);
 	        // pour voir ce que fait l'agent
 	        try {
 				this.myAgent.doWait(1000);
@@ -89,17 +90,23 @@ public class FollowGolemBehaviour extends SimpleBehaviour {
 	    	// message qu'on recoit (ou non)
 	    	MessageTemplate msgTemplate = MessageTemplate.and(
 					MessageTemplate.MatchProtocol("ACK_Ping"),
-					MessageTemplate.MatchPerformative(ACLMessage.INFORM));
-	    	System.out.println("on est là 1");	
+					MessageTemplate.MatchPerformative(ACLMessage.INFORM));	
 			ACLMessage msgReceived = this.myAgent.receive(msgTemplate);
 			
 			
 	    	// Noeuds agents
 			if (msgReceived != null ) {
-				// on ajoute à la liste 
-				this.liste_noeuds_agents.add( new gsLocation(msgReceived.getContent()));
+				// on ajoute à la liste
+				Location noeud = null;
+				try {
+					noeud = (Location) msgReceived.getContentObject();
+				} catch (UnreadableException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				liste_noeuds_agents.add(noeud);
 				System.out.println("On à croisé un agent");
-				System.out.println("liste_noeuds_agents : ");
+				System.out.println("noeud agent : " + liste_noeuds_agents);
 			}
 			
 			// Noeuds accessibles
@@ -108,7 +115,7 @@ public class FollowGolemBehaviour extends SimpleBehaviour {
 	        	//Couple<Location, List<Couple<Observation, Integer>>> agent = iter.next();
 	        	// on ajoute à la liste des noeuds accesibles
 	        	Location accessibleNode=iter.next().getLeft();
-	        	this.liste_noeuds_accessibles.add(accessibleNode);    	
+	        	liste_noeuds_accessibles.add(accessibleNode);    	
 	        }
 	        
 	        
@@ -122,7 +129,9 @@ public class FollowGolemBehaviour extends SimpleBehaviour {
 	        List<Location> nonGolemString = new ArrayList<>(liste_noeuds_accessibles);
 	        // nonGolemString contient les identifiants de tous les noeuds non golems
 	        nonGolemString.addAll(liste_noeuds_agents); 
-	
+	        System.out.println("-----------------");
+	       					
+	       
 	        // On soustrait de locations
 	        List<Location> liste_golem = new ArrayList<>(locations); 
 	        liste_golem.removeAll(nonGolemString); 

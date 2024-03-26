@@ -6,6 +6,8 @@ import java.util.List;
 import eu.su.mas.dedale.env.Location;
 import eu.su.mas.dedale.env.gs.gsLocation;
 import eu.su.mas.dedale.mas.AbstractDedaleAgent;
+import eu.su.mas.dedale.mas.agents.dedaleDummyAgents.Explo.ExploreCoopAgent;
+import eu.su.mas.dedaleEtu.mas.knowledge.MapRepresentation;
 import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.TickerBehaviour;
@@ -19,6 +21,7 @@ import jade.lang.acl.ACLMessage;
 public class SayHelloBehaviour extends TickerBehaviour{
 	
 	private List<String> receivers;
+	
 
 	/**
 	 * 
@@ -30,9 +33,10 @@ public class SayHelloBehaviour extends TickerBehaviour{
 	 * @param myagent the agent who posses the behaviour
 	 *  
 	 */
-	public SayHelloBehaviour (final Agent myagent, long period, List<String> receivers) {
+	public SayHelloBehaviour (final Agent myagent, long period, List<String> receivers, String protocol) {
 		super(myagent, period);
 		this.receivers=receivers;
+		this.protocol = protocol;
 		//super(myagent);
 	}
 
@@ -40,13 +44,12 @@ public class SayHelloBehaviour extends TickerBehaviour{
 	public void onTick() {
 		Location myPosition=((AbstractDedaleAgent)this.myAgent).getCurrentPosition();
 		
+		
+            
 		ACLMessage msg=new ACLMessage(ACLMessage.INFORM);
-		msg.setProtocol("UselessProtocol");
+		msg.setProtocol(protocol);
 		msg.setSender(this.myAgent.getAID());
 		
-		if (myPosition!=null && myPosition.getLocationId()!=""){
-			msg.setContent("Hello World, I'm at "+myPosition);
-		}
 		
 		// liste des receivers
 		for (String agentName : receivers) {
@@ -65,13 +68,10 @@ public class SayHelloBehaviour extends TickerBehaviour{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+			
 		
-		
-		
-		
-		
-		
-		
-		
-	}
+}
+	
+	
+
 }

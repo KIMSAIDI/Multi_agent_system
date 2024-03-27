@@ -106,11 +106,11 @@ public class ExploCoopBehaviour extends SimpleBehaviour {
 			Iterator<Couple<Location, List<Couple<Observation, Integer>>>> iter=lobs.iterator();
 			
 			
-			ArrayList<String> lobsString = new ArrayList<String>();
-			for (Couple<Location, List<Couple<Observation, Integer>>> couple : lobs) {
-				lobsString.add(couple.getLeft().toString());
-				
-			}
+//			ArrayList<String> lobsString = new ArrayList<String>();
+//			for (Couple<Location, List<Couple<Observation, Integer>>> couple : lobs) {
+//				lobsString.add(couple.getLeft().toString());
+//				
+//			}
 			//System.out.println("-------------------------------");
 //			System.out.println(this.myAgent.getLocalName()+" - Exploration in progress");
 //			System.out.println("Liste des observables : "+lobsString);			
@@ -130,9 +130,9 @@ public class ExploCoopBehaviour extends SimpleBehaviour {
 				}
 			}
 			
-//			System.out.println("liste_noeuds_accessibles : " + liste_noeuds_accessibles);
-//			System.out.println("liste noeuds observables : " + locations);
-//		    
+			System.out.println("liste_noeuds_accessibles : " + liste_noeuds_accessibles);
+			System.out.println("liste noeuds observables : " + locations);
+		    
 				
 			
 	        

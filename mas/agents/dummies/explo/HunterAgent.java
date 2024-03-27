@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import eu.su.mas.dedale.mas.AbstractDedaleAgent;
-import eu.su.mas.dedale.mas.agent.behaviours.RandomWalkBehaviour;
 import eu.su.mas.dedale.mas.agent.behaviours.platformManagment.*;
 
 import eu.su.mas.dedaleEtu.mas.behaviours.FollowGolemBehaviour;
@@ -13,7 +12,7 @@ import jade.core.behaviours.Behaviour;
 
 public class HunterAgent extends AbstractDedaleAgent{
 	
-	private static final long serialVersionUID = -2991562876411096907L;
+	private static final long serialVersionUID = -6431752665590433727L;
 	private MapRepresentation myMap;
 	
 	
@@ -38,7 +37,6 @@ public class HunterAgent extends AbstractDedaleAgent{
 		
 		
 		List<Behaviour> lb=new ArrayList<Behaviour>();
-		// suivre un golem
 		
 		lb.add(new FollowGolemBehaviour(this, list_agentNames, this.myMap)); 
 		

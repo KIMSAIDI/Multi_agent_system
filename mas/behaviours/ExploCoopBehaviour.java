@@ -7,6 +7,7 @@ import java.util.List;
 
 import dataStructures.serializableGraph.SerializableSimpleGraph;
 import dataStructures.tuple.Couple;
+import eu.su.mas.dedale.env.IEnvironment;
 import eu.su.mas.dedale.env.Location;
 import eu.su.mas.dedale.env.Observation;
 import eu.su.mas.dedale.env.gs.gsLocation;
@@ -49,6 +50,7 @@ public class ExploCoopBehaviour extends SimpleBehaviour {
 	private MapRepresentation myMap;
 
 	private List<String> list_agentNames;
+	
 
 /**
  * 
@@ -82,7 +84,10 @@ public class ExploCoopBehaviour extends SimpleBehaviour {
 		if (myPosition!=null){
 			//List of observable from the agent's current position
 			List<Couple<Location,List<Couple<Observation,Integer>>>> lobs=((AbstractDedaleAgent)this.myAgent).observe();//myPosition
-			
+			List<Location> locations = new ArrayList<>();
+	        for (Couple<Location, List<Couple<Observation, Integer>>> observable : lobs) {
+	            locations.add(observable.getLeft()); 
+	        }
 			
 			/**
 			 * Just added here to let you see what the agent is doing, otherwise he will be too quick
@@ -110,7 +115,8 @@ public class ExploCoopBehaviour extends SimpleBehaviour {
 //			System.out.println(this.myAgent.getLocalName()+" - Exploration in progress");
 //			System.out.println("Liste des observables : "+lobsString);			
 //			System.out.println("Position actuelle : "+myPosition);
-			
+			List<String> liste_noeuds_accessibles = new ArrayList<String>();
+			//System.out.println("~~~~~~~~");
 			while(iter.hasNext()){
 				Location accessibleNode=iter.next().getLeft();
 				//System.out.println("Noeud accessible : "+accessibleNode);
@@ -120,15 +126,25 @@ public class ExploCoopBehaviour extends SimpleBehaviour {
 				if (myPosition.getLocationId()!=accessibleNode.getLocationId()) {
 					this.myMap.addEdge(myPosition.getLocationId(), accessibleNode.getLocationId());
 					if (nextNodeId==null && isNewNode) nextNodeId=accessibleNode.getLocationId();
+				liste_noeuds_accessibles.add(accessibleNode.getLocationId());
 				}
 			}
 			
+//			System.out.println("liste_noeuds_accessibles : " + liste_noeuds_accessibles);
+//			System.out.println("liste noeuds observables : " + locations);
+//		    
+				
+			
+	        
 //			if (this.myMap.hasOpenNode()) {
 //				//System.out.println(this.myAgent.getLocalName()+" - Exploration in progress");
 //				 // log les noeuds qui manquent
 //				//System.out.println("Noeuds manquants : "+this.myMap.getOpenNodes());
 //				//System.out.println("-------------------------------");
 //			}
+			
+			
+			
 
 			//3) while openNodes is not empty, continues.
 			if (!this.myMap.hasOpenNode()) {
@@ -179,7 +195,12 @@ public class ExploCoopBehaviour extends SimpleBehaviour {
 			    this.myAgent.addBehaviour(new ReceiveMsg(this.myAgent, this.myMap, list_agentNames));
 				
 			    
-				((AbstractDedaleAgent)this.myAgent).moveTo(new gsLocation(nextNodeId));
+				
+
+				
+				
+			    
+			    ((AbstractDedaleAgent)this.myAgent).moveTo(new gsLocation(nextNodeId));
 				
 				
 				

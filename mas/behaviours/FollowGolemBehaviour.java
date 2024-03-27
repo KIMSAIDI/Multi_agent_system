@@ -33,13 +33,15 @@ public class FollowGolemBehaviour extends SimpleBehaviour {
 	
 	//private boolean busy; // si l'agent est occupé à suivre un golem
 	private List<String> list_agentNames;
+	private MapRepresentation myMap;
 
 	
 	
-	public FollowGolemBehaviour(final AbstractDedaleAgent myagent, List<String> list_agentNames ) {
+	public FollowGolemBehaviour(final AbstractDedaleAgent myagent, List<String> list_agentNames, MapRepresentation myMap ) {
 		super(myagent);
 		//this.busy = false;
 		this.list_agentNames = list_agentNames;
+		this.myMap = myMap;
 	
 	}
 	
@@ -47,30 +49,46 @@ public class FollowGolemBehaviour extends SimpleBehaviour {
 
 	@Override
 	public void action() {
+		
+		if(this.myMap==null) {
+			this.myMap= new MapRepresentation();
+			
+		}
+		
 		Location myPosition=((AbstractDedaleAgent)this.myAgent).getCurrentPosition();
 
 		if (myPosition!=null) {
 			
-			System.out.println("---------------------------------------------");
-			List<Location> liste_noeuds_agents = new ArrayList<Location>();
-			List<Location> liste_noeuds_accessibles = new ArrayList<Location>();
+			//System.out.println("---------------------------------------------");
 			
-	        // Liste des observables
+			 // Liste des observables
 	        List<Couple<Location, List<Couple<Observation, Integer>>>> lobs=((AbstractDedaleAgent)this.myAgent).observe();
 	        // liste des positions observables
-	        List<Location> locations = new ArrayList<>();
+	        List<Location> noeuds_observable = new ArrayList<>();
+	        String nextNodeId=null;
+	        // liste des noeuds à proximité qui sont des agents
+			List<Location> liste_noeuds_agents = new ArrayList<Location>();
+			// liste des noeuds accessibles, en string
+			List<String> noeuds_accessibles_string = new ArrayList<String>();
+			
+	       
 	        for (Couple<Location, List<Couple<Observation, Integer>>> observable : lobs) {
-	            locations.add(observable.getLeft()); 
+	        	noeuds_observable.add(observable.getLeft()); 
 	        }
-	        System.out.println("locations observable : " + locations);
-	        // pour voir ce que fait l'agent
-	        try {
+	        if (!noeuds_observable.isEmpty()) {
+	            noeuds_observable.remove(0); // Supprime le premier élément
+	        }
+			try {
 				this.myAgent.doWait(1000);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-	        
-	        
+			
+			
+			this.myMap.addNode(myPosition.getLocationId(), MapAttribute.closed);
+			
+			
+	       
 	        
 	        /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ IDEE ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 			 * Le but est de determiner si les agents autour de moi sont un explo ou un golem
@@ -78,11 +96,16 @@ public class FollowGolemBehaviour extends SimpleBehaviour {
 			 * Si notre agent recoit un message (contenant la position de l'agent) alors il y a au moins un agent explo autour de lui
 			 * On ajoute cette position à la liste_noeuds_agents
 			 * Au final, l'idée est de comparer la liste des noeuds accesibles + la liste des noeuds_agents avec la liste des noeuds observables
-			 * Si location - (liste_noeuds_accessibles + liste_noeuds_agents) != 0, alors il y a un golem à la position golemString[0:]
+			 * Si noeuds_observable - (liste_noeuds_accessibles + liste_noeuds_agents) != 0, alors il y a un golem à la position golemString[0:]
 			 * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 			
 	        
-			// fait un ping pour découvrir qui est autour de moi
+			
+
+			// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+			
+			
+			// fait un ping pour découvrir qui est autour de notre agent
 	        System.out.println("list_agentNames : " + list_agentNames);
 	    	this.myAgent.addBehaviour(new SayHelloBehaviour(this.myAgent, 500, this.list_agentNames, "Ping"));
 	    	
@@ -94,66 +117,104 @@ public class FollowGolemBehaviour extends SimpleBehaviour {
 			ACLMessage msgReceived = this.myAgent.receive(msgTemplate);
 			
 			
-	    	// Noeuds agents
+	    	// Si on recoit un message, un agent est à proximité
 			if (msgReceived != null ) {
-				// on ajoute à la liste
 				Location noeud = null;
 				try {
 					noeud = (Location) msgReceived.getContentObject();
 				} catch (UnreadableException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 				liste_noeuds_agents.add(noeud);
-				System.out.println("On à croisé un agent");
+				System.out.println("On a croisé un agent");
 				System.out.println("noeud agent : " + liste_noeuds_agents);
 			}
+			
+			// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 			
 			// Noeuds accessibles
 	        Iterator<Couple<Location, List<Couple<Observation, Integer>>>> iter=lobs.iterator();
 	        while (iter.hasNext()) {
-	        	//Couple<Location, List<Couple<Observation, Integer>>> agent = iter.next();
-	        	// on ajoute à la liste des noeuds accesibles
 	        	Location accessibleNode=iter.next().getLeft();
-	        	liste_noeuds_accessibles.add(accessibleNode);    	
+	        	boolean isNewNode=this.myMap.addNewNode(accessibleNode.getLocationId());
+				//the node may exist, but not necessarily the edge
+				if (myPosition.getLocationId()!=accessibleNode.getLocationId()) {
+					this.myMap.addEdge(myPosition.getLocationId(), accessibleNode.getLocationId());
+					if (nextNodeId==null && isNewNode) nextNodeId=accessibleNode.getLocationId();
+					noeuds_accessibles_string.add(accessibleNode.getLocationId());
+				}
 	        }
 	        
+
+			// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+			
 	        
-	        System.out.println("liste_noeuds_accessibles : " + liste_noeuds_accessibles);
+//	        System.out.println("locations observable : " + noeuds_observable);         
+//	        System.out.println("liste_noeuds_accessibles : " + noeuds_accessibles_string);
+//	        
+
+			// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+			
+	        // determiner si il y a un golem autour de notre agent
 	        
 	        // On convertit liste_noeuds_accessibles et liste_noeuds_agents en List<String>
-//	        List<String> accessiblesString = liste_noeuds_accessibles.stream().map(Location::toString).collect(Collectors.toList());
+	       // List<Location> list_noeuds_accessible = noeuds_accessibles_string.stream().map(gsLocation::new).collect(Collectors.toList());
 //	        List<String> agentsString = liste_noeuds_agents.stream().map(Location::toString).collect(Collectors.toList());
-//	
 	        // On fusionne les deux listes en une seule
-	        List<Location> nonGolemString = new ArrayList<>(liste_noeuds_accessibles);
-	        // nonGolemString contient les identifiants de tous les noeuds non golems
-	        nonGolemString.addAll(liste_noeuds_agents); 
-	        System.out.println("-----------------");
-	       					
-	       
-	        // On soustrait de locations
-	        List<Location> liste_golem = new ArrayList<>(locations); 
-	        liste_golem.removeAll(nonGolemString); 
-	        System.out.println("liste_golem : " + liste_golem);
-	
+	        List<String> noeuds_non_golem = new ArrayList<>(noeuds_accessibles_string);
 	        
-	        if (!liste_golem.isEmpty()) {
-	        	System.out.println("il y a un Golem à la position : " + liste_golem.get(0));
+	        // liste_noeuds_agen converit en string
+	        List<String> liste_noeuds_agents_string = liste_noeuds_agents.stream().map(Location::toString).collect(Collectors.toList());
+	        
+	        // liste des observerable en string
+	        List<String> noeuds_observable_string = noeuds_observable.stream().map(Location::toString).collect(Collectors.toList());
+	        
+	        // noeuds_non_golem contient les identifiants de tous les noeuds non golems
+	        noeuds_non_golem.addAll(liste_noeuds_agents_string); 
+	        		
+	       
+	        
+	        
+	        // On soustrait de noeuds_observable
+	        List<String> liste_golem = new ArrayList<String>();
+			for (String golem : noeuds_observable_string) {
+				if (!noeuds_non_golem.contains(golem)) {
+					liste_golem.add(golem);
+				}
+			}
+	       
+	        
+	        System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+	        System.out.println("noeuds_observable : " + noeuds_observable);
+	        System.out.println("liste_noeuds_accessibles : " + noeuds_accessibles_string);
+	        System.out.println("liste_noeuds_agents : " + liste_noeuds_agents);
+	        System.out.println("noeuds_non_golem : " + noeuds_non_golem);
+	        System.out.println("liste_golem : " + liste_golem);
+	        
+	     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	        
+	        // convertit liste_golem en Location
+	        List<Location> liste_golem_location = liste_golem.stream().map(gsLocation::new).collect(Collectors.toList());
+	        
+	        if (!liste_golem_location.isEmpty()) {
+	        	System.out.println("il y a un Golem à la position : " + liste_golem_location.get(0));
 	        	// on le suit
-	        	((AbstractDedaleAgent)this.myAgent).moveTo(liste_golem.get(0));
+	        	((AbstractDedaleAgent)this.myAgent).moveTo(liste_golem_location.get(0));
 	        	System.out.println("On suit le golem");
 	        	
 	        }else {
 	        
-		        //Random move from the current position
-				Random r= new Random();
-				int moveId=1+r.nextInt(lobs.size()-1);//removing the current position from the list of target, not necessary as to stay is an action but allow quicker random move
-	
-				//The move action (if any) should be the last action of your behaviour
-				((AbstractDedaleAgent)this.myAgent).moveTo(lobs.get(moveId).getLeft());
+	        	if (nextNodeId==null){
+					nextNodeId=this.myMap.getShortestPathToClosestOpenNode(myPosition.getLocationId()).get(0);//getShortestPath(myPosition,this.openNodes.get(0)).get(0);
+		        }
+	        	((AbstractDedaleAgent)this.myAgent).moveTo(new gsLocation(nextNodeId));
+		        
 			
 	        }
+	        
+	        
+	        
+	        
 
 			
 	  
@@ -184,7 +245,9 @@ public class FollowGolemBehaviour extends SimpleBehaviour {
 	//			
 	//			
 	//		}
-		}
+	} else {
+		System.out.println("Erreur : position actuelle non connue");
+	}
 			
 			
 	}

@@ -130,9 +130,7 @@ public class ExploCoopBehaviour extends SimpleBehaviour {
 				}
 			}
 			
-			System.out.println("liste_noeuds_accessibles : " + liste_noeuds_accessibles);
-			System.out.println("liste noeuds observables : " + locations);
-		    
+			
 				
 			
 	        

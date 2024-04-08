@@ -56,10 +56,9 @@ public class FollowGolemBehaviour extends SimpleBehaviour {
 	      
 	    	this.myAgent.addBehaviour(new SayHelloBehaviour(this.myAgent, 500, this.list_agentNames, "Ping"));
 	    	
-			
 		}
 		
-		
+		System.out.println("~~~~~~~~~~~~~~");
 		Location myPosition=((AbstractDedaleAgent)this.myAgent).getCurrentPosition();
 
 		if (myPosition!=null){
@@ -111,6 +110,9 @@ public class FollowGolemBehaviour extends SimpleBehaviour {
 			
 			// ~~~~~~~~~~~~~~~~~~~~~~~~~AGENTS~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 			
+			this.myAgent.addBehaviour(new ReceiveMsg(this.myAgent, this.myMap, this.list_agentNames));
+			
+			
 			
 			// liste des noeuds à proximité qui sont des agents
 			List<Location> liste_noeuds_agents = new ArrayList<Location>();
@@ -124,6 +126,7 @@ public class FollowGolemBehaviour extends SimpleBehaviour {
 			
 	    	// Si on recoit un message, un agent est à proximité
 			if (msgReceived != null ) {
+				System.out.println("J'ai recu un message");
 				Location noeud = null;
 				try {
 					noeud = (Location) msgReceived.getContentObject();
@@ -131,14 +134,14 @@ public class FollowGolemBehaviour extends SimpleBehaviour {
 					e.printStackTrace();
 				}
 				liste_noeuds_agents.add(noeud);
-				System.out.println("On a croisé un agent");
-				System.out.println("noeud agent : " + liste_noeuds_agents);
+//				System.out.println("On a croisé un agent");
+//				System.out.println("noeud agent : " + liste_noeuds_agents);
 			}
 			
-			System.out.println("~~~~~~~~~~~~~~");
+			
 //			System.out.println("my position : " + myPosition.getLocationId());
 //	        System.out.println("noeuds_observable : " + noeuds_observable);
-//	        System.out.println("liste_noeuds_agents : " + liste_noeuds_agents);
+	        System.out.println("liste_noeuds_agents : " + liste_noeuds_agents);
 	        
 			// ~~~~~~~~~~~~~~~~~~~~~~~GOLEM SANS ODEUR~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 			
@@ -158,17 +161,17 @@ public class FollowGolemBehaviour extends SimpleBehaviour {
 					// Génère un index aléatoire entre 0 (inclus) et la taille de la liste (exclus)
 				    int randomIndex = rand.nextInt(liste_position_golem.size());
 				    nextNodeId = liste_position_golem.get(randomIndex).getLocationId();
-				    System.out.println("Prochaine noeud choisit : " + nextNodeId);
+				    //System.out.println("Prochaine noeud choisit : " + nextNodeId);
 				}
 				
 				
 			    if (!((AbstractDedaleAgent)this.myAgent).moveTo(new gsLocation(nextNodeId))) {
-	            	System.out.println("Il ya un golem à la position : " + nextNodeId);
+//	            	System.out.println("Il ya un golem à la position : " + nextNodeId);
 	            	// on le suit
 	            	((AbstractDedaleAgent)this.myAgent).moveTo(new gsLocation(nextNodeId));
-	            	System.out.println("On suit le golem");
+//	            	System.out.println("On suit le golem");
 			    }else {
-				
+			    	System.out.println("j'ai changé de position");
 			    	((AbstractDedaleAgent)this.myAgent).moveTo(new gsLocation(nextNodeId));
 			    }
 	        } 
@@ -191,7 +194,7 @@ public class FollowGolemBehaviour extends SimpleBehaviour {
             	((AbstractDedaleAgent)this.myAgent).moveTo(new gsLocation(nextNodeId));
             	//System.out.println("On suit le golem");
 		    }else {
-			
+		    	System.out.println("j'ai changé de position");
 		    	((AbstractDedaleAgent)this.myAgent).moveTo(new gsLocation(nextNodeId));
 		    }
 		}

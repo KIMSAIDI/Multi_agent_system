@@ -47,6 +47,7 @@ public class ReceiveMsg extends SimpleBehaviour {
     @Override
     public void action() {
     	
+    	
 		Location myPosition=((AbstractDedaleAgent)this.myAgent).getCurrentPosition();
 		
     	if(this.myMap.hasOpenNode()) { // Vérifie si l'exploration n'est pas finie)
@@ -59,11 +60,10 @@ public class ReceiveMsg extends SimpleBehaviour {
 			
 			if (msgReceived != null) {
 				// create a new message
-				//System.out.println("J ai recu un bonjour");
+				System.out.println("------J ai recu un bonjour ------");
 				this.myAgent.addBehaviour(new ShareMapBehaviour(this.myAgent, this.myMap, list_agentNames));
 				
 			}
-	    	
 	    	
 	    	
 	    	// Si je recois une Map, je la merge avec la mienne
@@ -79,7 +79,7 @@ public class ReceiveMsg extends SimpleBehaviour {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-				System.out.println("on merge les map");
+				System.out.println("---------on merge les map---------");
 				this.myMap.mergeMap(sgreceived);
 			}
         
@@ -89,21 +89,21 @@ public class ReceiveMsg extends SimpleBehaviour {
 		}
     	
     	
-    	// Si je recois un Ping, j'envoie mon identifiant
-    	MessageTemplate msgTemplate = MessageTemplate.and(
+    	// Si je recois un Ping, j'envoie ma position 
+    	MessageTemplate msgTemplate3 = MessageTemplate.and(
 				MessageTemplate.MatchProtocol("Ping"),
 				MessageTemplate.MatchPerformative(ACLMessage.INFORM));
-        ACLMessage msgReceived4 = this.myAgent.receive(msgTemplate);
-        
-		if (msgReceived4 != null) {
+        ACLMessage msgReceived3 = this.myAgent.receive(msgTemplate3);
+       
+		if (msgReceived3 != null) {
 			// create a new message
 			System.out.println("J ai recu un ping");
 			ACLMessage msg=new ACLMessage(ACLMessage.INFORM);
 			msg.setProtocol("ACK_Ping");
 			msg.setSender(this.myAgent.getAID());
-			msg.addReceiver(msgReceived4.getSender());
+			msg.addReceiver(msgReceived3.getSender());
 			try {
-				
+				System.out.println("---- jai recu un ping, je renvoie ma position ----");
 				msg.setContentObject(myPosition);
 			} catch (Exception e) {
 				e.printStackTrace();

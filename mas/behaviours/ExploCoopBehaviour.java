@@ -76,7 +76,7 @@ public class ExploCoopBehaviour extends SimpleBehaviour {
 			
 		}
 		
-		
+		System.out.println("~~~~~~~~~");
 		
 		//0) Retrieve the current position
 		Location myPosition=((AbstractDedaleAgent)this.myAgent).getCurrentPosition();
@@ -190,9 +190,8 @@ public class ExploCoopBehaviour extends SimpleBehaviour {
 				
 				
 			    
-			    this.myAgent.addBehaviour(new ReceiveMsg(this.myAgent, this.myMap, list_agentNames));
-				
-			    
+			   this.myAgent.addBehaviour(new ReceiveMsg(this.myAgent, this.myMap, list_agentNames));
+
 				
 
 				

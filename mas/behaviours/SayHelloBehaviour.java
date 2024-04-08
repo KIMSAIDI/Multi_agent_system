@@ -55,6 +55,7 @@ public class SayHelloBehaviour extends TickerBehaviour{
 		// liste des receivers
 		for (String agentName : receivers) {
 			msg.addReceiver(new AID(agentName,AID.ISLOCALNAME));
+			
 		}
 		
 		
@@ -72,6 +73,7 @@ public class SayHelloBehaviour extends TickerBehaviour{
 		if (protocol == "Ping") {
 			try {
 				msg.setContentObject("Ping");
+				System.out.println("je suis" + this.myAgent.getLocalName() + " et je Ping");
 				((AbstractDedaleAgent) this.myAgent).sendMessage(msg);
 
 			} catch (IOException e) {

@@ -53,12 +53,14 @@ public class FollowGolemBehaviour extends SimpleBehaviour {
 			this.myMap= new MapRepresentation();
 			
 			// fait un ping pour découvrir qui est autour de notre agent
-	      
-	    	this.myAgent.addBehaviour(new SayHelloBehaviour(this.myAgent, 500, this.list_agentNames, "Ping"));
-	    	
+	    	this.myAgent.addBehaviour(new SayHelloBehaviour(this.myAgent, 100, this.list_agentNames, "Ping"));
+
+			
 		}
 		
 		System.out.println("~~~~~~~~~~~~~~");
+//		System.out.println("list des agents : " + this.list_agentNames);
+		
 		Location myPosition=((AbstractDedaleAgent)this.myAgent).getCurrentPosition();
 
 		if (myPosition!=null){
@@ -109,9 +111,8 @@ public class FollowGolemBehaviour extends SimpleBehaviour {
 			}
 			
 			// ~~~~~~~~~~~~~~~~~~~~~~~~~AGENTS~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-			
 			this.myAgent.addBehaviour(new ReceiveMsg(this.myAgent, this.myMap, this.list_agentNames));
-			
+//			
 			
 			
 			// liste des noeuds à proximité qui sont des agents
@@ -141,7 +142,7 @@ public class FollowGolemBehaviour extends SimpleBehaviour {
 			
 //			System.out.println("my position : " + myPosition.getLocationId());
 //	        System.out.println("noeuds_observable : " + noeuds_observable);
-	        System.out.println("liste_noeuds_agents : " + liste_noeuds_agents);
+	       // System.out.println("liste_noeuds_agents : " + liste_noeuds_agents);
 	        
 			// ~~~~~~~~~~~~~~~~~~~~~~~GOLEM SANS ODEUR~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 			
@@ -171,7 +172,7 @@ public class FollowGolemBehaviour extends SimpleBehaviour {
 	            	((AbstractDedaleAgent)this.myAgent).moveTo(new gsLocation(nextNodeId));
 //	            	System.out.println("On suit le golem");
 			    }else {
-			    	System.out.println("j'ai changé de position");
+			    	//System.out.println("j'ai changé de position");
 			    	((AbstractDedaleAgent)this.myAgent).moveTo(new gsLocation(nextNodeId));
 			    }
 	        } 
@@ -194,7 +195,7 @@ public class FollowGolemBehaviour extends SimpleBehaviour {
             	((AbstractDedaleAgent)this.myAgent).moveTo(new gsLocation(nextNodeId));
             	//System.out.println("On suit le golem");
 		    }else {
-		    	System.out.println("j'ai changé de position");
+		    	//System.out.println("j'ai changé de position");
 		    	((AbstractDedaleAgent)this.myAgent).moveTo(new gsLocation(nextNodeId));
 		    }
 		}

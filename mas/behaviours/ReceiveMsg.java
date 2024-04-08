@@ -39,8 +39,9 @@ public class ReceiveMsg extends SimpleBehaviour {
      * @param myagent The agent possessing this behaviour.
      */
     public ReceiveMsg(final Agent myagent, MapRepresentation myMap, List<String> list_agentNames) {
-        this.myMap=myMap;
-		this.myAgent=myagent;
+       
+    	this.myMap=myMap;
+    	this.myAgent = myagent;
 		this.list_agentNames=list_agentNames;
     }
 
@@ -93,8 +94,9 @@ public class ReceiveMsg extends SimpleBehaviour {
     	MessageTemplate msgTemplate3 = MessageTemplate.and(
 				MessageTemplate.MatchProtocol("Ping"),
 				MessageTemplate.MatchPerformative(ACLMessage.INFORM));
+    	
         ACLMessage msgReceived3 = this.myAgent.receive(msgTemplate3);
-       
+        
 		if (msgReceived3 != null) {
 			// create a new message
 			System.out.println("J ai recu un ping");
@@ -111,6 +113,10 @@ public class ReceiveMsg extends SimpleBehaviour {
 			((AbstractDedaleAgent) this.myAgent).sendMessage(msg);
 			
 		}
+		
+		
+		
+		
     }
     
     @Override

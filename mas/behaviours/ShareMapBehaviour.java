@@ -59,8 +59,11 @@ public class ShareMapBehaviour extends SimpleBehaviour {
 		ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
 		msg.setProtocol("SHARE-TOPO");
 		msg.setSender(this.myAgent.getAID());
+		
 		for (String agentName : receivers) {
 			msg.addReceiver(new AID(agentName,AID.ISLOCALNAME));
+			
+			
 		}
 			
 		SerializableSimpleGraph<String, MapAttribute> sg=this.myMap.getSerializableGraph();

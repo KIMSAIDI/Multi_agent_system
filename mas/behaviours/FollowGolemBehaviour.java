@@ -178,16 +178,18 @@ public class FollowGolemBehaviour extends SimpleBehaviour {
 		    
 		else {
 		    // On suit l'odeur
-			
 			if (nextNodeId==null) {
-				nextNodeId = liste_position_odeur.get(0).getLocationId();
+				Random rand = new Random();
+				// Génère un index aléatoire entre 0 (inclus) et la taille de la liste (exclus)
+			    int randomIndex = rand.nextInt(liste_position_odeur.size());
+				nextNodeId = liste_position_odeur.get(randomIndex).getLocationId();
 			}
 			
 			if (!((AbstractDedaleAgent)this.myAgent).moveTo(new gsLocation(nextNodeId))) {
-            	System.out.println("On à réussi à rattraper le goelem à la position : " + nextNodeId);
+            	//System.out.println("On à réussi à rattraper le goelem à la position : " + nextNodeId);
             	// on le suit
             	((AbstractDedaleAgent)this.myAgent).moveTo(new gsLocation(nextNodeId));
-            	System.out.println("On suit le golem");
+            	//System.out.println("On suit le golem");
 		    }else {
 			
 		    	((AbstractDedaleAgent)this.myAgent).moveTo(new gsLocation(nextNodeId));

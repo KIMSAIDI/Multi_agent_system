@@ -1,6 +1,7 @@
 package eu.su.mas.dedaleEtu.mas.behaviours;
 
 import java.io.IOException;
+import java.util.Random;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -256,13 +257,7 @@ public class FollowGolemBehaviour extends SimpleBehaviour {
 ////				
 ////	 	        
 ////	        }
-//	        
-//	       
-//			
-//	        
-//	        
-//	        
-//
+//	    
 //			
 //	  
 //	        	// si il recoit une rep, on le calcule pas
@@ -354,10 +349,7 @@ public class FollowGolemBehaviour extends SimpleBehaviour {
 
 			String nextNodeId=null;
 			Iterator<Couple<Location, List<Couple<Observation, Integer>>>> iter=lobs.iterator();
-			
-			
-	
-			
+		
 			while(iter.hasNext()){
 				Location accessibleNode=iter.next().getLeft();
 				//System.out.println("Noeud accessible : "+accessibleNode);
@@ -371,8 +363,7 @@ public class FollowGolemBehaviour extends SimpleBehaviour {
 				}
 			}
 			
-			
-			// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+			// ~~~~~~~~~~~~~~~~~~~~~~~~~AGENTS~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 			
 			
 			// liste des noeuds à proximité qui sont des agents
@@ -398,13 +389,12 @@ public class FollowGolemBehaviour extends SimpleBehaviour {
 				System.out.println("noeud agent : " + liste_noeuds_agents);
 			}
 			
-			
 			System.out.println("~~~~~~~~~~~~~~");
-			System.out.println("my position : " + myPosition.getLocationId());
-	        System.out.println("noeuds_observable : " + noeuds_observable);
-	        System.out.println("liste_noeuds_agents : " + liste_noeuds_agents);
+//			System.out.println("my position : " + myPosition.getLocationId());
+//	        System.out.println("noeuds_observable : " + noeuds_observable);
+//	        System.out.println("liste_noeuds_agents : " + liste_noeuds_agents);
 	        
-			// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+			// ~~~~~~~~~~~~~~~~~~~~~~~GOLEM SANS ODEUR~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 			
 	        
 	        // liste_position_golem = noeuds_observable - (liste_noeuds_agents) 
@@ -414,22 +404,31 @@ public class FollowGolemBehaviour extends SimpleBehaviour {
 	        System.out.println("liste_position_golem : " + liste_position_golem);
 	        
 	      
-			
-
-			
 			if (nextNodeId==null){
-				nextNodeId=this.myMap.getShortestPathToClosestOpenNode(myPosition.getLocationId()).get(0);//getShortestPath(myPosition,this.openNodes.get(0)).get(0);
+				// son prochain noeud est fait partie de la liste des possibles positions du golem si il y en a un
+				Random rand = new Random();
+				// Génère un index aléatoire entre 0 (inclus) et la taille de la liste (exclus)
+			    int randomIndex = rand.nextInt(liste_position_golem.size());
+			    nextNodeId = liste_position_golem.get(randomIndex).getLocationId();
+			    System.out.println("Prochaine noeud choisit : " + nextNodeId);
 			}
 			
 			
+		    if (!((AbstractDedaleAgent)this.myAgent).moveTo(new gsLocation(nextNodeId))) {
+            	System.out.println("Il ya un golem à la position : " + nextNodeId);
+            	// on le suit
+            	((AbstractDedaleAgent)this.myAgent).moveTo(new gsLocation(nextNodeId));
+            	System.out.println("On suit le golem");
+		    }else {
+			
+		    	((AbstractDedaleAgent)this.myAgent).moveTo(new gsLocation(nextNodeId));
+		    }
+		
+		 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		    
+		    
 		    
 			
-		    ((AbstractDedaleAgent)this.myAgent).moveTo(new gsLocation(nextNodeId));
-			
-			
-			
-			
-
 		}
 	}
 

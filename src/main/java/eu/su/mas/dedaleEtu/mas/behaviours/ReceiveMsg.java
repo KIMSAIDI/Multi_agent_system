@@ -96,7 +96,7 @@ public class ReceiveMsg extends SimpleBehaviour {
 				MessageTemplate.MatchPerformative(ACLMessage.INFORM));
     	
         ACLMessage msgReceived3 = this.myAgent.receive(msgTemplate3);
-        
+        System.out.println(msgReceived3);
 		if (msgReceived3 != null) {
 			// create a new message
 			System.out.println("J ai recu un ping");

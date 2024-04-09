@@ -53,13 +53,12 @@ public class FollowGolemBehaviour extends SimpleBehaviour {
 			this.myMap= new MapRepresentation();
 			
 			// fait un ping pour découvrir qui est autour de notre agent
-	    	this.myAgent.addBehaviour(new SayHelloBehaviour(this.myAgent, 100, this.list_agentNames, "Ping"));
+	    	this.myAgent.addBehaviour(new SayHelloBehaviour(this.myAgent, 100, list_agentNames, "Ping"));
 
 			
 		}
 		
 		System.out.println("~~~~~~~~~~~~~~");
-//		System.out.println("list des agents : " + this.list_agentNames);
 		
 		Location myPosition=((AbstractDedaleAgent)this.myAgent).getCurrentPosition();
 

@@ -46,18 +46,22 @@ public class SayHelloBehaviour extends TickerBehaviour{
 	public void onTick() {
 		Location myPosition=((AbstractDedaleAgent)this.myAgent).getCurrentPosition();
 		
-		
+		//System.out.println("receivers : " + receivers);
             
 		ACLMessage msg=new ACLMessage(ACLMessage.INFORM);
 		msg.setProtocol(protocol);
 		msg.setSender(this.myAgent.getAID());
 		
-		// liste des receivers
+//		// liste des receivers
 		for (String agentName : receivers) {
 			msg.addReceiver(new AID(agentName,AID.ISLOCALNAME));
 			
 		}
 		
+		
+		
+		// print les receivers de message 
+		//System.out.println("receivers : " + msg.getAllReceiver().toString().replace("[", "").replace("]", ""));
 		
 		if (protocol == "HelloProtocol") {
 			try {

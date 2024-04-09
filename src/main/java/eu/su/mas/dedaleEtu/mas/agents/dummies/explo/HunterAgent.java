@@ -35,9 +35,6 @@ public class HunterAgent extends AbstractDedaleAgent{
 			}
 		}
 		
-		System.out.println("------------liste agent  -----------: " + list_agentNames);
-		System.out.println("------------liste agent taille  -----------: " + list_agentNames.size());
-		
 		
 		List<Behaviour> lb=new ArrayList<Behaviour>();
 		

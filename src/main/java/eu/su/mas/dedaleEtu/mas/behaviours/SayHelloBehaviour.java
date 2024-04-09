@@ -66,7 +66,6 @@ public class SayHelloBehaviour extends TickerBehaviour{
 		if (protocol == "HelloProtocol") {
 			try {
 				msg.setContentObject("Hello World, I'm at "+myPosition + " I am "+this.myAgent.getAID()) ;
-				System.out.println("hello");
 				((AbstractDedaleAgent)this.myAgent).sendMessage(msg);
 
 			} catch (IOException e) {
@@ -74,10 +73,9 @@ public class SayHelloBehaviour extends TickerBehaviour{
 				e.printStackTrace();
 			}
 		}
-		if (protocol == "Ping") {
+		if (protocol == "HunterProtocol") {
 			try {
-				msg.setContentObject("Ping");
-				System.out.println("je suis" + this.myAgent.getLocalName() + " et je Ping");
+				msg.setContentObject("HunterProtocol");
 				((AbstractDedaleAgent) this.myAgent).sendMessage(msg);
 
 			} catch (IOException e) {

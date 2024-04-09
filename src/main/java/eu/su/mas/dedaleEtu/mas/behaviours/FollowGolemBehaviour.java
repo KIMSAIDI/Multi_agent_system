@@ -1,6 +1,7 @@
 package eu.su.mas.dedaleEtu.mas.behaviours;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.Random;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -36,6 +37,8 @@ public class FollowGolemBehaviour extends SimpleBehaviour {
 
 	private MapRepresentation myMap;
 	private List<String> list_agentNames;
+	boolean busy = false;
+	List<String> GuildMembers = new ArrayList<String>();
 	
 
 	public FollowGolemBehaviour(final AbstractDedaleAgent myagent, List<String> list_agentNames, MapRepresentation myMap ) {
@@ -113,23 +116,49 @@ public class FollowGolemBehaviour extends SimpleBehaviour {
 			this.myAgent.addBehaviour(new ReceiveMsg(this.myAgent, this.myMap, this.list_agentNames));
 //			
 			
+			// si on recontre un agent ou un groupe d'agent PAS busy ou si nous même on est pas busy -> on merge
+			// si on rencontre un agent ou un groupe d'agent busy et que on est aussi busy -> on merge pas
+			
 			
 			// liste des noeuds à proximité qui sont des agents
 			List<Location> liste_noeuds_agents = new ArrayList<Location>();
 	    	
 	    	// message qu'on recoit (ou non)
 	    	MessageTemplate msgTemplate = MessageTemplate.and(
-					MessageTemplate.MatchProtocol("ACK_Ping"),
+					MessageTemplate.MatchProtocol("ACK_HunterProtocol"),
 					MessageTemplate.MatchPerformative(ACLMessage.INFORM));	
 			ACLMessage msgReceived = this.myAgent.receive(msgTemplate);
 			
 			
-	    	// Si on recoit un message, un agent est à proximité
+	    	// Si on recoit un message, un agent est à proximité donc on crée une guild
 			if (msgReceived != null ) {
 				System.out.println("J'ai recu un message");
 				Location noeud = null;
 				try {
 					noeud = (Location) msgReceived.getContentObject();
+//					// ~~~~~~~~~~~~~~~~ BUSY ~~~~~~~~~~~~~~~~
+//					
+//					// Si l'agent est actuellement entrain de suivre un golem, il envoie les positions possibles du golem
+//					
+////					if (busy) {
+////						ACLMessage msg=new ACLMessage(ACLMessage.INFORM);
+////						msg.setProtocol("GolemPosition");
+////						msg.setSender(this.myAgent.getAID());
+////						msg.addReceiver(msgReceived.getSender());
+////						try {
+////							msg.setContentObject((Serializable) liste_position_odeur);
+////						} catch (IOException e) {
+////							e.printStackTrace();
+////						}
+////						((AbstractDedaleAgent) this.myAgent).sendMessage(msg);
+//					
+//					// ~~~~~~~~~~~~~~~~ PAS BUSY ~~~~~~~~~~~~~~~~
+////					}else {
+////						// pour le moment on fait rien
+////						assert true;
+////					}
+//					
+					
 				} catch (UnreadableException e) {
 					e.printStackTrace();
 				}
@@ -168,7 +197,13 @@ public class FollowGolemBehaviour extends SimpleBehaviour {
 			    if (!((AbstractDedaleAgent)this.myAgent).moveTo(new gsLocation(nextNodeId))) {
 //	            	System.out.println("Il ya un golem à la position : " + nextNodeId);
 	            	// on le suit
-	            	((AbstractDedaleAgent)this.myAgent).moveTo(new gsLocation(nextNodeId));
+			    	while (!((AbstractDedaleAgent)this.myAgent).moveTo(new gsLocation(nextNodeId))){
+			    		// tant qu'on peut pas y accèder, le golem est surement coincé on ne bouge pas
+			    		System.out.println("Le golem est coincé");
+			    		((AbstractDedaleAgent)this.myAgent).moveTo(myPosition);
+			    	}
+	            	((AbstractDedaleAgent)this.myAgent).moveTo(new gsLocation(nextNodeId)); // si ils arrivent tjrs pas à a atteindre alors le golem est coincé
+	            	busy = true;
 //	            	System.out.println("On suit le golem");
 			    }else {
 			    	//System.out.println("j'ai changé de position");
@@ -190,8 +225,14 @@ public class FollowGolemBehaviour extends SimpleBehaviour {
 			
 			if (!((AbstractDedaleAgent)this.myAgent).moveTo(new gsLocation(nextNodeId))) {
             	//System.out.println("On à réussi à rattraper le goelem à la position : " + nextNodeId);
-            	// on le suit
+				while (!((AbstractDedaleAgent)this.myAgent).moveTo(new gsLocation(nextNodeId))){
+		    		// tant qu'on peut pas y accèder, le golem est surement coincé on ne bouge pas
+		    		System.out.println("Le golem est coincé");
+		    		((AbstractDedaleAgent)this.myAgent).moveTo(myPosition);
+		    	}
+				// on le suit
             	((AbstractDedaleAgent)this.myAgent).moveTo(new gsLocation(nextNodeId));
+            	busy = true;
             	//System.out.println("On suit le golem");
 		    }else {
 		    	//System.out.println("j'ai changé de position");

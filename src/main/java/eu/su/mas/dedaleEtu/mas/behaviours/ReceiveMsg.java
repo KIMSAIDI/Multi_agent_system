@@ -67,45 +67,44 @@ public class ReceiveMsg extends SimpleBehaviour {
 			}
 	    	
 	    	
-	    	// Si je recois une Map, je la merge avec la mienne
-	    	MessageTemplate msgTemplate2=MessageTemplate.and(
-					MessageTemplate.MatchProtocol("SHARE-TOPO"),
-					MessageTemplate.MatchPerformative(ACLMessage.INFORM));
-			ACLMessage msgReceived2=this.myAgent.receive(msgTemplate2);
-			if (msgReceived2!=null) {
-				SerializableSimpleGraph<String, MapAttribute> sgreceived=null;
-				try {
-					sgreceived = (SerializableSimpleGraph<String, MapAttribute>)msgReceived2.getContentObject();
-				} catch (UnreadableException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				System.out.println("---------on merge les map---------");
-				this.myMap.mergeMap(sgreceived);
+    	// ~~~~~~~~~~~~~~ Si je recois une Map, je la merge avec la mienne ~~~~~~~~~~~~~~
+    	MessageTemplate msgTemplate2=MessageTemplate.and(
+				MessageTemplate.MatchProtocol("SHARE-TOPO"),
+				MessageTemplate.MatchPerformative(ACLMessage.INFORM));
+		ACLMessage msgReceived2=this.myAgent.receive(msgTemplate2);
+		if (msgReceived2!=null) {
+			SerializableSimpleGraph<String, MapAttribute> sgreceived=null;
+			try {
+				sgreceived = (SerializableSimpleGraph<String, MapAttribute>)msgReceived2.getContentObject();
+			} catch (UnreadableException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
-        
+			System.out.println("---------on merge les map---------");
+			this.myMap.mergeMap(sgreceived);
+		}
+	    
 		} else {
 			//System.out.println("-----------------Exploration terminée pour "+this.myAgent.getLocalName()+"------------------");
 			finished = true;
 		}
     	
     	
-    	// Si je recois un Ping, j'envoie ma position 
+    	// ~~~~~~~~~~~~~~ Si je recois un Ping, j'envoie ma position ~~~~~~~~~~~~~~ 
     	MessageTemplate msgTemplate3 = MessageTemplate.and(
-				MessageTemplate.MatchProtocol("Ping"),
+				MessageTemplate.MatchProtocol("HunterProtocol"),
 				MessageTemplate.MatchPerformative(ACLMessage.INFORM));
     	
         ACLMessage msgReceived3 = this.myAgent.receive(msgTemplate3);
-        System.out.println(msgReceived3);
+     
 		if (msgReceived3 != null) {
 			// create a new message
 			System.out.println("J ai recu un ping");
 			ACLMessage msg=new ACLMessage(ACLMessage.INFORM);
-			msg.setProtocol("ACK_Ping");
+			msg.setProtocol("ACK_HunterProtocol");
 			msg.setSender(this.myAgent.getAID());
 			msg.addReceiver(msgReceived3.getSender());
 			try {
-				System.out.println("---- jai recu un ping, je renvoie ma position ----");
 				msg.setContentObject(myPosition);
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -113,6 +112,7 @@ public class ReceiveMsg extends SimpleBehaviour {
 			((AbstractDedaleAgent) this.myAgent).sendMessage(msg);
 			
 		}
+		
 		
 		
 		

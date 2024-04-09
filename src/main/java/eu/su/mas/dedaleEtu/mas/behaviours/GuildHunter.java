@@ -24,13 +24,14 @@ import jade.lang.acl.UnreadableException;
  * it processes the contained object. Messages are expected to follow a specific protocol
  * and be of certain performative types (INFORM or REFUSE).
  */
-public class ShareNextPosition extends SimpleBehaviour {
+public class GuildHunter extends SimpleBehaviour {
 
     private static final long serialVersionUID = -2058134622078521998L;
     
     private Location nextPosition;
     private Agent myAgent;
     private List<String> list_agentNames;
+    private boolean busy = false;
     private boolean finished = false;
 
 
@@ -39,15 +40,24 @@ public class ShareNextPosition extends SimpleBehaviour {
      * 
      * @param myagent The agent possessing this behaviour.
      */
-    public ShareNextPosition(final Agent myagent, Location nextPosition, List<String> list_agentNames) {
+    public GuildHunter(final Agent myagent, Location nextPosition, List<String> list_agentNames, boolean busy) {
         this.nextPosition=nextPosition;
 		this.myAgent=myagent;
 		this.list_agentNames=list_agentNames;
+		this.busy = busy;
     }
 
     @Override
     public void action() {
     	
+    	
+    	// list_agentNames est la liste 
+    	
+    	// ~~~~~~~~~~~~~~~~ BUSY ~~~~~~~~~~~~~~~~
+    	
+    	
+    	
+    	// ~~~~~~~~~~~~~~~~ PAS BUSY ~~~~~~~~~~~~~~~~
     	
 		ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
 		msg.setProtocol("SHARE-NEXT-POSITION");

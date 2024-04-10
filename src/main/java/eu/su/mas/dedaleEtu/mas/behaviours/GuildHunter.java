@@ -18,63 +18,59 @@ import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
 
-/**
- * Behaviour that periodically checks for incoming messages from other agents,
- * attempting to deserialize an object from these messages. If a message is received,
- * it processes the contained object. Messages are expected to follow a specific protocol
- * and be of certain performative types (INFORM or REFUSE).
- */
+
 public class GuildHunter extends SimpleBehaviour {
+	
+	/* Détermine le comportement collectif des Hunter */
 
     private static final long serialVersionUID = -2058134622078521998L;
     
-    private Location nextPosition;
+
     private Agent myAgent;
-    private List<String> list_agentNames;
+    private List<String> guildMembers;
+    private List<Location> liste_position_odeur;		
     private boolean busy = false;
     private boolean finished = false;
 
 
-    /**
-     * Constructs the ReceivePing behaviour.
-     * 
-     * @param myagent The agent possessing this behaviour.
-     */
-    public GuildHunter(final Agent myagent, Location nextPosition, List<String> list_agentNames, boolean busy) {
-        this.nextPosition=nextPosition;
+   
+    public GuildHunter(final Agent myagent, List<String> guildMembers, List<Location> liste_position_odeur, boolean busy) {
 		this.myAgent=myagent;
-		this.list_agentNames=list_agentNames;
+		this.guildMembers=guildMembers;
+		this.liste_position_odeur = liste_position_odeur;
 		this.busy = busy;
     }
 
     @Override
     public void action() {
     	
-    	
-    	// list_agentNames est la liste 
-    	
-    	// ~~~~~~~~~~~~~~~~ BUSY ~~~~~~~~~~~~~~~~
+    	// La guild avance collecivement
     	
     	
+    	// soit un agent est sur la liste d'un golem
+    	if (busy) {
+    		
+    		// commnique les positions possible du golem
+    		;
     	
-    	// ~~~~~~~~~~~~~~~~ PAS BUSY ~~~~~~~~~~~~~~~~
     	
-		ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
-		msg.setProtocol("SHARE-NEXT-POSITION");
-		msg.setSender(this.myAgent.getAID());
-		for (String agentName : list_agentNames) {
-			msg.addReceiver(new AID(agentName,AID.ISLOCALNAME));
-		}
-			
-		try {
-			msg.setContentObject(nextPosition);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		((AbstractDedaleAgent) this.myAgent).sendMessage(msg);
-
-		
-	}
+    	
+    	}
+    	
+    	
+    	else {
+    		
+    		// avance en groupe
+    		;
+    	}
+    	
+    	
+    	;
+    	
+    
+    
+    
+    }
 
     
     

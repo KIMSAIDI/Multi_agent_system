@@ -117,9 +117,6 @@ public class FollowGolemBehaviour extends SimpleBehaviour {
 			this.myAgent.addBehaviour(new ReceiveMsg(this.myAgent, this.myMap, this.list_agentNames));
 //			
 			
-			// si on recontre un agent ou un groupe d'agent PAS busy ou si nous même on est pas busy -> on merge
-			// si on rencontre un agent ou un groupe d'agent busy et que on est aussi busy -> on merge pas
-			
 			
 			// liste des noeuds à proximité qui sont des agents
 			List<Location> liste_noeuds_agents = new ArrayList<Location>();
@@ -137,29 +134,12 @@ public class FollowGolemBehaviour extends SimpleBehaviour {
 				Location noeud = null;
 				try {
 					noeud = (Location) msgReceived.getContentObject();
-//					// ~~~~~~~~~~~~~~~~ BUSY ~~~~~~~~~~~~~~~~
-//					
-//					// Si l'agent est actuellement entrain de suivre un golem, il envoie les positions possibles du golem
-//					
-////					if (busy) {
-////						ACLMessage msg=new ACLMessage(ACLMessage.INFORM);
-////						msg.setProtocol("GolemPosition");
-////						msg.setSender(this.myAgent.getAID());
-////						msg.addReceiver(msgReceived.getSender());
-////						try {
-////							msg.setContentObject((Serializable) liste_position_odeur);
-////						} catch (IOException e) {
-////							e.printStackTrace();
-////						}
-////						((AbstractDedaleAgent) this.myAgent).sendMessage(msg);
-//					
-//					// ~~~~~~~~~~~~~~~~ PAS BUSY ~~~~~~~~~~~~~~~~
-////					}else {
-////						// pour le moment on fait rien
-////						assert true;
-////					}
-//					
+					// ~~~~~~~~~~~~~~~ MODE GUILD ~~~~~~~~~~~~~~~~~
+					// j'ajoute le sender à ma guild
+					GuildMembers.add(msgReceived.getSender().getLocalName());
 					
+					// on partage notre prochain noeud 
+				
 				} catch (UnreadableException e) {
 					e.printStackTrace();
 				}

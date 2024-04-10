@@ -76,6 +76,7 @@ public class SayHelloBehaviour extends TickerBehaviour{
 		if (protocol == "HunterProtocol") {
 			try {
 				msg.setContentObject("HunterProtocol");
+				
 				((AbstractDedaleAgent) this.myAgent).sendMessage(msg);
 
 			} catch (IOException e) {

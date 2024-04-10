@@ -56,12 +56,13 @@ public class FollowGolemBehaviour extends SimpleBehaviour {
 			this.myMap= new MapRepresentation();
 			
 			// fait un ping pour découvrir qui est autour de notre agent
-	    	this.myAgent.addBehaviour(new SayHelloBehaviour(this.myAgent, 100, list_agentNames, "Ping"));
+	    	this.myAgent.addBehaviour(new SayHelloBehaviour(this.myAgent, 100, list_agentNames, "HunterProtocol"));
 
 			
 		}
 		
 		System.out.println("~~~~~~~~~~~~~~");
+		System.out.println("je suis l'agent : " + this.myAgent.getLocalName());	
 		
 		Location myPosition=((AbstractDedaleAgent)this.myAgent).getCurrentPosition();
 
@@ -88,7 +89,7 @@ public class FollowGolemBehaviour extends SimpleBehaviour {
 	        }
 	        
 			try {
-				this.myAgent.doWait(1000);
+				this.myAgent.doWait(990);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -132,7 +133,7 @@ public class FollowGolemBehaviour extends SimpleBehaviour {
 			
 	    	// Si on recoit un message, un agent est à proximité donc on crée une guild
 			if (msgReceived != null ) {
-				System.out.println("J'ai recu un message");
+				//System.out.println("J'ai recu un message");
 				Location noeud = null;
 				try {
 					noeud = (Location) msgReceived.getContentObject();
@@ -170,12 +171,13 @@ public class FollowGolemBehaviour extends SimpleBehaviour {
 			
 //			System.out.println("my position : " + myPosition.getLocationId());
 //	        System.out.println("noeuds_observable : " + noeuds_observable);
-	       // System.out.println("liste_noeuds_agents : " + liste_noeuds_agents);
+//	        System.out.println("liste_noeuds_agents : " + liste_noeuds_agents);
 	        
 			// ~~~~~~~~~~~~~~~~~~~~~~~GOLEM SANS ODEUR~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 			
 	        if (liste_position_odeur.isEmpty()) {
-            	
+//            	
+	        	System.out.println("liste_position_odeur est vide");
       
 		        // liste_position_golem = noeuds_observable - (liste_noeuds_agents) 
 		        List<Location> liste_position_golem = new ArrayList<Location>(noeuds_observable);
@@ -197,11 +199,11 @@ public class FollowGolemBehaviour extends SimpleBehaviour {
 			    if (!((AbstractDedaleAgent)this.myAgent).moveTo(new gsLocation(nextNodeId))) {
 //	            	System.out.println("Il ya un golem à la position : " + nextNodeId);
 	            	// on le suit
-			    	while (!((AbstractDedaleAgent)this.myAgent).moveTo(new gsLocation(nextNodeId))){
-			    		// tant qu'on peut pas y accèder, le golem est surement coincé on ne bouge pas
-			    		System.out.println("Le golem est coincé");
-			    		((AbstractDedaleAgent)this.myAgent).moveTo(myPosition);
-			    	}
+//			    	while (!((AbstractDedaleAgent)this.myAgent).moveTo(new gsLocation(nextNodeId))){
+//			    		// tant qu'on peut pas y accèder, le golem est surement coincé on ne bouge pas
+//			    		//System.out.println("Le golem est coincé");
+//			    		((AbstractDedaleAgent)this.myAgent).moveTo(myPosition);
+//			    	}
 	            	((AbstractDedaleAgent)this.myAgent).moveTo(new gsLocation(nextNodeId)); // si ils arrivent tjrs pas à a atteindre alors le golem est coincé
 	            	busy = true;
 //	            	System.out.println("On suit le golem");
@@ -215,6 +217,7 @@ public class FollowGolemBehaviour extends SimpleBehaviour {
 		    
 		    
 		else {
+			//System.out.println(liste_position_odeur);
 		    // On suit l'odeur
 			if (nextNodeId==null) {
 				Random rand = new Random();
@@ -222,14 +225,15 @@ public class FollowGolemBehaviour extends SimpleBehaviour {
 			    int randomIndex = rand.nextInt(liste_position_odeur.size());
 				nextNodeId = liste_position_odeur.get(randomIndex).getLocationId();
 			}
+			//System.out.println("je sens quelque chose donc prochaine noeud choisit : " + nextNodeId);
 			
 			if (!((AbstractDedaleAgent)this.myAgent).moveTo(new gsLocation(nextNodeId))) {
             	//System.out.println("On à réussi à rattraper le goelem à la position : " + nextNodeId);
-				while (!((AbstractDedaleAgent)this.myAgent).moveTo(new gsLocation(nextNodeId))){
-		    		// tant qu'on peut pas y accèder, le golem est surement coincé on ne bouge pas
-		    		System.out.println("Le golem est coincé");
-		    		((AbstractDedaleAgent)this.myAgent).moveTo(myPosition);
-		    	}
+//				while (!((AbstractDedaleAgent)this.myAgent).moveTo(new gsLocation(nextNodeId))){
+//		    		// tant qu'on peut pas y accèder, le golem est surement coincé on ne bouge pas
+//		    		//System.out.println("Le golem est surement coincé");
+//		    		((AbstractDedaleAgent)this.myAgent).moveTo(myPosition);
+//		    	}
 				// on le suit
             	((AbstractDedaleAgent)this.myAgent).moveTo(new gsLocation(nextNodeId));
             	busy = true;

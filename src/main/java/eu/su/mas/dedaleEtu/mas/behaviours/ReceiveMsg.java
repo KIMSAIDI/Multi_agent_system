@@ -99,7 +99,7 @@ public class ReceiveMsg extends SimpleBehaviour {
      
 		if (msgReceived3 != null) {
 			// create a new message
-			System.out.println("J ai recu un ping");
+			//System.out.println("J ai recu un ping");
 			ACLMessage msg=new ACLMessage(ACLMessage.INFORM);
 			msg.setProtocol("ACK_HunterProtocol");
 			msg.setSender(this.myAgent.getAID());

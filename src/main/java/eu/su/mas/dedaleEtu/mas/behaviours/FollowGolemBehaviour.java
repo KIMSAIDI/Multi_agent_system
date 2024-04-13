@@ -257,14 +257,16 @@ public class FollowGolemBehaviour extends SimpleBehaviour {
 			System.out.println("liste noeuds des agents : " + string_location_agent);
 			System.out.println("liste noeuds des golems : " + liste_position_golem);
 			
-			if (!((AbstractDedaleAgent)this.myAgent).moveTo(new gsLocation(nextNodeId))) {
+			while (!((AbstractDedaleAgent)this.myAgent).moveTo(new gsLocation(nextNodeId))) {
 				
-				return ;
+				nextNodeId = tmp;
+				this.myAgent.addBehaviour(new SayHelloBehaviour(this.myAgent, 100, list_agentNames, "HunterProtocol"));
+
 		    }
 		    	
 			 
 			((AbstractDedaleAgent)this.myAgent).moveTo(new gsLocation(nextNodeId));
-
+			
 		
 		    
 		    

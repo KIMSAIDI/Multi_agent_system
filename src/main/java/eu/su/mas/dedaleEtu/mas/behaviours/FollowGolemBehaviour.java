@@ -63,6 +63,7 @@ public class FollowGolemBehaviour extends SimpleBehaviour {
 		
 		System.out.println("~~~~~~~~~~~~~~");
 		System.out.println("je suis l'agent : " + this.myAgent.getLocalName());	
+		System.out.println("je suis à la position : " + ((AbstractDedaleAgent)this.myAgent).getCurrentPosition().getLocationId());
 		
 		Location myPosition=((AbstractDedaleAgent)this.myAgent).getCurrentPosition();
 
@@ -100,22 +101,23 @@ public class FollowGolemBehaviour extends SimpleBehaviour {
 			String nextNodeId=null;
 			Iterator<Couple<Location, List<Couple<Observation, Integer>>>> iter=lobs.iterator();
 		
-			while(iter.hasNext()){
-				Location accessibleNode=iter.next().getLeft();
-				//System.out.println("Noeud accessible : "+accessibleNode);
-				
-				boolean isNewNode=this.myMap.addNewNode(accessibleNode.getLocationId());
-				//the node may exist, but not necessarily the edge
-				if (myPosition.getLocationId()!=accessibleNode.getLocationId()) {
-					this.myMap.addEdge(myPosition.getLocationId(), accessibleNode.getLocationId());
-					if (nextNodeId==null && isNewNode) nextNodeId=accessibleNode.getLocationId();
-				
-				}
-			}
+//			while(iter.hasNext()){
+//				Location accessibleNode=iter.next().getLeft();
+//				//System.out.println("Noeud accessible : "+accessibleNode);
+//				
+//				boolean isNewNode=this.myMap.addNewNode(accessibleNode.getLocationId());
+//				//the node may exist, but not necessarily the edge
+//				if (myPosition.getLocationId()!=accessibleNode.getLocationId()) {
+//					this.myMap.addEdge(myPosition.getLocationId(), accessibleNode.getLocationId());
+//					if (nextNodeId==null && isNewNode) nextNodeId=accessibleNode.getLocationId();
+//				
+//				}
+//			}
 			
 			// ~~~~~~~~~~~~~~~~~~~~~~~~~AGENTS~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 			this.myAgent.addBehaviour(new ReceiveMsg(this.myAgent, this.myMap, this.list_agentNames));
-//			
+			
+			
 			
 			
 			// liste des noeuds à proximité qui sont des agents
@@ -129,8 +131,9 @@ public class FollowGolemBehaviour extends SimpleBehaviour {
 			
 			
 	    	// Si on recoit un message, un agent est à proximité donc on crée une guild
-			if (msgReceived != null ) {
-				//System.out.println("J'ai recu un message");
+			while (msgReceived != null ) {
+				
+				System.out.println("J'ai recu un message");
 				Location noeud = null;
 				try {
 					noeud = (Location) msgReceived.getContentObject();
@@ -144,6 +147,12 @@ public class FollowGolemBehaviour extends SimpleBehaviour {
 					e.printStackTrace();
 				}
 				liste_noeuds_agents.add(noeud);
+				msgTemplate = MessageTemplate.and(
+						MessageTemplate.MatchProtocol("ACK_HunterProtocol"),
+						MessageTemplate.MatchPerformative(ACLMessage.INFORM));	
+				msgReceived = this.myAgent.receive(msgTemplate);
+				
+				
 //				System.out.println("On a croisé un agent");
 //				System.out.println("noeud agent : " + liste_noeuds_agents);
 			}
@@ -166,24 +175,24 @@ public class FollowGolemBehaviour extends SimpleBehaviour {
 		        //System.out.println("liste_position_golem : " + liste_position_golem);
 		        
 		      
-				if (nextNodeId==null){
+				//if (nextNodeId==null){
 					// son prochain noeud est fait partie de la liste des possibles positions du golem si il y en a un
-					Random rand = new Random();
+				Random rand = new Random();
 					// Génère un index aléatoire entre 0 (inclus) et la taille de la liste (exclus)
-				    int randomIndex = rand.nextInt(liste_position_golem.size());
-				    nextNodeId = liste_position_golem.get(randomIndex).getLocationId();
+				int randomIndex = rand.nextInt(liste_position_golem.size());
+				nextNodeId = liste_position_golem.get(randomIndex).getLocationId();
 				    //System.out.println("Prochaine noeud choisit : " + nextNodeId);
-				}
+				//}
 				
 				
 			    if (!((AbstractDedaleAgent)this.myAgent).moveTo(new gsLocation(nextNodeId))) {
-//	            	System.out.println("Il ya un golem à la position : " + nextNodeId);
+			    	System.out.println("Il ya un golem à la position : " + nextNodeId);
 	            	// on le suit
-			    	while (!((AbstractDedaleAgent)this.myAgent).moveTo(new gsLocation(nextNodeId))){
-			    		// tant qu'on peut pas y accèder, le golem est surement coincé on ne bouge pas
-			    		System.out.println("Le golem est coincé");
-			    		((AbstractDedaleAgent)this.myAgent).moveTo(myPosition);
-			    	}
+//			    	while (!((AbstractDedaleAgent)this.myAgent).moveTo(new gsLocation(nextNodeId))){
+//			    		// tant qu'on peut pas y accèder, le golem est surement coincé on ne bouge pas
+//			    		//System.out.println("Le golem est coincé");
+//			    		((AbstractDedaleAgent)this.myAgent).moveTo(myPosition);
+//			    	}
 	            	((AbstractDedaleAgent)this.myAgent).moveTo(new gsLocation(nextNodeId)); // si ils arrivent tjrs pas à a atteindre alors le golem est coincé
 	            	busy = true;
 //	            	System.out.println("On suit le golem");
@@ -201,26 +210,26 @@ public class FollowGolemBehaviour extends SimpleBehaviour {
 			List<Location> liste_agents_noeuds = new ArrayList<Location>(liste_noeuds_agents);
 			liste_agents_noeuds.add(myPosition);
 			liste_position_odeur.removeAll(liste_agents_noeuds);
-			//System.out.println("je sens quelque chose donc prochaine noeud choisit : " + nextNodeId);
 			
-						
-			//System.out.println(liste_position_odeur);
+			System.out.println("liste position des agents : " + liste_agents_noeuds);
+		    //System.out.println(liste_position_odeur);
 		    // On suit l'odeur
-			if (nextNodeId==null) {
-				Random rand = new Random();
-				// Génère un index aléatoire entre 0 (inclus) et la taille de la liste (exclus)
-			    int randomIndex = rand.nextInt(liste_position_odeur.size());
-				nextNodeId = liste_position_odeur.get(randomIndex).getLocationId();
-			}
+			//if (nextNodeId==null) {
+			Random rand = new Random();
+			// Génère un index aléatoire entre 0 (inclus) et la taille de la liste (exclus)
+		    int randomIndex = rand.nextInt(liste_position_odeur.size());
+			nextNodeId = liste_position_odeur.get(randomIndex).getLocationId();
+			System.out.println("Prochaine noeud choisit : " + nextNodeId);
+		//	}
 			
-			boolean present = ((AbstractDedaleAgent)this.myAgent).moveTo(new gsLocation(nextNodeId));
-			if (!present) {
-            	//System.out.println("On à réussi à rattraper le goelem à la position : " + nextNodeId);
-				while (!present){
-		    		// tant qu'on peut pas y accèder, le golem est surement coincé on ne bouge pas
-		    		System.out.println("Le golem est surement coincé");
-		    		present = ((AbstractDedaleAgent)this.myAgent).moveTo(new gsLocation(nextNodeId));
-		    	}
+			
+			if (!((AbstractDedaleAgent)this.myAgent).moveTo(new gsLocation(nextNodeId))) {
+            	System.out.println("On à réussi à rattraper le goelem à la position : " + nextNodeId);
+//				while (!present){
+//		    		// tant qu'on peut pas y accèder, le golem est surement coincé on ne bouge pas
+//		    		//System.out.println("Le golem est surement coincé");
+//		    		present = ((AbstractDedaleAgent)this.myAgent).moveTo(new gsLocation(nextNodeId));
+//		    	}
 				// on le suit
             	((AbstractDedaleAgent)this.myAgent).moveTo(new gsLocation(nextNodeId));
             	busy = true;

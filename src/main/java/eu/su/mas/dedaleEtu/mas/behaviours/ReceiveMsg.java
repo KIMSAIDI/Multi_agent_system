@@ -97,7 +97,7 @@ public class ReceiveMsg extends SimpleBehaviour {
     	
         ACLMessage msgReceived3 = this.myAgent.receive(msgTemplate3);
      
-		if (msgReceived3 != null) {
+		while (msgReceived3 != null) {
 			// create a new message
 			//System.out.println("J ai recu un ping");
 			ACLMessage msg=new ACLMessage(ACLMessage.INFORM);
@@ -110,6 +110,12 @@ public class ReceiveMsg extends SimpleBehaviour {
 				e.printStackTrace();
 			}
 			((AbstractDedaleAgent) this.myAgent).sendMessage(msg);
+			msgTemplate3 = MessageTemplate.and(
+					MessageTemplate.MatchProtocol("HunterProtocol"),
+					MessageTemplate.MatchPerformative(ACLMessage.INFORM));
+	    	
+	        msgReceived3 = this.myAgent.receive(msgTemplate3);
+	     
 			
 		}
 		

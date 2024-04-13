@@ -210,118 +210,65 @@ public class FollowGolemBehaviour extends SimpleBehaviour {
 		    
 		    
 		else {
-			this.myAgent.addBehaviour(new ReceiveMsg(this.myAgent, this.myMap, this.list_agentNames));
-			
 			// liste des noeuds à proximité qui sont des agents
 			List<Location> liste_noeuds_agents = new ArrayList<Location>();
-	    	
-	    	// message qu'on recoit (ou non)
-	    	MessageTemplate msgTemplate = MessageTemplate.and(
-					MessageTemplate.MatchProtocol("ACK_HunterProtocol"),
-					MessageTemplate.MatchPerformative(ACLMessage.INFORM));	
-			ACLMessage msgReceived = this.myAgent.receive(msgTemplate);
+				    	
+			this.myAgent.addBehaviour(new CommunicationHunter(this.myAgent, this.list_agentNames, this.myMap, liste_noeuds_agents));
 			
-			
-	    	// Si on recoit un message, un agent est à proximité donc on crée une guild
-			while (msgReceived != null ) {
-				
-				System.out.println("J'ai recu un message");
-				Location noeud = null;
-				try {
-					noeud = (Location) msgReceived.getContentObject();
-					// ~~~~~~~~~~~~~~~ MODE GUILD ~~~~~~~~~~~~~~~~~
-					// j'ajoute le sender à ma guild
-					GuildMembers.add(msgReceived.getSender().getLocalName());
-					
-					// on partage notre prochain noeud 
-				
-				} catch (UnreadableException e) {
-					e.printStackTrace();
-				}
-				liste_noeuds_agents.add(noeud);
-				msgTemplate = MessageTemplate.and(
-						MessageTemplate.MatchProtocol("ACK_HunterProtocol"),
-						MessageTemplate.MatchPerformative(ACLMessage.INFORM));	
-				msgReceived = this.myAgent.receive(msgTemplate);
-				
-				
-//				System.out.println("On a croisé un agent");
-//				System.out.println("noeud agent : " + liste_noeuds_agents);
-			}
-			
-			// on retire les noeuds des autres agents dans liste_agents_noeuds
-			//System.out.println("AVANT liste position des golems : " + liste_position_odeur);
-			
+			// On fait en sorte de ne pas aller sur les noeuds où il y a des agents
+			// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 			// convertit en string des positions des agents
 			List<String> string_location_agent = new ArrayList<String>();
 			for (Location loc : liste_noeuds_agents) {
 				string_location_agent.add(loc.getLocationId());
 			}
-			
 			// convertit en string la liste des positions des golems
 			List<String> string_location_golem = new ArrayList<String>();
 			for (Location loc : liste_position_odeur) {
 				string_location_golem.add(loc.getLocationId());
 			}
-			
-			System.out.println("AVANT liste position des golems : " + string_location_golem);
-			
 			string_location_agent.add(myPosition.getLocationId());
 			string_location_golem.removeAll(string_location_agent);
-			System.out.println("position des agents : " + string_location_agent);
-			System.out.println("liste position des golems : " + string_location_golem);
 			
-			//System.out.println("je suis à la position : " + ((AbstractDedaleAgent)this.myAgent).getCurrentPosition().getLocationId());
-			
-			//System.out.println("liste position des agents : " + liste_noeuds_agents);
-			//System.out.println("liste position des golems : " + liste_position_odeur);
-		    //System.out.println(liste_position_odeur);
-	
 			// on reconvertit les positions des golems en location
 			List<Location> liste_position_golem = new ArrayList<Location>();
 			for (String loc : string_location_golem) {
-                liste_position_golem.add(new gsLocation(loc));
+		        liste_position_golem.add(new gsLocation(loc)); // liste_position_golem est la liste des noeuds avec une odeur mais sans agents
 			}
+			// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 			
-			Random rand = new Random();
-//			// Génère un index aléatoire entre 0 (inclus) et la taille de la liste (exclus)
-		    int randomIndex = rand.nextInt(liste_position_golem.size());
-//		    
 			
 		    // si la liste est vide, behaviour golem sans odeur
+			String tmp = null;
 			if (liste_position_golem.isEmpty()) {
 				nextNodeId = noeuds_observable.get(0).getLocationId();
 			}else {
+				Random rand = new Random();
+			    int randomIndex = rand.nextInt(liste_position_golem.size());
+				nextNodeId = liste_position_golem.get(randomIndex).getLocationId();
 			
-			
-			nextNodeId = liste_position_golem.get(randomIndex).getLocationId();
-			//System.out.println("Prochaine noeud choisit : " + nextNodeId);
-	
 			}
+			tmp = nextNodeId;
+			
+			if (string_location_agent.isEmpty()) {
+				System.out.println("je suis l'agent : " + this.myAgent.getLocalName());	
+				System.out.println("liste noeuds des agents est vide");
+			}
+			System.out.println("liste noeuds des agents : " + string_location_agent);
+			System.out.println("liste noeuds des golems : " + liste_position_golem);
 			
 			if (!((AbstractDedaleAgent)this.myAgent).moveTo(new gsLocation(nextNodeId))) {
-            	//System.out.println("On à réussi à rattraper le goelem à la position : " + nextNodeId);
-//				while (!((AbstractDedaleAgent)this.myAgent).moveTo(new gsLocation(nextNodeId))){
-//		    		// tant qu'on peut pas y accèder, le golem est surement coincé on ne bouge pas
-//		    		//System.out.println("Le golem est surement coincé");
-//					((AbstractDedaleAgent)this.myAgent).moveTo(new gsLocation(nextNodeId));
-//					//System.out.println("golem coincé à la position : " + nextNodeId);
-//		    	}
-				nextNodeId = liste_position_golem.get(randomIndex).getLocationId();
-				// on le suit
-            	//((AbstractDedaleAgent)this.myAgent).moveTo(new gsLocation(nextNodeId));
-            	//busy = true;
-            	//System.out.println("On suit le golem");
+				
+				;
 		    }
-		    	//System.out.println("j'ai changé de position");
-			else{
-				((AbstractDedaleAgent)this.myAgent).moveTo(new gsLocation(nextNodeId));
-			}
+		    	
+			 
+			((AbstractDedaleAgent)this.myAgent).moveTo(new gsLocation(nextNodeId));
+
+		
 		    
-		}
 		    
-		    
-			
+		}		
 	}
 }
 

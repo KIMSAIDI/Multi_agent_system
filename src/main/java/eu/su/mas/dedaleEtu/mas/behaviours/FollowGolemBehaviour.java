@@ -259,7 +259,7 @@ public class FollowGolemBehaviour extends SimpleBehaviour {
 			
 			if (!((AbstractDedaleAgent)this.myAgent).moveTo(new gsLocation(nextNodeId))) {
 				
-				;
+				return ;
 		    }
 		    	
 			 

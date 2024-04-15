@@ -103,7 +103,7 @@ public class FollowGolemBehaviour extends SimpleBehaviour {
 	
 					}
 				}
-				if (!tmp.isEmpty()) { // ça veut dire qu'on a break avant la fin du chemin jusqu'à position_golem
+				if (tmp != null && !tmp.isEmpty()) { // ça veut dire qu'on a break avant la fin du chemin jusqu'à position_golem
 					// on va envoyer un message pour savoir qui nous entoure
 					ACLMessage msg=new ACLMessage(ACLMessage.INFORM);
 					msg.setProtocol("WhoAreYouProtocol");

@@ -170,11 +170,10 @@ public class FollowGolemBehaviour extends SimpleBehaviour {
 						System.out.println("Golem capturé");
 						((AbstractDedaleAgent) this.myAgent).moveTo(new gsLocation(myPosition.getLocationId()));
                         done = true;
+                        this.myAgent.doWait(1000000);
+							
 					}
-	//				while(!((AbstractDedaleAgent) this.myAgent).moveTo(new gsLocation(position_golem))){
-	//					System.out.println("Golem capturé");
-	//                    ((AbstractDedaleAgent) this.myAgent).moveTo(new gsLocation(position_golem));
-	//                }
+
 				}
 				
 				
@@ -431,20 +430,20 @@ public class FollowGolemBehaviour extends SimpleBehaviour {
 				
 				// partage l'information avec tout les hunters
 				
-				ACLMessage msg=new ACLMessage(ACLMessage.INFORM);
-				msg.setProtocol("CaptureGolemProtocol");
-				msg.setSender(this.myAgent.getAID());
+				ACLMessage msg_=new ACLMessage(ACLMessage.INFORM);
+				msg_.setProtocol("CaptureGolemProtocol");
+				msg_.setSender(this.myAgent.getAID());
 				for (String agentName : list_agentNames) {
-					msg.addReceiver(new AID(agentName,AID.ISLOCALNAME));	
+					msg_.addReceiver(new AID(agentName,AID.ISLOCALNAME));	
 				}
 				try {
-					msg.setContentObject((Serializable) map);
-					((AbstractDedaleAgent) this.myAgent).sendMessage(msg);
+					msg_.setContentObject((Serializable) map);
+					((AbstractDedaleAgent) this.myAgent).sendMessage(msg_);
 				} catch (IOException e) {
 					e.printStackTrace();
 				}				
 				
-				((AbstractDedaleAgent)this.myAgent).moveTo(new gsLocation(position_golem));
+				((AbstractDedaleAgent)this.myAgent).moveTo(new gsLocation(myPosition.getLocationId()));
 			
 				
 				// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -39,6 +39,8 @@ public class CommunicationHunter extends SimpleBehaviour {
 	public void action() {
 		// TODO Auto-generated method stub
 		
+
+
 		
 		this.myAgent.addBehaviour(new ReceiveMsg(this.myAgent, this.myMap, this.list_agentNames));
 		

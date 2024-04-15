@@ -63,7 +63,6 @@ public class ShareMapBehaviour extends SimpleBehaviour {
 		for (String agentName : receivers) {
 			msg.addReceiver(new AID(agentName,AID.ISLOCALNAME));
 			
-			
 		}
 			
 		SerializableSimpleGraph<String, MapAttribute> sg=this.myMap.getSerializableGraph();

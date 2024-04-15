@@ -113,7 +113,7 @@ public class FollowGolemBehaviour extends SimpleBehaviour {
 					}
 					// on envoie sa position
 					try {
-						msg.setContentObject((Serializable) myPosition); // envoyer sa position ici ça sert un peu à rien
+						msg.setContentObject((Serializable) myPosition); // envoyer sa position ici sert un peu à rien
 	                    ((AbstractDedaleAgent) this.myAgent).sendMessage(msg);
 	                } catch (IOException e) {
 	                    e.printStackTrace();
@@ -141,7 +141,7 @@ public class FollowGolemBehaviour extends SimpleBehaviour {
 		                }
 					}
 					
-					// si je capture une la réponse
+					// si je capture une réponse
 					MessageTemplate msgTemplate6 = MessageTemplate.and(
 							MessageTemplate.MatchProtocol("ACK_WhoAreYouProtocol"),
 							MessageTemplate.MatchPerformative(ACLMessage.INFORM));
@@ -169,7 +169,6 @@ public class FollowGolemBehaviour extends SimpleBehaviour {
 						System.out.println(" le Golem doit être capturé");
 						// je reste sur place pour le bloquer
 						((AbstractDedaleAgent) this.myAgent).moveTo(new gsLocation(myPosition.getLocationId()));
-                    
                        	this.myAgent.doWait();
 					}
 
@@ -301,9 +300,7 @@ public class FollowGolemBehaviour extends SimpleBehaviour {
 			    int randomIndex = rand.nextInt(liste_position_golem.size());
 			    // on va vers un noeud avec une odeur
 				nextNodeId = liste_position_golem.get(randomIndex).getLocationId();
-			
 			}
-
 			if (!((AbstractDedaleAgent)this.myAgent).moveTo(new gsLocation(nextNodeId))) {
 				// si je ne peux pas aller sur un noeud, c'est un golem
 				

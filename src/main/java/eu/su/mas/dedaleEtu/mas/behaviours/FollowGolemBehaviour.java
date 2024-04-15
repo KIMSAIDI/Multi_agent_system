@@ -42,6 +42,7 @@ public class FollowGolemBehaviour extends SimpleBehaviour {
 	boolean busy = false;
 	List<String> GuildMembers = new ArrayList<String>();
 	String position_golem = null;
+	boolean done;
 
 	public FollowGolemBehaviour(final AbstractDedaleAgent myagent, List<String> list_agentNames, MapRepresentation myMap ) {
 		super(myagent);
@@ -53,15 +54,15 @@ public class FollowGolemBehaviour extends SimpleBehaviour {
 
 	@Override
 	public void action() {
-
+		done = false;
 		if(this.myMap==null) {
 			this.myMap= new MapRepresentation();
 	    	this.myAgent.addBehaviour(new SayHelloBehaviour(this.myAgent, 100, list_agentNames, "HunterProtocol"));
 		}
 		Location myPosition=((AbstractDedaleAgent)this.myAgent).getCurrentPosition();
 
-//		System.out.println("~~~~~~~~~~~~~~");
-		//System.out.println("je suis l'agent : " + this.myAgent.getLocalName());	
+		System.out.println("~~~~~~~~~~~~~~");
+		System.out.println("je suis l'agent : " + this.myAgent.getLocalName());	
 		//System.out.println("je suis à la position : " + ((AbstractDedaleAgent)this.myAgent).getCurrentPosition().getLocationId());
 		
 		
@@ -119,16 +120,38 @@ public class FollowGolemBehaviour extends SimpleBehaviour {
 	                    e.printStackTrace();
 	                }
 					
-					// on capture la réponse
+					// si on recoit un message de protocol who are you, on envoie sa position
 					MessageTemplate msgTemplate5 = MessageTemplate.and(
 							MessageTemplate.MatchProtocol("WhoAreYouProtocol"),
 							MessageTemplate.MatchPerformative(ACLMessage.INFORM));
 					ACLMessage msgReceived5 = this.myAgent.receive(msgTemplate5);
+					if (msgReceived5 != null) {
+						// on envoie sa position
+						ACLMessage position_msg=new ACLMessage(ACLMessage.INFORM);
+						position_msg.setProtocol("ACK_WhoAreYouProtocol");
+						position_msg.setSender(this.myAgent.getAID());
+						for (String agentName : list_agentNames) {
+							position_msg.addReceiver(new AID(agentName, AID.ISLOCALNAME));
+						}
+						// on envoie sa position
+						try {
+							position_msg.setContentObject((Serializable) myPosition);
+		                    ((AbstractDedaleAgent) this.myAgent).sendMessage(position_msg);
+		                } catch (IOException e) {
+		                    e.printStackTrace();
+		                }
+					}
+					
+					// si je capture une la réponse
+					MessageTemplate msgTemplate6 = MessageTemplate.and(
+							MessageTemplate.MatchProtocol("ACK_WhoAreYouProtocol"),
+							MessageTemplate.MatchPerformative(ACLMessage.INFORM));
+					ACLMessage msgReceived6 = this.myAgent.receive(msgTemplate6);
 					boolean golem = true;
-					while (msgReceived5 != null) {
+					while (msgReceived6 != null) {
 						Location noeud = null;
 						try {
-							noeud = (Location) msgReceived5.getContentObject();
+							noeud = (Location) msgReceived6.getContentObject();
 						} catch (UnreadableException e) {
 							e.printStackTrace();
 						}
@@ -138,15 +161,15 @@ public class FollowGolemBehaviour extends SimpleBehaviour {
 							golem = false;
 							break;
 						}
-						msgTemplate5 = MessageTemplate.and(
-								MessageTemplate.MatchProtocol("WhoAreYouProtocol"),
+						msgTemplate6 = MessageTemplate.and(
+								MessageTemplate.MatchProtocol("ACK_WhoAreYouProtocol"),
 								MessageTemplate.MatchPerformative(ACLMessage.INFORM));
-						msgReceived5 = this.myAgent.receive(msgTemplate5);
+						msgReceived6 = this.myAgent.receive(msgTemplate6);
 					}
 					if (golem) {
 						System.out.println("Golem capturé");
-                        this.myAgent.doWait();
-                        
+						((AbstractDedaleAgent) this.myAgent).moveTo(new gsLocation(myPosition.getLocationId()));
+                        done = true;
 					}
 	//				while(!((AbstractDedaleAgent) this.myAgent).moveTo(new gsLocation(position_golem))){
 	//					System.out.println("Golem capturé");
@@ -160,11 +183,12 @@ public class FollowGolemBehaviour extends SimpleBehaviour {
 				e.printStackTrace();
 			}	
 		}
+		
 		// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~	
 				
 		
 		
-		if (myPosition!=null){
+		if (myPosition!=null && done == false){
 			//List of observable from the agent's current position
 			List<Couple<Location,List<Couple<Observation,Integer>>>> lobs=((AbstractDedaleAgent)this.myAgent).observe();//myPosition
 			// Liste de tous les noeuds avec une odeur

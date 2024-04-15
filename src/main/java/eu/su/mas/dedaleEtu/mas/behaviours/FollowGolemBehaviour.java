@@ -60,7 +60,7 @@ public class FollowGolemBehaviour extends SimpleBehaviour {
 		}
 		Location myPosition=((AbstractDedaleAgent)this.myAgent).getCurrentPosition();
 
-		System.out.println("~~~~~~~~~~~~~~");
+//		System.out.println("~~~~~~~~~~~~~~");
 		//System.out.println("je suis l'agent : " + this.myAgent.getLocalName());	
 		//System.out.println("je suis à la position : " + ((AbstractDedaleAgent)this.myAgent).getCurrentPosition().getLocationId());
 		
@@ -88,13 +88,9 @@ public class FollowGolemBehaviour extends SimpleBehaviour {
 				if (tmp.isEmpty()) {
                     ;
                 }else {
-                	// on fait  le chemin complet vers lui
-//                	System.out.println("je suis l'agent : " + this.myAgent.getLocalName());	
-//                	System.out.println("je suis à la position : " + myPosition.getLocationId());
-//                	System.out.println("je vais vers le golem : " + position_golem);
-//                	System.out.println("liste : "+tmp);
+             
 					for (String nextNodeId : tmp) {
-						//System.out.println("------------on avance vers : "+nextNodeId);
+						// Si on arrive pas à acceder à un noeud, on break
 						if (!((AbstractDedaleAgent) this.myAgent).moveTo(new gsLocation(nextNodeId))) {
 							break;
 						}
@@ -102,19 +98,63 @@ public class FollowGolemBehaviour extends SimpleBehaviour {
 						myPosition=((AbstractDedaleAgent)this.myAgent).getCurrentPosition();
 						tmp = this.myMap.getShortestPath(myPosition.getLocationId() , position_golem );
 						if (tmp.isEmpty()) {
-							System.out.println("on a break");
+							// Si on est arrivé au bout du chemin, on break
+							break;
+						}	
+					}
+                }
+				if (!tmp.isEmpty()) {
+					// on va envoyer un message au noeud qui bloque le chemin
+					ACLMessage msg=new ACLMessage(ACLMessage.INFORM);
+					msg.setProtocol("WhoAreYouProtocol");
+					msg.setSender(this.myAgent.getAID());
+					for (String agentName : list_agentNames) {
+						msg.addReceiver(new AID(agentName, AID.ISLOCALNAME));
+					}
+					// on envoie sa position
+					try {
+						msg.setContentObject((Serializable) myPosition);
+	                    ((AbstractDedaleAgent) this.myAgent).sendMessage(msg);
+	                } catch (IOException e) {
+	                    e.printStackTrace();
+	                }
+					
+					// on capture la réponse
+					MessageTemplate msgTemplate5 = MessageTemplate.and(
+							MessageTemplate.MatchProtocol("WhoAreYouProtocol"),
+							MessageTemplate.MatchPerformative(ACLMessage.INFORM));
+					ACLMessage msgReceived5 = this.myAgent.receive(msgTemplate5);
+					boolean golem = true;
+					while (msgReceived5 != null) {
+						Location noeud = null;
+						try {
+							noeud = (Location) msgReceived5.getContentObject();
+						} catch (UnreadableException e) {
+							e.printStackTrace();
+						}
+						// je regarde si le noeud correspond à la position du golem
+						if (noeud.getLocationId() == position_golem) {
+							// on s'est trompé, ce n'était pas le golem
+							golem = false;
 							break;
 						}
-						
+						msgTemplate5 = MessageTemplate.and(
+								MessageTemplate.MatchProtocol("WhoAreYouProtocol"),
+								MessageTemplate.MatchPerformative(ACLMessage.INFORM));
+						msgReceived5 = this.myAgent.receive(msgTemplate5);
 					}
-					this.myAgent.doWait(1990);
-					
-                	
-                }
+					if (golem) {
+						System.out.println("Golem capturé");
+                        this.myAgent.doWait();
+                        
+					}
+	//				while(!((AbstractDedaleAgent) this.myAgent).moveTo(new gsLocation(position_golem))){
+	//					System.out.println("Golem capturé");
+	//                    ((AbstractDedaleAgent) this.myAgent).moveTo(new gsLocation(position_golem));
+	//                }
+				}
 				
-				//System.out.println("je suis arrivé à la position du golem : " + position_golem);
-				//((AbstractDedaleAgent)this.myAgent).moveTo(new gsLocation(position_golem));
-			
+				
 			} catch (UnreadableException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

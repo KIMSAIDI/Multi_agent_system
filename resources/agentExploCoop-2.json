@@ -44,7 +44,7 @@
   "lockPickingExpertise":1
   },
   {
-    "agentType":"agentExplo",
+    "agentType":"wumpus",
     "agentName": "G1",
     "communicationRange": 3,
     "initialLocation": "free",

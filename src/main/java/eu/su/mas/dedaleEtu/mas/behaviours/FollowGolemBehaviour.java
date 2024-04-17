@@ -42,32 +42,135 @@ public class FollowGolemBehaviour extends SimpleBehaviour {
 	boolean busy = false;
 	List<String> GuildMembers = new ArrayList<String>();
 	String position_golem = null;
-	
+	boolean done = false;
+	boolean golem = false;
 
 	public FollowGolemBehaviour(final AbstractDedaleAgent myagent, List<String> list_agentNames, MapRepresentation myMap ) {
 		super(myagent);
 		//this.busy = false;
 		this.list_agentNames = list_agentNames;
 		this.myMap = myMap;
-	
+		
 	}
 
 	@Override
 	public void action() {
+		System.out.println("~~~~~~~~~~~~~~");
+		System.out.println("je suis l'agent : " + this.myAgent.getLocalName());	
 		
 		if(this.myMap==null) {
 			this.myMap= new MapRepresentation();
-	    	this.myAgent.addBehaviour(new SayHelloBehaviour(this.myAgent, 100, list_agentNames, "HunterProtocol"));
+			
+	    }
+		//this.myAgent.addBehaviour(new SayHelloBehaviour(this.myAgent, 100, list_agentNames, "HunterProtocol"));
+		ACLMessage msg_k=new ACLMessage(ACLMessage.INFORM);
+		msg_k.setProtocol("HunterProtocol");
+		msg_k.setSender(this.myAgent.getAID());
+		
+//		// liste des receivers
+		for (String agentName : list_agentNames) {
+			msg_k.addReceiver(new AID(agentName,AID.ISLOCALNAME));
+			
+		}
+		try {
+			msg_k.setContentObject("HunterProtocol");
+			//System.out.println("on say hello");
+			((AbstractDedaleAgent) this.myAgent).sendMessage(msg_k);
+			this.myAgent.doWait(500); 
+
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		
 		Location myPosition=((AbstractDedaleAgent)this.myAgent).getCurrentPosition();
-		System.out.println("~~~~~~~~~~~~~~");
-		System.out.println("je suis l'agent : " + this.myAgent.getLocalName());	
+		// liste des noeuds à proximité qui sont des agents
+		List<Location> liste_noeuds_agents = new ArrayList<Location>();				    	
+
+		
+		// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ COMMUNICATION ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		
+		
+		// ~~~~~~~~~~~~~~~ on vérifie qu'on à pas reçu un hello ~~~~~~~~~~~~~~~
+		MessageTemplate msgTemplate3 = MessageTemplate.and(
+				MessageTemplate.MatchProtocol("HunterProtocol"),
+				MessageTemplate.MatchPerformative(ACLMessage.INFORM));
+        ACLMessage msgReceived3 = this.myAgent.receive(msgTemplate3);
+        // si on reçoit un (ou des) hello, on répond avec notre position
+		while (msgReceived3 != null) {
+			ACLMessage msg=new ACLMessage(ACLMessage.INFORM);
+			msg.setProtocol("HelloBackProtocol");
+			msg.setSender(this.myAgent.getAID());
+			msg.addReceiver(msgReceived3.getSender());
+			try {
+				msg.setContentObject(myPosition);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			 msgTemplate3 = MessageTemplate.and(
+					MessageTemplate.MatchProtocol("HunterProtocol"),
+					MessageTemplate.MatchPerformative(ACLMessage.INFORM));
+			 msgReceived3 = this.myAgent.receive(msgTemplate3);
+			((AbstractDedaleAgent) this.myAgent).sendMessage(msg);
+			this.myAgent.doWait(500); // j'attend mon ack
+		}
+		
+		// ~~~~~~~~~~~~~~~ Si on répond à notre hello, un agent est à proximité ~~~~~~~~~~~~~~~
+		MessageTemplate msgTemplate = MessageTemplate.and(
+				MessageTemplate.MatchProtocol("HelloBackProtocol"),
+				MessageTemplate.MatchPerformative(ACLMessage.INFORM));	
+		ACLMessage msgReceived = this.myAgent.receive(msgTemplate);
+		
+		while (msgReceived != null ) {
+			// j'envoie un ack avec ma position
+			Location noeud = null;
+			ACLMessage msg=new ACLMessage(ACLMessage.INFORM);
+			msg.setProtocol("ACK_HunterProtocol");
+			msg.setSender(this.myAgent.getAID());
+			msg.addReceiver(msgReceived.getSender());
+			try {
+				msg.setContentObject(myPosition);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			// je récupère la position de l'agent
+			try {
+				noeud = (Location) msgReceived.getContentObject();
+				liste_noeuds_agents.add(noeud);
+			} catch (UnreadableException e) {
+				e.printStackTrace();
+			}
+			
+			msgTemplate = MessageTemplate.and(
+					MessageTemplate.MatchProtocol("ACK_HunterProtocol"),
+					MessageTemplate.MatchPerformative(ACLMessage.INFORM));	
+			msgReceived = this.myAgent.receive(msgTemplate);	
+		}
+		
+		
+		// ~~~~~~~~~~~~~~~ Si on reçoit un ack, on ajoute la position de l'agent à notre liste ~~~~~~~~~~~~~~~
+		MessageTemplate msgTemplate2 = MessageTemplate.and(MessageTemplate.MatchProtocol("ACK_HunterProtocol"),
+				MessageTemplate.MatchPerformative(ACLMessage.INFORM));
+		ACLMessage msgReceived2 = this.myAgent.receive(msgTemplate2);
+		while (msgReceived2 != null) {
+			Location noeud = null;
+			try {
+				noeud = (Location) msgReceived2.getContentObject();
+				liste_noeuds_agents.add(noeud);
+			} catch (UnreadableException e) {
+				e.printStackTrace();
+			}
+			msgTemplate2 = MessageTemplate.and(MessageTemplate.MatchProtocol("ACK_HunterProtocol"),
+					MessageTemplate.MatchPerformative(ACLMessage.INFORM));
+			msgReceived2 = this.myAgent.receive(msgTemplate2);
+		}
+		
 		
 		
 		// ~~~~~~~~~~~~~~~~~~~~~~~ MODE CAPTURE ~~~~~~~~~~~~~~~~~~~~~~~
 		
 		// Si je recois un message de capture, j'adopte le mode capture
+		
 		MessageTemplate msgTemplate4 = MessageTemplate.and(
 				MessageTemplate.MatchProtocol("CaptureGolemProtocol"),
 				MessageTemplate.MatchPerformative(ACLMessage.INFORM));
@@ -104,6 +207,7 @@ public class FollowGolemBehaviour extends SimpleBehaviour {
 					}
 				}
 				if (tmp != null && !tmp.isEmpty()) { // ça veut dire qu'on a break avant la fin du chemin jusqu'à position_golem
+					//golem = false;
 					// on va envoyer un message pour savoir qui nous entoure
 					ACLMessage msg=new ACLMessage(ACLMessage.INFORM);
 					msg.setProtocol("WhoAreYouProtocol");
@@ -115,6 +219,7 @@ public class FollowGolemBehaviour extends SimpleBehaviour {
 					try {
 						msg.setContentObject((Serializable) myPosition); // envoyer sa position ici sert un peu à rien
 	                    ((AbstractDedaleAgent) this.myAgent).sendMessage(msg);
+	                    this.myAgent.doWait(500);
 	                } catch (IOException e) {
 	                    e.printStackTrace();
 	                }
@@ -141,12 +246,12 @@ public class FollowGolemBehaviour extends SimpleBehaviour {
 		                }
 					}
 					
-					// si je capture une réponse
+					// si je capture une (ou des) réponse(s)
 					MessageTemplate msgTemplate6 = MessageTemplate.and(
 							MessageTemplate.MatchProtocol("ACK_WhoAreYouProtocol"),
 							MessageTemplate.MatchPerformative(ACLMessage.INFORM));
 					ACLMessage msgReceived6 = this.myAgent.receive(msgTemplate6);
-					boolean golem = true;
+					
 					while (msgReceived6 != null) {
 						Location noeud = null;
 						try {
@@ -159,18 +264,23 @@ public class FollowGolemBehaviour extends SimpleBehaviour {
 							// on s'est trompé, ce n'était pas le golem mais un autre agent
 							golem = false;
 							break;
+						}else {
+							golem = true;
 						}
 						msgTemplate6 = MessageTemplate.and(
 								MessageTemplate.MatchProtocol("ACK_WhoAreYouProtocol"),
 								MessageTemplate.MatchPerformative(ACLMessage.INFORM));
 						msgReceived6 = this.myAgent.receive(msgTemplate6);
 					}
-					if (golem) { // si on a pas reçu de message de la position qui bloque alors c'est le golem
-						System.out.println(" le Golem doit être capturé");
-						// je reste sur place pour le bloquer
-						((AbstractDedaleAgent) this.myAgent).moveTo(new gsLocation(myPosition.getLocationId()));
-                       	this.myAgent.doWait();
-					}
+					
+//					if (golem) { // si on a pas reçu de message de la position qui bloque alors c'est le golem
+//						System.out.println("le Golem doit être capturé");
+//						// je reste sur place pour le bloquer
+////						((AbstractDedaleAgent) this.myAgent).moveTo(new gsLocation(myPosition.getLocationId()));
+////						done = true;
+//						//this.myAgent.doWait(5000000);
+//						
+//					}
 
 					}
 				
@@ -182,6 +292,33 @@ public class FollowGolemBehaviour extends SimpleBehaviour {
 		
 		// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~	
 				
+		
+		if (golem) {
+			
+//			SerializableSimpleGraph<String, MapAttribute> sg=this.myMap.getSerializableGraph(); // map
+//			
+//			// On crée une liste contenant ces deux informations
+//			Map<String, Serializable> map = new HashMap<String, Serializable>();
+//			map.put("position_golem", position_golem);
+//			map.put("map", sg);
+//			
+//			// partage l'information avec tout les hunters
+//			ACLMessage msg_=new ACLMessage(ACLMessage.INFORM);
+//			msg_.setProtocol("CaptureGolemProtocol");
+//			msg_.setSender(this.myAgent.getAID());
+//			for (String agentName : list_agentNames) {
+//				msg_.addReceiver(new AID(agentName,AID.ISLOCALNAME));	
+//			}
+//			try {
+//				msg_.setContentObject((Serializable) map);
+//				((AbstractDedaleAgent) this.myAgent).sendMessage(msg_);
+//			} catch (IOException e) {
+//				e.printStackTrace();
+//			}
+			
+			((AbstractDedaleAgent) this.myAgent).moveTo(new gsLocation(myPosition.getLocationId()));
+//			
+		}else {
 		if (myPosition!=null){
 			//List of observable from the agent's current position
 			List<Couple<Location,List<Couple<Observation,Integer>>>> lobs=((AbstractDedaleAgent)this.myAgent).observe();
@@ -200,17 +337,17 @@ public class FollowGolemBehaviour extends SimpleBehaviour {
 	        }
 			// pour supprimer notre propre position
 	        if (!noeuds_observable.isEmpty()) {
-	            noeuds_observable.remove(0); // Supprime le premier élément
+	            noeuds_observable.remove(0); // Supprime le premier élément  
 	        }
-	        
+			if (!liste_position_odeur.isEmpty()) {
+				liste_position_odeur.remove(0); // Supprime le premier élément
+			}
 			try {
 				this.myAgent.doWait(1000);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 
-			// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-			
 			this.myMap.addNode(myPosition.getLocationId(), MapAttribute.closed);
 			String nextNodeId=null;
 			Iterator<Couple<Location, List<Couple<Observation, Integer>>>> iter=lobs.iterator();
@@ -227,32 +364,9 @@ public class FollowGolemBehaviour extends SimpleBehaviour {
 			}
 			// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 			
-			// liste des noeuds à proximité qui sont des agents
-			List<Location> liste_noeuds_agents = new ArrayList<Location>();				    	
-
-			this.myAgent.addBehaviour(new ReceiveMsg(this.myAgent, this.myMap, this.list_agentNames));
 			
-			// message qu'on recoit (ou non)
-			MessageTemplate msgTemplate = MessageTemplate.and(
-					MessageTemplate.MatchProtocol("ACK_HunterProtocol"),
-					MessageTemplate.MatchPerformative(ACLMessage.INFORM));	
-			ACLMessage msgReceived = this.myAgent.receive(msgTemplate);
-			// Si on recoit un message, un agent est à proximité
-			while (msgReceived != null ) {
-				Location noeud = null;
-				try {
-					noeud = (Location) msgReceived.getContentObject();
-
-				} catch (UnreadableException e) {
-					e.printStackTrace();
-				}
-				liste_noeuds_agents.add(noeud);
-				msgTemplate = MessageTemplate.and(
-						MessageTemplate.MatchProtocol("ACK_HunterProtocol"),
-						MessageTemplate.MatchPerformative(ACLMessage.INFORM));	
-				msgReceived = this.myAgent.receive(msgTemplate);
-				
-			}
+			//this.myAgent.addBehaviour(new ReceiveMsg(this.myAgent, this.myMap, this.list_agentNames));
+	
 			
 			// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 			// On fait en sorte de ne pas aller sur les noeuds où il y a des agents
@@ -270,7 +384,7 @@ public class FollowGolemBehaviour extends SimpleBehaviour {
 			}
 			// convertit en string la liste des positions des golems
 			List<String> string_location_golem = new ArrayList<String>();
-			for (Location loc : liste_position_odeur) {
+			for (Location loc : liste_position_odeur) { // il faut enlever notre position
 				string_location_golem.add(loc.getLocationId());
 			}
 			
@@ -288,6 +402,7 @@ public class FollowGolemBehaviour extends SimpleBehaviour {
 				liste_position_observable.add(new gsLocation(loc)); 
 																	
 			}
+			System.out.println("liste_position_agent : " + liste_noeuds_agents);
 			
 			// ~~~~~~~~~~~~~~ DETECTION GOLEM ~~~~~~~~~~~~~~~~~~~
 			
@@ -330,14 +445,16 @@ public class FollowGolemBehaviour extends SimpleBehaviour {
 				}				
 				// on reste sur place pour tenter de le bloquer
 				((AbstractDedaleAgent)this.myAgent).moveTo(new gsLocation(myPosition.getLocationId()));
-				
+				//golem = true;
 				// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	
 		    }else {
 		    	
 		    	((AbstractDedaleAgent)this.myAgent).moveTo(new gsLocation(nextNodeId));
 		    }
-		}		
+		    
+			}	
+		}
  }
 
 

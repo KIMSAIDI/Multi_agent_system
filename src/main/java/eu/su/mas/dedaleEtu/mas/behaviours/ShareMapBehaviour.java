@@ -11,7 +11,7 @@ import eu.su.mas.dedaleEtu.mas.knowledge.MapRepresentation.MapAttribute;
 
 import jade.core.AID;
 import jade.core.Agent;
-import jade.core.behaviours.SimpleBehaviour;
+import jade.core.behaviours.OneShotBehaviour;
 
 import jade.lang.acl.ACLMessage;
 
@@ -23,12 +23,10 @@ import jade.lang.acl.ACLMessage;
  * @author hc
  *
  */
-public class ShareMapBehaviour extends SimpleBehaviour {
+public class ShareMapBehaviour extends OneShotBehaviour {
 	
 	private MapRepresentation myMap;
 	private List<String> receivers;
-	private boolean finished = false;
-
 	/**
 	 * The agent periodically share its map.
 	 * It blindly tries to send all its graph to its friend(s)  	
@@ -43,8 +41,6 @@ public class ShareMapBehaviour extends SimpleBehaviour {
 		super(a);
 		this.myMap=mymap;
 		this.receivers=receivers;	
-
-
 	}
 
 	/**
@@ -52,6 +48,7 @@ public class ShareMapBehaviour extends SimpleBehaviour {
 	 */
 	private static final long serialVersionUID = -568863390879327961L;
 
+	@Override
 	public void action() {
 		//4) At each time step, the agent blindly send all its graph to its surrounding to illustrate how to share its knowledge (the topology currently) with the the others agents. 	
 		// If it was written properly, this sharing action should be in a dedicated behaviour set, the receivers be automatically computed, and only a subgraph would be shared.
@@ -71,15 +68,7 @@ public class ShareMapBehaviour extends SimpleBehaviour {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		((AbstractDedaleAgent)this.myAgent).sendMessage(msg);
-
-		
-	}
-
-	@Override
-	public boolean done() {
-		// TODO Auto-generated method stub
-		return !finished;
-	}
+		((AbstractDedaleAgent)this.myAgent).sendMessage(msg);	
+	}	
 
 }

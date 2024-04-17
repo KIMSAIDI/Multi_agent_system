@@ -4,13 +4,10 @@ import java.io.IOException;
 import java.util.List;
 
 import eu.su.mas.dedale.env.Location;
-import eu.su.mas.dedale.env.gs.gsLocation;
 import eu.su.mas.dedale.mas.AbstractDedaleAgent;
-import eu.su.mas.dedale.mas.agents.dedaleDummyAgents.Explo.ExploreCoopAgent;
-import eu.su.mas.dedaleEtu.mas.knowledge.MapRepresentation;
 import jade.core.AID;
 import jade.core.Agent;
-import jade.core.behaviours.TickerBehaviour;
+import jade.core.behaviours.OneShotBehaviour;
 import jade.lang.acl.ACLMessage;
 
 /**
@@ -18,12 +15,9 @@ import jade.lang.acl.ACLMessage;
  * @author hc
  *
  */
-public class SayHelloBehaviour extends TickerBehaviour{
+public class SayHelloBehaviour extends OneShotBehaviour{
 	
 	private List<String> receivers;
-	private String protocol;
-	
-
 	/**
 	 * 
 	 */
@@ -34,59 +28,32 @@ public class SayHelloBehaviour extends TickerBehaviour{
 	 * @param myagent the agent who posses the behaviour
 	 *  
 	 */
-	public SayHelloBehaviour (final Agent myagent, long period, List<String> receivers, String protocol) {
-		super(myagent, period);
+	public SayHelloBehaviour (final Agent myagent, List<String> receivers) {
+		super(myagent);
 		this.receivers=receivers;
-		this.protocol=protocol;
-		
-		//super(myagent);
 	}
 
 	@Override
-	public void onTick() {
+	public void action() {
 		Location myPosition=((AbstractDedaleAgent)this.myAgent).getCurrentPosition();
 		
-		//System.out.println("receivers : " + receivers);
-            
 		ACLMessage msg=new ACLMessage(ACLMessage.INFORM);
-		msg.setProtocol(protocol);
+		msg.setProtocol("HelloProtocol");
 		msg.setSender(this.myAgent.getAID());
-		
-//		// liste des receivers
 		for (String agentName : receivers) {
 			msg.addReceiver(new AID(agentName,AID.ISLOCALNAME));
 			
 		}
 		
-		
-		
-		// print les receivers de message 
-		//System.out.println("receivers : " + msg.getAllReceiver().toString().replace("[", "").replace("]", ""));
-		
-		if (protocol == "HelloProtocol") {
-			try {
-				msg.setContentObject("Hello World, I'm at "+myPosition + " I am "+this.myAgent.getAID()) ;
-				((AbstractDedaleAgent)this.myAgent).sendMessage(msg);
-
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-		if (protocol == "HunterProtocol") {
-			try {
-				msg.setContentObject("HunterProtocol");
-				((AbstractDedaleAgent) this.myAgent).sendMessage(msg);
-
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+		try {
+			msg.setContentObject("Hello World, I'm at "+myPosition + " I am "+this.myAgent.getAID()) ;
+			((AbstractDedaleAgent)this.myAgent).sendMessage(msg);
+		} catch (IOException e) {
+			e.printStackTrace();
 			}
 			
-		}
-			
 		
-}
+	}
 	
 	
 

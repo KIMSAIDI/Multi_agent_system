@@ -72,11 +72,9 @@ public class ExploCoopBehaviour extends SimpleBehaviour {
 		if(this.myMap==null) {
 			this.myMap= new MapRepresentation();
 			//this.myAgent.addBehaviour(new ShareMapBehaviour(this.myAgent,500,this.myMap,list_agentNames));
-			this.myAgent.addBehaviour(new SayHelloBehaviour(this.myAgent, 500, list_agentNames, "HelloProtocol"));
+			//this.myAgent.addBehaviour(new SayHelloBehaviour(this.myAgent, list_agentNames, "HelloProtocol"));
 			
 		}
-		
-		System.out.println("~~~~~~~~~");
 		
 		//0) Retrieve the current position
 		Location myPosition=((AbstractDedaleAgent)this.myAgent).getCurrentPosition();
@@ -89,9 +87,6 @@ public class ExploCoopBehaviour extends SimpleBehaviour {
 	            locations.add(observable.getLeft()); 
 	        }
 			
-			/**
-			 * Just added here to let you see what the agent is doing, otherwise he will be too quick
-			 */
 			try {
 				this.myAgent.doWait(1000);
 			} catch (Exception e) {
@@ -130,27 +125,12 @@ public class ExploCoopBehaviour extends SimpleBehaviour {
 				}
 			}
 			
-			
-				
-			
-	        
-//			if (this.myMap.hasOpenNode()) {
-//				//System.out.println(this.myAgent.getLocalName()+" - Exploration in progress");
-//				 // log les noeuds qui manquent
-//				//System.out.println("Noeuds manquants : "+this.myMap.getOpenNodes());
-//				//System.out.println("-------------------------------");
-//			}
-			
-			
-			
 
 			//3) while openNodes is not empty, continues.
 			if (!this.myMap.hasOpenNode()) {
 				//Explo finished
 				finished=true;
 				System.out.println(this.myAgent.getLocalName()+" - Exploration successufully done, behaviour removed.");
-				//System.out.println("ON A FINIT");
-				
 				
 				// Si je ne suis pas le dernier agent
 				
@@ -192,10 +172,6 @@ public class ExploCoopBehaviour extends SimpleBehaviour {
 			    
 			   this.myAgent.addBehaviour(new ReceiveMsg(this.myAgent, this.myMap, list_agentNames));
 
-				
-
-				
-				
 			    
 			    ((AbstractDedaleAgent)this.myAgent).moveTo(new gsLocation(nextNodeId));
 				

@@ -22,6 +22,7 @@ import jade.core.behaviours.SimpleBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
+import jade.core.behaviours.OneShotBehaviour;
 
 
 /**
@@ -38,12 +39,12 @@ import jade.lang.acl.UnreadableException;
  * @author hc
  *
  */
-public class ExploCoopBehaviour extends SimpleBehaviour {
+public class ExploCoopBehaviour extends OneShotBehaviour {
 
 	private static final long serialVersionUID = 8567689731496787661L;
 
 	private boolean finished = false;
-
+	private int exitValue;
 	/**
 	 * Current knowledge of the agent regarding the environment
 	 */
@@ -68,13 +69,15 @@ public class ExploCoopBehaviour extends SimpleBehaviour {
 
 	@Override
 	public void action() {
-
+		this.exitValue = 0;
+		
 		if(this.myMap==null) {
 			this.myMap= new MapRepresentation();
-			//this.myAgent.addBehaviour(new ShareMapBehaviour(this.myAgent,500,this.myMap,list_agentNames));
-			//this.myAgent.addBehaviour(new SayHelloBehaviour(this.myAgent, list_agentNames, "HelloProtocol"));
-			
 		}
+
+		
+		// je décrouvre qui est autour de moi
+		//this.exitValue = 1;
 		
 		//0) Retrieve the current position
 		Location myPosition=((AbstractDedaleAgent)this.myAgent).getCurrentPosition();
@@ -100,28 +103,16 @@ public class ExploCoopBehaviour extends SimpleBehaviour {
 			String nextNodeId=null;
 			Iterator<Couple<Location, List<Couple<Observation, Integer>>>> iter=lobs.iterator();
 			
-			
-//			ArrayList<String> lobsString = new ArrayList<String>();
-//			for (Couple<Location, List<Couple<Observation, Integer>>> couple : lobs) {
-//				lobsString.add(couple.getLeft().toString());
-//				
-//			}
-			//System.out.println("-------------------------------");
-//			System.out.println(this.myAgent.getLocalName()+" - Exploration in progress");
-//			System.out.println("Liste des observables : "+lobsString);			
-//			System.out.println("Position actuelle : "+myPosition);
 			List<String> liste_noeuds_accessibles = new ArrayList<String>();
 			//System.out.println("~~~~~~~~");
 			while(iter.hasNext()){
 				Location accessibleNode=iter.next().getLeft();
-				//System.out.println("Noeud accessible : "+accessibleNode);
 				
 				boolean isNewNode=this.myMap.addNewNode(accessibleNode.getLocationId());
 				//the node may exist, but not necessarily the edge
 				if (myPosition.getLocationId()!=accessibleNode.getLocationId()) {
 					this.myMap.addEdge(myPosition.getLocationId(), accessibleNode.getLocationId());
 					if (nextNodeId==null && isNewNode) nextNodeId=accessibleNode.getLocationId();
-				liste_noeuds_accessibles.add(accessibleNode.getLocationId());
 				}
 			}
 			
@@ -131,26 +122,6 @@ public class ExploCoopBehaviour extends SimpleBehaviour {
 				//Explo finished
 				finished=true;
 				System.out.println(this.myAgent.getLocalName()+" - Exploration successufully done, behaviour removed.");
-				
-				// Si je ne suis pas le dernier agent
-				
-				//System.out.println("Liste des agents manquants : "+list_agentNames);
-				ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
-				// set the protocol of the message
-				msg.setProtocol("SHARE-TOPO");
-				msg.setSender(this.myAgent.getAID());
-				for (String agentName : list_agentNames) {
-					msg.addReceiver(new AID(agentName,AID.ISLOCALNAME));
-				}
-				
-				SerializableSimpleGraph<String, MapAttribute> sg=this.myMap.getSerializableGraph();
-				try {					
-					msg.setContentObject(sg);
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-				
-				((AbstractDedaleAgent)this.myAgent).sendMessage(msg);
 				
 			}else{
 				//4) select next move.
@@ -165,31 +136,24 @@ public class ExploCoopBehaviour extends SimpleBehaviour {
 					//System.out.println("nextNode notNUll - "+this.myAgent.getLocalName()+"-- list= "+this.myMap.getOpenNodes()+"\n -- nextNode: "+nextNode);
 				}
 				
-				//5) At each time step, the agent check if he received a graph from a teammate. 	
-				// If it was written properly, this sharing action should be in a dedicated behaviour set.
-				
-				
 			    
-			   this.myAgent.addBehaviour(new ReceiveMsg(this.myAgent, this.myMap, list_agentNames));
+			   	//this.myAgent.addBehaviour(new ReceiveMsg(this.myAgent, this.myMap, list_agentNames));
 
 			    
 			    ((AbstractDedaleAgent)this.myAgent).moveTo(new gsLocation(nextNodeId));
 				
-				
-				
+			 
 			}
 
 		}
 	}
 	
 	
-
-	
-	
 	@Override
-	public boolean done() {
-		System.out.println("End of behaviour");
-		return finished;
+	public int onEnd() {
+		return exitValue;
 	}
+	
+	
 
 }

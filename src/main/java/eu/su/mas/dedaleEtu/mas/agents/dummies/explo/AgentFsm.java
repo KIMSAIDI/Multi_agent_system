@@ -66,24 +66,34 @@ public class AgentFsm extends AbstractDedaleAgent {
 				i++;
 			}
 		}
+		this.nbAgent = list_agentNames.size();
+		this.list_agentNames = list_agentNames;
 
         fsm = new FSMBehaviour(this);
 
         // Definition des etats
         fsm.registerFirstState(new InitBehaviour(), STATE_INIT);
-        fsm.registerState(new ExploCoopBehaviour(this, myMap, list_agentNames), STATE_EXPLORE);
-        fsm.registerState(new ShareMapBehaviour(this, myMap, list_agentNames), STATE_SEND_MAP);
-        fsm.registerState(new ReceiveMapBehaviour(this), STATE_RECEIVE_MAP);
-        fsm.registerState(new SayHelloBehaviour(this, list_agentNames), STATE_SAYHELLO);
-        fsm.registerState(new FollowGolemBehaviour(this, list_agentNames, myMap), STATE_FOLLOW_GOLEM);
-        fsm.registerState(new CheckGolemBehaviour(this), STATE_CHECK_GOLEM);
-        fsm.registerState(new GuildBehaviour(this), STATE_GUILD);
+        fsm.registerState(new ExploCoopBehaviour(this, myMap, this.list_agentNames), STATE_EXPLORE);
+        //fsm.registerState(new ShareMapBehaviour(this, myMap, list_agentNames), STATE_SEND_MAP);
+        // fsm.registerState(new ReceiveMapBehaviour(this), STATE_RECEIVE_MAP);
+        fsm.registerState(new SayHelloBehaviour(this, this.list_agentNames), STATE_SAYHELLO);
+        // fsm.registerState(new FollowGolemBehaviour(this, list_agentNames, myMap), STATE_FOLLOW_GOLEM);
+        // fsm.registerState(new CheckGolemBehaviour(this), STATE_CHECK_GOLEM);
+        // fsm.registerState(new GuildBehaviour(this), STATE_GUILD);
         
 
         // Definition des transitions
         fsm.registerDefaultTransition(STATE_INIT, STATE_EXPLORE);
+        fsm.registerDefaultTransition(STATE_EXPLORE, STATE_EXPLORE);
+        // Exploration
         fsm.registerTransition(STATE_EXPLORE, STATE_SAYHELLO, 1);
+        fsm.registerDefaultTransition(STATE_SAYHELLO,STATE_EXPLORE);//Back to explo
         // ect
+
+        this.lb = new ArrayList<Behaviour>();
+        this.lb.add(fsm);
+        addBehaviour(new startMyBehaviours(this, this.lb));
+        System.out.println("the  agent "+this.getLocalName()+ " is started");
 
     }
 
@@ -93,6 +103,26 @@ public class AgentFsm extends AbstractDedaleAgent {
 
     public MapRepresentation getMyMap() {
         return myMap;
+    }
+    
+    public FSMBehaviour getFSM() {
+		return fsm;
+	}
+
+    public void setNbAgent(int nbAgent) {
+        this.nbAgent = nbAgent;
+    }
+
+    public int getNbAgent() {
+        return nbAgent;
+    }
+
+    public void setList_agentNames(List<String> list_agentNames) {
+        this.list_agentNames = list_agentNames;
+    }
+
+    public List<String> getList_agentNames() {
+        return list_agentNames;
     }
 
 }

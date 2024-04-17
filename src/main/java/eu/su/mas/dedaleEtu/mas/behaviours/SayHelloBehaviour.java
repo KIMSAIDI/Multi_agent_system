@@ -52,6 +52,7 @@ public class SayHelloBehaviour extends OneShotBehaviour{
 			e.printStackTrace();
 			}
 			
+		System.out.println("----------- " + this.myAgent.getLocalName()+" sent a message to its friend");
 		
 	}
 	

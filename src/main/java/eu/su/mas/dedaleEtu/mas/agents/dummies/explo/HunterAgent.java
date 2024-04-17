@@ -42,8 +42,6 @@ public class HunterAgent extends AbstractDedaleAgent{
 		lb.add(new FollowGolemBehaviourV2(this, list_agentNames, this.myMap)); 
 		
 		
-		
-		
 		addBehaviour(new startMyBehaviours(this,lb));
 		System.out.println("the  agent "+this.getLocalName()+ " is started");
 

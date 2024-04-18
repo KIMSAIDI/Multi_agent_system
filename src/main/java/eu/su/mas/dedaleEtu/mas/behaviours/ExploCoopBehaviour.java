@@ -1,13 +1,10 @@
 package eu.su.mas.dedaleEtu.mas.behaviours;
 
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 import dataStructures.serializableGraph.SerializableSimpleGraph;
 import dataStructures.tuple.Couple;
-import eu.su.mas.dedale.env.IEnvironment;
 import eu.su.mas.dedale.env.Location;
 import eu.su.mas.dedale.env.Observation;
 import eu.su.mas.dedale.env.gs.gsLocation;
@@ -16,13 +13,13 @@ import eu.su.mas.dedale.mas.AbstractDedaleAgent;
 import eu.su.mas.dedaleEtu.mas.knowledge.MapRepresentation.MapAttribute;
 import eu.su.mas.dedaleEtu.mas.knowledge.MapRepresentation;
 import eu.su.mas.dedaleEtu.mas.behaviours.ShareMapBehaviour;
-import jade.core.AID;
-import jade.core.behaviours.Behaviour;
+
 import jade.core.behaviours.SimpleBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
 import jade.core.behaviours.OneShotBehaviour;
+
 
 
 /**
@@ -45,13 +42,13 @@ public class ExploCoopBehaviour extends OneShotBehaviour {
 
 	private boolean finished = false;
 	private int exitValue;
+
 	/**
 	 * Current knowledge of the agent regarding the environment
 	 */
 	private MapRepresentation myMap;
 
 	private List<String> list_agentNames;
-	
 
 /**
  * 
@@ -65,31 +62,29 @@ public class ExploCoopBehaviour extends OneShotBehaviour {
 		this.list_agentNames=agentNames;
 		
 		
+	
 	}
 
 	@Override
 	public void action() {
-		this.exitValue = 0;
-		
+
 		if(this.myMap==null) {
 			this.myMap= new MapRepresentation();
+			//this.myAgent.addBehaviour(new ShareMapBehaviour(this.myAgent, 500, this.myMap, this.list_agentNames));
+			
 		}
+		this.exitValue = 1;
 
-		
-		// je décrouvre qui est autour de moi
-		//this.exitValue = 1;
-		
 		//0) Retrieve the current position
 		Location myPosition=((AbstractDedaleAgent)this.myAgent).getCurrentPosition();
 
 		if (myPosition!=null){
 			//List of observable from the agent's current position
 			List<Couple<Location,List<Couple<Observation,Integer>>>> lobs=((AbstractDedaleAgent)this.myAgent).observe();//myPosition
-			List<Location> locations = new ArrayList<>();
-	        for (Couple<Location, List<Couple<Observation, Integer>>> observable : lobs) {
-	            locations.add(observable.getLeft()); 
-	        }
-			
+
+			/**
+			 * Just added here to let you see what the agent is doing, otherwise he will be too quick
+			 */
 			try {
 				this.myAgent.doWait(1000);
 			} catch (Exception e) {
@@ -102,12 +97,8 @@ public class ExploCoopBehaviour extends OneShotBehaviour {
 			//2) get the surrounding nodes and, if not in closedNodes, add them to open nodes.
 			String nextNodeId=null;
 			Iterator<Couple<Location, List<Couple<Observation, Integer>>>> iter=lobs.iterator();
-			
-			List<String> liste_noeuds_accessibles = new ArrayList<String>();
-			//System.out.println("~~~~~~~~");
 			while(iter.hasNext()){
 				Location accessibleNode=iter.next().getLeft();
-				
 				boolean isNewNode=this.myMap.addNewNode(accessibleNode.getLocationId());
 				//the node may exist, but not necessarily the edge
 				if (myPosition.getLocationId()!=accessibleNode.getLocationId()) {
@@ -115,14 +106,12 @@ public class ExploCoopBehaviour extends OneShotBehaviour {
 					if (nextNodeId==null && isNewNode) nextNodeId=accessibleNode.getLocationId();
 				}
 			}
-			
 
 			//3) while openNodes is not empty, continues.
-			if (!this.myMap.hasOpenNode()) {
+			if (!this.myMap.hasOpenNode()){
 				//Explo finished
 				finished=true;
 				System.out.println(this.myAgent.getLocalName()+" - Exploration successufully done, behaviour removed.");
-				
 			}else{
 				//4) select next move.
 				//4.1 If there exist one open node directly reachable, go for it,
@@ -136,24 +125,18 @@ public class ExploCoopBehaviour extends OneShotBehaviour {
 					//System.out.println("nextNode notNUll - "+this.myAgent.getLocalName()+"-- list= "+this.myMap.getOpenNodes()+"\n -- nextNode: "+nextNode);
 				}
 				
-			    
-			   	//this.myAgent.addBehaviour(new ReceiveMsg(this.myAgent, this.myMap, list_agentNames));
-
-			    
-			    ((AbstractDedaleAgent)this.myAgent).moveTo(new gsLocation(nextNodeId));
 				
-			 
+
+				((AbstractDedaleAgent)this.myAgent).moveTo(new gsLocation(nextNodeId));
 			}
 
 		}
 	}
-	
-	
+
 	@Override
 	public int onEnd() {
 		return exitValue;
 	}
-	
-	
+
 
 }

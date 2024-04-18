@@ -74,14 +74,16 @@ public class AgentFsm extends AbstractDedaleAgent {
         // Definition des etats
         fsm.registerFirstState(new InitBehaviour(), STATE_INIT);
         fsm.registerState(new ExploCoopBehaviour(this, myMap, this.list_agentNames), STATE_EXPLORE);
-        //fsm.registerState(new ShareMapBehaviour(this, myMap, list_agentNames), STATE_SEND_MAP);
-        // fsm.registerState(new ReceiveMapBehaviour(this), STATE_RECEIVE_MAP);
+        fsm.registerState(new ShareMapBehaviour(this, myMap, list_agentNames), STATE_SEND_MAP);
+        fsm.registerState(new ReceiveMapBehaviour(this), STATE_RECEIVE_MAP);
         fsm.registerState(new SayHelloBehaviour(this, this.list_agentNames), STATE_SAYHELLO);
-        // fsm.registerState(new FollowGolemBehaviour(this, list_agentNames, myMap), STATE_FOLLOW_GOLEM);
-        // fsm.registerState(new CheckGolemBehaviour(this), STATE_CHECK_GOLEM);
-        // fsm.registerState(new GuildBehaviour(this), STATE_GUILD);
         
-
+        fsm.registerState(new FollowGolemBehaviour(this, list_agentNames, myMap), STATE_FOLLOW_GOLEM);
+        fsm.registerState(new CheckGolemBehaviour(this), STATE_CHECK_GOLEM);
+       // fsm.registerState(new GuildBehaviour(this), STATE_GUILD); à casser en deux
+        
+        // behaviour tracking jusqu'au golem / position utile (?)
+        
         // Definition des transitions
         fsm.registerDefaultTransition(STATE_INIT, STATE_EXPLORE);
         fsm.registerDefaultTransition(STATE_EXPLORE, STATE_EXPLORE);

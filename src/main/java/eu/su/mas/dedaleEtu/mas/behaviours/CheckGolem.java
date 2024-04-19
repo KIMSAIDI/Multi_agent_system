@@ -45,6 +45,9 @@ public class CheckGolem extends OneShotBehaviour {
             	
             if ((string_location_observable.contains(((AgentFsm)this.myAgent).getPosition_golem()))) {
             	this.exitValue = 7; // On va bloquer le golem
+            }else {
+            	((AgentFsm)this.myAgent).setPosition_golem(""); 
+            	this.exitValue = 6; // On va patrouiller
             }
         }
             // On vérifie déjà si on a reçu un message

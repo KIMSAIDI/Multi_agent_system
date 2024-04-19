@@ -157,7 +157,15 @@ public class PatrolBehaviour extends OneShotBehaviour{
 
         // Si je peux pas avancer alors c'est que j'ai trouvé un golem
         if (!((AbstractDedaleAgent)this.myAgent).moveTo(new gsLocation(nextNodeId))) {
-            
+        	
+        	MessageTemplate msgTemplate3 = MessageTemplate.and(
+            		MessageTemplate.MatchProtocol("I_Am_An_AgentBlockGolemProtocol"),
+            		MessageTemplate.MatchPerformative(ACLMessage.INFORM));
+            ACLMessage msgReceived3 = this.myAgent.receive(msgTemplate3);
+    		if (msgReceived3 != null) {
+    			// c'est un autre agent qui bloque
+                return;
+    		}
             ((AgentFsm)this.myAgent).setPosition_golem(nextNodeId); // on enregistre la position du golem (pour les autres agents
             
             // j'envoie la position du golem pour de l'aide

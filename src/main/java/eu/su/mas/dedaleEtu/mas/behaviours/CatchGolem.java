@@ -34,10 +34,10 @@ public class CatchGolem extends OneShotBehaviour{
         	
             Location myPosition=((AbstractDedaleAgent)this.myAgent).getCurrentPosition();
             
-			 if (this.position_golem == "") {
-			 	System.out.println("======ERREUR : je n'ai pas de position");
-			 	return;
-			 }
+//			 if (this.position_golem == "") {
+//			 	System.out.println("======ERREUR : je n'ai pas de position");
+//			 	return;
+//			 }
             // On trouve le chemin le plus court pour aller aider
             List<String> path = this.myMap.getShortestPath(myPosition.getLocationId() , ((AgentFsm)this.myAgent).getPosition_golem());
 			if (path.size() > 0){
@@ -58,7 +58,7 @@ public class CatchGolem extends OneShotBehaviour{
                     }
                 }
             }
-			System.out.println("------ CATCHGOLEM ---- JE SUIS ARRIVE A DESTINATION");
+			System.out.println(this.myAgent.getLocalName() + " : ------ CATCHGOLEM ---- JE SUIS ARRIVE A DESTINATION");
 			return;
         }
 

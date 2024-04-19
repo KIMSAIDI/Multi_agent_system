@@ -37,8 +37,37 @@ public class BlockGolemBehaviour extends OneShotBehaviour{
 
         // ~~~~~~~~~ Step 1 : Je vérifie que je bloque toujours le golem ~~~~~~~~~
         
-        // 1) je vérifie qu'on parle bien de mon golem 
         
+        //whichGolem(); // determine si je reste bien à ma place, pour le moment inutile
+            
+        
+        // je vérifie que je le bloque encore
+        if (!checkStillBlockGolem()){
+            return;
+        }else{
+            // On envoie un message pour dire qu'on est un agent qui bloque un golem
+            ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
+            msg.setProtocol("I_Am_An_AgentBlockGolemProtocol");
+            msg.setSender(this.myAgent.getAID());
+            for (String agentName : this.list_agentNames) {
+                msg.addReceiver(new AID(agentName,AID.ISLOCALNAME));
+            }
+            try{
+                // On envoie la position du golem
+                msg.setContentObject(((AgentFsm)this.myAgent).getPosition_golem());
+                ((AbstractDedaleAgent)this.myAgent).sendMessage(msg);
+            }
+            catch (Exception e) {
+                e.printStackTrace();
+            }
+            System.out.println(this.myAgent.getLocalName() + " : ----Je bloque un golem, il est à la position : " + position_golem + "----	");
+            return;
+        }
+        
+    }
+    
+    public boolean whichGolem(){
+        // 1) je vérifie qu'on parle bien de mon golem 
         // Liste des observables
 		List<Couple<Location,List<Couple<Observation,Integer>>>> lobs=((AbstractDedaleAgent)this.myAgent).observe();
 		// Liste des noeuds observables
@@ -52,36 +81,21 @@ public class BlockGolemBehaviour extends OneShotBehaviour{
             string_location_observable.add(loc.getLocationId());
         }
         // 2) Si il s'agit d'un autre golem alors on ne fait rien
-        if (!string_location_observable.contains(position_golem)){
+        if (!string_location_observable.contains(((AgentFsm)this.myAgent).getPosition_golem())){
             this.exitValue = 0;
-        
-        }else{
-            // je vérifie que je le bloque encore
-            if (((AbstractDedaleAgent)this.myAgent).moveTo(new gsLocation(position_golem))) {
-                this.exitValue = 4; // je retourne en patrouille
-            }else{
-                // On envoie un message pour dire qu'on est un agent qui bloque un golem
-                ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
-                msg.setProtocol("I_Am_An_AgentBlockGolemProtocol");
-                msg.setSender(this.myAgent.getAID());
-                for (String agentName : this.list_agentNames) {
-                    msg.addReceiver(new AID(agentName,AID.ISLOCALNAME));
-                }
-                try{
-                    // On envoie sa position
-                    msg.setContentObject(((AbstractDedaleAgent)this.myAgent).getCurrentPosition());
-                    ((AbstractDedaleAgent)this.myAgent).sendMessage(msg);
-                }
-                catch (Exception e) {
-                    e.printStackTrace();
-                }
-        
-            }
-            System.out.println("----Je bloque un golem, il est à la position : " + position_golem + "----	");
-            return;
+            return false;
         }
-        
-    
+        return true;
+    }
+
+    public boolean checkStillBlockGolem(){
+        // si je peux acceder à la position du golem alors je ne le bloque plus
+        if (((AbstractDedaleAgent)this.myAgent).moveTo(new gsLocation(((AgentFsm)this.myAgent).getPosition_golem()))) {
+            ((AgentFsm)this.myAgent).setPosition_golem(""); 
+            this.exitValue = 4; // je retourne en patrouille
+            return false;
+        }
+        return true;
     }
 
     @Override

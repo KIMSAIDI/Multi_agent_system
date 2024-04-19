@@ -161,7 +161,7 @@ public class PatrolBehaviour extends OneShotBehaviour{
             ((AgentFsm)this.myAgent).setPosition_golem(nextNodeId); // on enregistre la position du golem (pour les autres agents
             
             // j'envoie la position du golem pour de l'aide
-            System.out.println("A L'AAIDEEEEEEE !");
+            System.out.println(this.myAgent.getLocalName() + " : A L'AAIDEEEEEEE !");
             ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
             msg.setProtocol("NeedHelpProtocol");
             msg.setSender(this.myAgent.getAID()); 
@@ -169,7 +169,7 @@ public class PatrolBehaviour extends OneShotBehaviour{
                 msg.addReceiver(new AID(agentName,AID.ISLOCALNAME));
             }
             try {
-                msg.setContentObject(position_golem);
+                msg.setContentObject(nextNodeId);
                 ((AbstractDedaleAgent)this.myAgent).sendMessage(msg);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -211,10 +211,7 @@ public class PatrolBehaviour extends OneShotBehaviour{
         ACLMessage msgReceived2 = this.myAgent.receive(msgTemplate2);
         if (msgReceived2 != null) {
             try {
-            	System.out.println("J'ARRIVE AIDER !!!!!");
-                if ((String) msgReceived2.getContentObject() == "") {
-                    System.out.println("|||||||||||| ERREUR ||||||||||||||||");
-                }
+            	System.out.println(this.myAgent.getLocalName() + " : J'ARRIVE AIDER !!!!!");
                 ((AgentFsm)this.myAgent).setPosition_golem((String) msgReceived2.getContentObject());
                 
                 this.exitValue = 5; // on va aider pour bloquer le golem, on va a CatchGolem
@@ -223,6 +220,21 @@ public class PatrolBehaviour extends OneShotBehaviour{
                 e.printStackTrace();
             }
         }
+        
+//        // Message d'un agent qui bloque
+//        MessageTemplate msgTemplate3 = MessageTemplate.and(
+//        		MessageTemplate.MatchProtocol("I_Am_An_AgentBlockGolemProtocol"),
+//        		MessageTemplate.MatchPerformative(ACLMessage.INFORM));
+//        ACLMessage msgReceived3 = this.myAgent.receive(msgTemplate3);
+//		if (msgReceived3 != null) {
+//			try {
+//				((AgentFsm) this.myAgent).setPosition_golem((String) msgReceived3.getContentObject());
+//				this.exitValue = 0; 
+//				return true;
+//			} catch (UnreadableException e) {
+//				e.printStackTrace();
+//			}
+//		}
         
         return false;
     } 

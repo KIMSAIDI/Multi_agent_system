@@ -77,7 +77,8 @@ public class BlockGolemBehaviour extends OneShotBehaviour{
                 }
         
             }
-            System.out.println("----Je bloque un golem");
+            System.out.println("----Je bloque un golem, il est à la position : " + position_golem + "----	");
+            return;
         }
         
     

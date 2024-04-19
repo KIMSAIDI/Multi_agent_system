@@ -29,18 +29,17 @@ public class CatchGolem extends OneShotBehaviour{
         }
 
         public void action(){
+            this.position_golem = ((AgentFsm)this.myAgent).getPosition_golem();
         	this.myMap = ((AgentFsm)this.myAgent).getMyMap();
-        	this.position_golem = ((AgentFsm)this.myAgent).getPosition_golem();
-            
-
+        	
             Location myPosition=((AbstractDedaleAgent)this.myAgent).getCurrentPosition();
             
-			if (this.position_golem == "") {
-				System.out.println("======ERREUR : je n'ai pas de position");
-				return;
-			}
+			 if (this.position_golem == "") {
+			 	System.out.println("======ERREUR : je n'ai pas de position");
+			 	return;
+			 }
             // On trouve le chemin le plus court pour aller aider
-            List<String> path = this.myMap.getShortestPath(myPosition.getLocationId() , this.position_golem );
+            List<String> path = this.myMap.getShortestPath(myPosition.getLocationId() , ((AgentFsm)this.myAgent).getPosition_golem());
 			if (path.size() > 0){
                 for (String nodeId : path){
                     if (!((AbstractDedaleAgent) this.myAgent).moveTo(new gsLocation(nodeId))) {
@@ -49,15 +48,18 @@ public class CatchGolem extends OneShotBehaviour{
                     }else {
                         myPosition=((AbstractDedaleAgent)this.myAgent).getCurrentPosition();
                         // on recalcule le chemin le plus court à partir de notre nouvelle position
-                        path = this.myMap.getShortestPath(myPosition.getLocationId() , this.position_golem );
+                        path = this.myMap.getShortestPath(myPosition.getLocationId() , ((AgentFsm)this.myAgent).getPosition_golem() );
                         if (path.isEmpty()) {
                             // Si on est arrivé au bout du chemin, on à pas trouver de golem, on retourne patrouiller
-                            break;
+                        	((AgentFsm)this.myAgent).setPosition_golem("");
+                        	break;
+                            
                         }
                     }
                 }
             }
 			System.out.println("------ CATCHGOLEM ---- JE SUIS ARRIVE A DESTINATION");
+			return;
         }
 
 

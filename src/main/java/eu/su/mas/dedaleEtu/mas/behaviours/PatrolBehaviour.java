@@ -46,21 +46,20 @@ public class PatrolBehaviour extends OneShotBehaviour{
        
         this.myMap = ((AgentFsm)this.myAgent).getMyMap();
         this.position_golem = ((AgentFsm)this.myAgent).getPosition_golem();
-        // je retire mon nom de liste des agents
-		if (this.list_agentNames.contains(this.myAgent.getLocalName())) {
-			System.out.println("||||||| Je retire mon nom de la liste des agents |||||||");
-			this.list_agentNames.remove(this.myAgent.getLocalName());
-		}
+    
         // ~~~~~~~~~~~~~~~~~~~~ Step 1 : On envoie sa position ~~~~~~~~~~~~~~~~~~~~
         this.exitValue = 2;
 
         // ~~~~~~~~~~~~~~~~~~~~ Step 2 : On check ses messages ~~~~~~~~~~~~~~~~~~~~
-        if (checkMessage()){
-            if (this.exitValue == 5) {
-                return; // On va tout de suite aider à catch le golem
-            }
+        // if (checkMessage()){
+        //     if (this.exitValue == 5) {
+        //         return; // On va tout de suite aider à catch le golem
+        //     }
+        // }
+        checkMessage_position();
+        if (checkMessage_need_help()) {
+            return;
         }
-
         // ~~~~~~~~~~~~~~~~~~~~ Step 3 : On cherche où le golem pourrait être ~~~~~~~~~~~~~~~~~~~~
 
         // Liste des observables
@@ -183,7 +182,7 @@ public class PatrolBehaviour extends OneShotBehaviour{
         
     }
 
-    public boolean checkMessage(){
+    public boolean checkMessage_position(){
         // Message de position
         MessageTemplate msgTemplate = MessageTemplate.and(
 				MessageTemplate.MatchProtocol("SendPositionProtocol"),
@@ -200,6 +199,10 @@ public class PatrolBehaviour extends OneShotBehaviour{
                 e.printStackTrace();
             }
         }
+        return false;
+    }
+
+    public boolean checkMessage_need_help(){
     
         // Message de blocage de golem
         MessageTemplate msgTemplate2 = MessageTemplate.and(
@@ -209,6 +212,9 @@ public class PatrolBehaviour extends OneShotBehaviour{
         if (msgReceived2 != null) {
             try {
             	System.out.println("J'ARRIVE AIDER !!!!!");
+                if ((String) msgReceived2.getContentObject() == "") {
+                    System.out.println("|||||||||||| ERREUR ||||||||||||||||");
+                }
                 ((AgentFsm)this.myAgent).setPosition_golem((String) msgReceived2.getContentObject());
                 
                 this.exitValue = 5; // on va aider pour bloquer le golem, on va a CatchGolem

@@ -4,6 +4,7 @@ package eu.su.mas.dedaleEtu.mas.behaviours;
 import java.util.List;
 
 import eu.su.mas.dedale.mas.AbstractDedaleAgent;
+import eu.su.mas.dedaleEtu.mas.agents.dummies.explo.AgentFsm;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
@@ -31,7 +32,8 @@ public class CheckGolem extends OneShotBehaviour {
             if (msgReceived != null) {
                 // Un agent est arrivé avant moi, je retourne patrouiller
             	System.out.println("Un agent est arrivé avant moi, je retourne patrouiller");
-                this.exitValue = 0;
+            	((AgentFsm)this.myAgent).setPosition_golem(""); 
+            	this.exitValue = 0;
             }else{
                 // On renvoie un message de controle
 //                 ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
@@ -55,7 +57,7 @@ public class CheckGolem extends OneShotBehaviour {
             	
                 this.exitValue = 7;
             }
-            
+            System.out.println("------ CHECKGOLEM ----");
         }
 
         public int onEnd(){

@@ -91,7 +91,8 @@ public class BlockGolemBehaviour extends OneShotBehaviour{
     public boolean checkStillBlockGolem(){
         // si je peux acceder à la position du golem alors je ne le bloque plus
         if (((AbstractDedaleAgent)this.myAgent).moveTo(new gsLocation(((AgentFsm)this.myAgent).getPosition_golem()))) {
-            ((AgentFsm)this.myAgent).setPosition_golem(""); 
+            System.out.println("je ne le bloque plus");
+        	((AgentFsm)this.myAgent).setPosition_golem(""); 
             this.exitValue = 4; // je retourne en patrouille
             return false;
         }

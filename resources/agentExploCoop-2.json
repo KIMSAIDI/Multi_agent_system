@@ -33,6 +33,17 @@
   "lockPickingExpertise":1
   },
   { 
+  "agentType":"agentExplo",
+  "agentName": "Frodon",
+  "communicationRange": 3,
+  "initialLocation": "free",
+  "backPackCapacityGold": -1,
+  "backPackCapacityDiamond":-1, 
+  "detectionRadius": 0,
+  "strengthExpertise": 1,
+  "lockPickingExpertise":1
+  },
+  { 
   "agentType":"HumanControlled",
   "agentName": "ImHere",
   "communicationRange": 3,

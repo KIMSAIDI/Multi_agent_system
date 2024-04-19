@@ -50,12 +50,7 @@ public class SayHelloBehaviour extends OneShotBehaviour{
 			((AbstractDedaleAgent)this.myAgent).sendMessage(msg);
 		} catch (IOException e) {
 			e.printStackTrace();
-			}
-			
-		System.out.println("----------- " + this.myAgent.getLocalName()+" sent a message to its friend");
-		
-	}
-	
-	
+		}	
+	}	
 
 }

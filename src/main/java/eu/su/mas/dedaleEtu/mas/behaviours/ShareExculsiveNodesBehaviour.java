@@ -47,6 +47,7 @@ public class ShareExculsiveNodesBehaviour extends OneShotBehaviour {
         for (Couple<String, SerializableSimpleGraph<String, MapAttribute>> couple : list_friends_map) {
             if (couple.getLeft().equals(receiver)) {
                 SerializableSimpleGraph<String, MapAttribute> otherMap = couple.getRight();
+				
                 //List<Couple<String, List<String>>> exclusiveNodes = this.myMap.getNodesAndEdgesExclusiveToMyMap(otherMap);
                 //if (exclusiveNodes.isEmpty()) {
                 //    System.out.println("No exclusive nodes to share with agent: "+receiver);

@@ -8,13 +8,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Random;
-import java.util.stream.Collectors;
-
 import dataStructures.serializableGraph.SerializableSimpleGraph;
 import dataStructures.tuple.Couple;
-import debug.Debug;
-import eu.su.mas.dedale.env.IEnvironment;
+
 import eu.su.mas.dedale.env.Location;
 import eu.su.mas.dedale.env.Observation;
 import eu.su.mas.dedale.env.gs.gsLocation;
@@ -22,8 +18,7 @@ import eu.su.mas.dedale.mas.AbstractDedaleAgent;
 
 import eu.su.mas.dedaleEtu.mas.knowledge.MapRepresentation.MapAttribute;
 import eu.su.mas.dedaleEtu.mas.knowledge.MapRepresentation;
-import eu.su.mas.dedaleEtu.mas.agents.dummies.explo.HunterAgent;
-import eu.su.mas.dedaleEtu.mas.behaviours.ShareMapBehaviour;
+
 import jade.core.AID;
 import jade.core.behaviours.SimpleBehaviour;
 import jade.lang.acl.ACLMessage;

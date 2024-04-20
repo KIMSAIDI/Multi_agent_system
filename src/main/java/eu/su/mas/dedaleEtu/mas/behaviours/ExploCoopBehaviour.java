@@ -5,6 +5,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Random;
+import java.util.ArrayList;
 
 import dataStructures.serializableGraph.SerializableNode;
 import dataStructures.serializableGraph.SerializableSimpleGraph;
@@ -16,7 +18,7 @@ import eu.su.mas.dedale.mas.AbstractDedaleAgent;
 
 import eu.su.mas.dedaleEtu.mas.knowledge.MapRepresentation.MapAttribute;
 import eu.su.mas.dedaleEtu.mas.knowledge.MapRepresentation;
-import eu.su.mas.dedaleEtu.mas.behaviours.ShareMapBehaviour;
+import eu.su.mas.dedaleEtu.mas.agents.dummies.explo.AgentFsm;
 
 import jade.core.behaviours.SimpleBehaviour;
 import jade.lang.acl.ACLMessage;
@@ -83,7 +85,6 @@ public class ExploCoopBehaviour extends OneShotBehaviour {
 		if(this.myMap==null) {
 			this.myMap= new MapRepresentation();
 			//this.myAgent.addBehaviour(new ShareMapBehaviour(this.myAgent, 500, this.myMap, this.list_agentNames));
-			
 		}
 		this.exitValue = 0;
 
@@ -98,7 +99,7 @@ public class ExploCoopBehaviour extends OneShotBehaviour {
 			 * Just added here to let you see what the agent is doing, otherwise he will be too quick
 			 */
 			try {
-				this.myAgent.doWait(1000);
+				this.myAgent.doWait(500);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -115,7 +116,11 @@ public class ExploCoopBehaviour extends OneShotBehaviour {
 
 			//2) get the surrounding nodes and, if not in closedNodes, add them to open nodes.
 			String nextNodeId=null;
+			List<Location> noeuds_observable = new ArrayList<Location>();
 			Iterator<Couple<Location, List<Couple<Observation, Integer>>>> iter=lobs.iterator();
+			 for (Couple<Location, List<Couple<Observation, Integer>>> observable : lobs) {
+		            noeuds_observable.add(observable.getLeft()); 
+			 }   
 			while(iter.hasNext()){
 				Location accessibleNode=iter.next().getLeft();
 				boolean isNewNode=this.myMap.addNewNode(accessibleNode.getLocationId());
@@ -131,7 +136,7 @@ public class ExploCoopBehaviour extends OneShotBehaviour {
 			//3) while openNodes is not empty, continues.
 			if (!this.myMap.hasOpenNode()){
 				//Explo finished
-				finished=true;
+				this.exitValue = 10;
 				System.out.println(this.myAgent.getLocalName()+" - Exploration successufully done, behaviour removed.");
 			}else{
 				//4) select next move.
@@ -154,10 +159,20 @@ public class ExploCoopBehaviour extends OneShotBehaviour {
 				((AgentFsm)this.myAgent).majList_spam();
 				System.out.println("List_spam de "+ this.myAgent.getLocalName() + " : " + list_spam);
 
-				((AbstractDedaleAgent)this.myAgent).moveTo(new gsLocation(nextNodeId));
+				if (!((AbstractDedaleAgent)this.myAgent).moveTo(new gsLocation(nextNodeId))) {
+					System.out.println("je suis bloqué");
+					Random rand = new Random();
+					int randomIndex = rand.nextInt(noeuds_observable.size());
+					nextNodeId = noeuds_observable.get(randomIndex).getLocationId();
+					((AbstractDedaleAgent) this.myAgent).moveTo(new gsLocation(nextNodeId));
+					
+					
+				}
+				((AgentFsm)this.myAgent).setMyMap(this.myMap);
 			}
 
 		}
+		System.out.println(" ------------------- " + this.myAgent.getLocalName() + "ExploCoopBehaviour");
 	}
 	
 

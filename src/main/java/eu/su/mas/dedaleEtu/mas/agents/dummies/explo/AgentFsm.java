@@ -2,7 +2,6 @@ package eu.su.mas.dedaleEtu.mas.agents.dummies.explo;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.graphstream.graph.Node;
 
 import dataStructures.serializableGraph.SerializableSimpleGraph;
 import dataStructures.tuple.Couple;
@@ -17,16 +16,16 @@ import eu.su.mas.dedaleEtu.mas.behaviours.ShareMapBehaviour;
 import eu.su.mas.dedaleEtu.mas.behaviours.ReceiveMapBehaviour;
 import eu.su.mas.dedaleEtu.mas.behaviours.SayHelloBehaviour;
 import eu.su.mas.dedaleEtu.mas.behaviours.ShareExculsiveNodesBehaviour;
-import eu.su.mas.dedaleEtu.mas.behaviours.CheckGolemBehaviour;
-import eu.su.mas.dedaleEtu.mas.behaviours.GuildBehaviour;
+import eu.su.mas.dedaleEtu.mas.behaviours.BlockGolemBehaviour;
+import eu.su.mas.dedaleEtu.mas.behaviours.CatchGolem;
+import eu.su.mas.dedaleEtu.mas.behaviours.PatrolBehaviour;
+import eu.su.mas.dedaleEtu.mas.behaviours.SendPosition;
+import eu.su.mas.dedaleEtu.mas.behaviours.CheckGolem;
 
 import eu.su.mas.dedaleEtu.mas.knowledge.MapRepresentation.MapAttribute;
 import eu.su.mas.dedaleEtu.mas.knowledge.MapRepresentation;
 import jade.core.behaviours.Behaviour;
-import jade.core.Agent;
-import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.FSMBehaviour;
-import jade.util.leap.Map;
 
 public class AgentFsm extends AbstractDedaleAgent {
     private static final long serialVersionUID = 8567689731496787661L;
@@ -41,18 +40,20 @@ public class AgentFsm extends AbstractDedaleAgent {
     private List<Couple<String, SerializableSimpleGraph<String, MapAttribute>>> list_friends_map = new ArrayList<>();
     private String receiver = ""; // pour le partage des noeuds exclusifs
 	private static final int SPAM = 6; // pour limiter les conversations avec un agent
+    private String position_golem = "";
+
 
     private static final String STATE_INIT = "STATE_INIT";
     private static final String STATE_EXPLORE = "STATE_EXPLORE";
     private static final String STATE_SEND_MAP = "STATE_SEND_MAP";
     private static final String STATE_RECEIVE_MAP = "STATE_RECEIVE_MAP";
     private static final String STATE_SAYHELLO = "STATE_SAYHELLO";
-    private static final String STATE_SHARE_EXCLUSIVE_NODES = "STATE_SHARE_EXCLUSIVE_NODES";
-    private static final String STATE_FOLLOW_GOLEM = "STATE_FOLLOW_GOLEM";
+    private static final String STATE_SHARE_EXCLUSIVE_NODES = "STATE_SHARE_EXCLUSIVE_NODES";    
+    private static final String STATE_BLOCK_GOLEM = "STATE_BLOCK_GOLEM";
+    private static final String STATE_CATCH_GOLEM = "STATE_CATCH_GOLEM";
+    private static final String STATE_SENDPOSITION = "STATE_SENDPOSITION";
+    private static final String STATE_PATROL = "STATE_PATROL";
     private static final String STATE_CHECK_GOLEM = "STATE_CHECK_GOLEM";
-    private static final String STATE_GUILD = "STATE_GUILD";
-    private static final String SUCCES = "SUCCES";
-    private static final String END = "END";
 
 
 
@@ -85,17 +86,19 @@ public class AgentFsm extends AbstractDedaleAgent {
         fsm.registerState(new ShareMapBehaviour(this, myMap, list_agentNames), STATE_SEND_MAP);
         fsm.registerState(new ReceiveMapBehaviour(this), STATE_RECEIVE_MAP);
         fsm.registerState(new SayHelloBehaviour(this, this.list_agentNames), STATE_SAYHELLO);
-        fsm.registerState(new ShareExculsiveNodesBehaviour(this, myMap, receiver), STATE_SHARE_EXCLUSIVE_NODES);
-        fsm.registerState(new FollowGolemBehaviour(this, list_agentNames, myMap), STATE_FOLLOW_GOLEM);
-        fsm.registerState(new CheckGolemBehaviour(this), STATE_CHECK_GOLEM);
-       // fsm.registerState(new GuildBehaviour(this), STATE_GUILD); à casser en deux
-        
+        fsm.registerState(new ShareExculsiveNodesBehaviour(this, myMap, receiver), STATE_SHARE_EXCLUSIVE_NODES);      
+        fsm.registerState(new PatrolBehaviour(this, list_agentNames, this.position_golem , this.myMap), STATE_PATROL);
+        fsm.registerState(new BlockGolemBehaviour(this, list_agentNames, this.position_golem), STATE_BLOCK_GOLEM);
+        fsm.registerState(new SendPosition(this, list_agentNames), STATE_SENDPOSITION);
+        fsm.registerState(new CatchGolem(this, this.position_golem, this.myMap), STATE_CATCH_GOLEM);
+        fsm.registerState(new CheckGolem(this, this.list_agentNames), STATE_CHECK_GOLEM);
         // behaviour tracking jusqu'au golem / position utile (?)
         
         // Definition des transitions
         fsm.registerDefaultTransition(STATE_INIT, STATE_EXPLORE);
         fsm.registerDefaultTransition(STATE_EXPLORE, STATE_EXPLORE);
-        // Exploration
+        
+        // ~~~~~~~~~~~~~~~~~~~ Exploration ~~~~~~~~~~~~~~~~~~~
         fsm.registerTransition(STATE_EXPLORE, STATE_SAYHELLO, 1);
         fsm.registerDefaultTransition(STATE_SAYHELLO,STATE_EXPLORE);//Back to explo
         fsm.registerTransition(STATE_EXPLORE, STATE_SEND_MAP, 2);
@@ -105,6 +108,27 @@ public class AgentFsm extends AbstractDedaleAgent {
         //fsm.registerTransition(STATE_EXPLORE, STATE_RECEIVE_MAP, 3);
         //fsm.registerDefaultTransition(STATE_RECEIVE_MAP, STATE_EXPLORE);
         // ect
+        fsm.registerTransition(STATE_EXPLORE, STATE_PATROL, 10);
+        // ~~~~~~~~~~~~~~~~~~~ Hunt ~~~~~~~~~~~~~~~~~~~
+        // SendPosition
+        fsm.registerDefaultTransition(STATE_PATROL, STATE_PATROL);
+        fsm.registerTransition(STATE_PATROL, STATE_SENDPOSITION, 2); 
+        fsm.registerDefaultTransition(STATE_SENDPOSITION, STATE_PATROL);
+        
+        // BlockGolem
+        fsm.registerDefaultTransition(STATE_BLOCK_GOLEM, STATE_BLOCK_GOLEM);
+        fsm.registerTransition(STATE_PATROL, STATE_BLOCK_GOLEM, 3);
+        fsm.registerTransition(STATE_BLOCK_GOLEM, STATE_PATROL, 4);
+
+        // CatchGolem
+        fsm.registerTransition(STATE_PATROL, STATE_CATCH_GOLEM, 5);
+        fsm.registerDefaultTransition(STATE_CATCH_GOLEM, STATE_PATROL);
+
+        // CheckGolem
+        fsm.registerTransition(STATE_CATCH_GOLEM, STATE_CHECK_GOLEM, 6);
+        fsm.registerTransition(STATE_CHECK_GOLEM, STATE_BLOCK_GOLEM, 7);
+        fsm.registerDefaultTransition(STATE_CHECK_GOLEM, STATE_PATROL);
+        
 
         this.lb = new ArrayList<Behaviour>();
         this.lb.add(fsm);
@@ -118,12 +142,21 @@ public class AgentFsm extends AbstractDedaleAgent {
     }
 
     public MapRepresentation getMyMap() {
-        return myMap;
+    	
+        return this.myMap;
     }
     
     public FSMBehaviour getFSM() {
 		return fsm;
 	}
+
+    public void setPosition_golem(String position_golem) {
+        this.position_golem = position_golem;
+    }
+
+    public String getPosition_golem() {
+        return this.position_golem;
+    }
 
     public void setNbAgent(int nbAgent) {
         this.nbAgent = nbAgent;

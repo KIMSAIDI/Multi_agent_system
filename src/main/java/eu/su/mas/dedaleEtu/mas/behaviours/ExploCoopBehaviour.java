@@ -1,8 +1,12 @@
 package eu.su.mas.dedaleEtu.mas.behaviours;
 
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import dataStructures.serializableGraph.SerializableNode;
 import dataStructures.serializableGraph.SerializableSimpleGraph;
 import dataStructures.tuple.Couple;
 import eu.su.mas.dedale.env.Location;
@@ -18,7 +22,9 @@ import jade.core.behaviours.SimpleBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
+import jade.core.Agent;
 import jade.core.behaviours.OneShotBehaviour;
+import eu.su.mas.dedaleEtu.mas.agents.dummies.explo.AgentFsm;
 
 
 
@@ -40,14 +46,17 @@ public class ExploCoopBehaviour extends OneShotBehaviour {
 
 	private static final long serialVersionUID = 8567689731496787661L;
 
+    private static final int sayHello = 2; // pour limiter le nombre de ping, un ping toutes les X actions
+
 	private boolean finished = false;
 	private int exitValue;
-
+	private List<Couple<String,Integer>> list_spam = new ArrayList<>();
+	private List<Couple<String, SerializableSimpleGraph<String, MapAttribute> >> list_friends_map = new ArrayList<>();
 	/**
 	 * Current knowledge of the agent regarding the environment
 	 */
 	private MapRepresentation myMap;
-
+	private int nbActions;
 	private List<String> list_agentNames;
 
 /**
@@ -55,25 +64,28 @@ public class ExploCoopBehaviour extends OneShotBehaviour {
  * @param myagent reference to the agent we are adding this behaviour to
  * @param myMap known map of the world the agent is living in
  * @param agentNames name of the agents to share the map with
+ * @param nbActions number of actions done by the agent
+ * @param list_spam list of agents with whom the agent has already talked
+ * @param list_friends_map list of agents and their maps
  */
-	public ExploCoopBehaviour(final AbstractDedaleAgent myagent, MapRepresentation myMap,List<String> agentNames) {
+	public ExploCoopBehaviour(final AbstractDedaleAgent myagent, MapRepresentation myMap,List<String> agentNames, int nbActions, List<Couple<String,Integer>> list_spam, List<Couple<String, SerializableSimpleGraph<String, MapAttribute> >> list_friends_map) {
 		super(myagent);
-		this.myMap=myMap;
-		this.list_agentNames=agentNames;
-		
-		
-	
+		this.myMap = myMap;
+		this.list_agentNames = agentNames;
+		this.nbActions = nbActions;
+		this.list_spam = list_spam;
+		this.list_friends_map = list_friends_map;
 	}
 
 	@Override
 	public void action() {
-
+		this.myMap=((AgentFsm)this.myAgent).getMyMap();
 		if(this.myMap==null) {
 			this.myMap= new MapRepresentation();
 			//this.myAgent.addBehaviour(new ShareMapBehaviour(this.myAgent, 500, this.myMap, this.list_agentNames));
 			
 		}
-		this.exitValue = 1;
+		this.exitValue = 0;
 
 		//0) Retrieve the current position
 		Location myPosition=((AbstractDedaleAgent)this.myAgent).getCurrentPosition();
@@ -90,7 +102,14 @@ public class ExploCoopBehaviour extends OneShotBehaviour {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-
+			try {
+				if (checkReceivedMessage()) {
+					return;
+				}
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			//1) remove the current node from openlist and add it to closedNodes.
 			this.myMap.addNode(myPosition.getLocationId(), MapAttribute.closed);
 
@@ -106,6 +125,8 @@ public class ExploCoopBehaviour extends OneShotBehaviour {
 					if (nextNodeId==null && isNewNode) nextNodeId=accessibleNode.getLocationId();
 				}
 			}
+			//update the map
+			((AgentFsm)this.myAgent).setMyMap(this.myMap); 
 
 			//3) while openNodes is not empty, continues.
 			if (!this.myMap.hasOpenNode()){
@@ -124,13 +145,139 @@ public class ExploCoopBehaviour extends OneShotBehaviour {
 				}else {
 					//System.out.println("nextNode notNUll - "+this.myAgent.getLocalName()+"-- list= "+this.myMap.getOpenNodes()+"\n -- nextNode: "+nextNode);
 				}
-				
-				
+				((AgentFsm)this.myAgent).incNbActions();
+				if (this.nbActions % sayHello == 0) {
+					//System.out.println("SayHelloBehaviour");
+					this.exitValue = 1;
+				}
+
+				((AgentFsm)this.myAgent).majList_spam();
+				System.out.println("List_spam de "+ this.myAgent.getLocalName() + " : " + list_spam);
 
 				((AbstractDedaleAgent)this.myAgent).moveTo(new gsLocation(nextNodeId));
 			}
 
 		}
+	}
+	
+
+	// Check les messages reçus
+	@SuppressWarnings("unchecked")
+	public Boolean checkReceivedMessage() throws IOException {
+
+		// recu: protocol HelloProtocol
+		MessageTemplate mtH = MessageTemplate.and(MessageTemplate.MatchPerformative(ACLMessage.INFORM), MessageTemplate.MatchProtocol("HelloProtocol"));
+		ACLMessage msgHello = this.myAgent.receive(mtH);
+		if (msgHello != null && !isInList_spam(msgHello.getSender().getLocalName())) {
+			((AgentFsm)this.myAgent).addList_spam(msgHello.getSender().getLocalName());
+			System.out.println(this.myAgent.getLocalName() + " received a message from " + msgHello.getSender().getLocalName() + " : " + msgHello.getContent());
+			((AgentFsm)this.myAgent).setReceiver(msgHello.getSender().getLocalName());
+			// si l'agent n'est pas dans la liste des amis, on partage toute la map
+			if (!((AgentFsm)this.myAgent).isInList_friends_map(msgHello.getSender().getLocalName())) {
+				this.exitValue = 2;
+				return true;
+			}
+			// sinon, partager les noeuds exclusifs
+			this.exitValue = 3;
+			return true;
+		}
+
+
+		// recu: protocol SHARE-TOPO
+		MessageTemplate mtSM = MessageTemplate.and(MessageTemplate.MatchPerformative(ACLMessage.INFORM), MessageTemplate.MatchProtocol("SHARE-TOPO"));
+		ACLMessage msgShareMap = this.myAgent.receive(mtSM);
+		if (msgShareMap != null) {
+			SerializableSimpleGraph<String, MapAttribute> autreMap=null;
+			try {
+				autreMap = (SerializableSimpleGraph<String, MapAttribute>) msgShareMap.getContentObject();
+			} catch (UnreadableException e) {
+				e.printStackTrace();
+			}
+			((AgentFsm)this.myAgent).addList_spam(msgShareMap.getSender().getLocalName());
+			System.out.println(this.myAgent.getLocalName() + " received a map from " + msgShareMap.getSender().getLocalName());
+			this.myMap.mergeMap(autreMap);
+			((AgentFsm)this.myAgent).setMyMap(this.myMap);
+			SerializableSimpleGraph<String, MapAttribute> mergedMap = this.copyGraph(autreMap);
+			// ajouter la map de l'agent expéditeur à la liste des maps des amis (mergées)
+			((AgentFsm)this.myAgent).addList_friends_map(msgShareMap.getSender().getLocalName(), mergedMap); 
+			// renvoyer les noeuds non visités de l'agent expéditeur si ils ne sont pas dans notre map
+			//((AgentFsm)this.myAgent).setReceiver(msgShareMap.getSender().getLocalName());
+			//this.exitValue = 3;
+			return true;
+		}
+
+		// recu: protocol SHARE-EXCLUSIVE-NODES
+		MessageTemplate mtExNods = MessageTemplate.and(MessageTemplate.MatchPerformative(ACLMessage.INFORM), MessageTemplate.MatchProtocol("SHARE-EXCLUSIVE-NODES"));
+		ACLMessage msgExNodes = this.myAgent.receive(mtExNods);
+		if (msgExNodes != null) {
+			SerializableSimpleGraph<String, MapAttribute> subGraph = null;
+			try {
+				subGraph = (SerializableSimpleGraph<String, MapAttribute>) msgExNodes.getContentObject();
+			} catch (UnreadableException e) {
+				e.printStackTrace();
+			}
+			System.out.println(this.myAgent.getLocalName() + " received exclu map " + subGraph + "from " + msgExNodes.getSender().getLocalName());
+
+			this.myMap.mergeMap(subGraph);
+			((AgentFsm)this.myAgent).setMyMap(this.myMap);
+			return true;
+		}
+
+		return false;
+	}
+	public boolean isInList_spam(String agent_name) {
+		Iterator<Couple<String,  Integer>> iter=list_spam.iterator();
+
+		while(iter.hasNext()){
+			Couple<String, Integer> agent = iter.next();
+			String name= agent.getLeft();
+			if ( name.equals(agent_name)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public List<String> getOnlyNodes(List<Couple<String, List<String>>> nodes) {
+		List<String> onlyNodes = new ArrayList<>();
+		for (Couple<String, List<String>> node : nodes) {
+			onlyNodes.add(node.getLeft());
+		}
+		return onlyNodes;
+	}
+
+	public SerializableSimpleGraph<String, MapAttribute> copyGraph(SerializableSimpleGraph<String, MapAttribute> originalMap) {
+		SerializableSimpleGraph<String, MapAttribute> copyMap = new SerializableSimpleGraph<>();
+		// Parcourir tous les nœuds de la carte d'origine
+		for (SerializableNode<String, MapAttribute> n : originalMap.getAllNodes()) {
+			// Ajouter le nœud à la carte copiée
+			copyMap.addNode(n.getNodeId(), n.getNodeContent());
+		}
+		//4 now that all nodes are added, we can add edges
+		for (SerializableNode<String, MapAttribute> n: originalMap.getAllNodes()){
+			for(String s:originalMap.getEdges(n.getNodeId())){
+				copyMap.addEdge(null, n.getNodeId(),s);
+			}
+		}
+		return copyMap;
+	}
+
+	public SerializableSimpleGraph<String, MapAttribute> getMergeGraph(SerializableSimpleGraph<String, MapAttribute> map1, SerializableSimpleGraph<String, MapAttribute> map2) {
+		SerializableSimpleGraph<String, MapAttribute> subGraph = copyGraph(map1);
+		// Parcourir tous les nœuds 
+		for (SerializableNode<String, MapAttribute> n : map2.getAllNodes()) {
+			// Ajouter le nœud à la carte copiée
+			subGraph.addNode(n.getNodeId(), n.getNodeContent());
+		}
+		//4 now that all nodes are added, we can add edges
+		for (SerializableNode<String, MapAttribute> n : map2.getAllNodes()) {
+			for (String s : map2.getEdges(n.getNodeId())) {
+				subGraph.addEdge(null, n.getNodeId(), s);
+			}
+		}
+
+		
+		return subGraph;
 	}
 
 	@Override

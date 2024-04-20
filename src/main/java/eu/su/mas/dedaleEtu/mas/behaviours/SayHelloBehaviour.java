@@ -45,14 +45,11 @@ public class SayHelloBehaviour extends OneShotBehaviour{
 			
 		}
 		
-		try {
-			msg.setContentObject("Hello World, I'm at "+myPosition + " I am "+this.myAgent.getAID()) ;
-			((AbstractDedaleAgent)this.myAgent).sendMessage(msg);
-		} catch (IOException e) {
-			e.printStackTrace();
-			}
-			
+		msg.setContent("Hello World, I'm at "+myPosition + " I am "+this.myAgent.getAID().getLocalName());
+		((AbstractDedaleAgent)this.myAgent).sendMessage(msg);
+		
 		System.out.println("----------- " + this.myAgent.getLocalName()+" sent a message to its friend");
+		block(1000);
 		
 	}
 	

@@ -377,20 +377,49 @@ public class MapRepresentation implements Serializable {
 	}
 	
 	public SerializableSimpleGraph<String, MapAttribute> getExclusiveMap(SerializableSimpleGraph<String, MapAttribute> otherMap) {
+		if (otherMap == null) {
+			return this.getSerializableGraph();
+		}
 		SerializableSimpleGraph<String, MapAttribute> exclusiveMap = new SerializableSimpleGraph<>();
+		Set<SerializableNode<String, MapAttribute>> nodes_otherMap = otherMap.getAllNodes();
+		// recuperer que les ids des noeuds de l'autre carte
+		List<String> nodesId_otherMap = new ArrayList<>();
+		for (SerializableNode<String, MapAttribute> node : nodes_otherMap) {
+			nodesId_otherMap.add(node.getNodeId());
+		}
+		System.out.println("My map : " + this.sg);
+		System.out.println("other map: " + otherMap);
 		// Récupérer les nœuds et les arêtes exclusifs à ma carte
 		for (SerializableNode<String, MapAttribute> node : this.sg.getAllNodes()) {
-			// Vérification si le nœud n'existe pas dans l'autre carte
-			if (!otherMap.getAllNodes().contains(node)) {
+			SerializableNode<String, MapAttribute> other_node = otherMap.getNode(node.getNodeId());			
+			// Vérification si le nœud n'existe pas dans l'autre carte	
+			if ( !nodesId_otherMap.contains(node.getNodeId())) {
 				exclusiveMap.addNode(node.getNodeId(), node.getNodeContent());
-			}	
-		}
-		// Ajouter les arêtes 
-		for (SerializableNode<String, MapAttribute> n: exclusiveMap.getAllNodes()){
-			for(String s:this.sg.getEdges(n.getNodeId())){
-				exclusiveMap.addEdge(null, n.getNodeId(),s);
+			} 
+			else {
+				Set<String> edges = this.sg.getEdges(node.getNodeId());
+				//System.out.println("Edges: " + edges);
+				Set<String> edges_otherMap = otherMap.getEdges(node.getNodeId());
+				//System.out.println("Edges other map: " + edges_otherMap);
+				if (!edges.equals(edges_otherMap) || edges.size() > edges_otherMap.size()) {
+					exclusiveMap.addNode(node.getNodeId(), node.getNodeContent());
+				}
 			}
 		}
+
+		// Ajouter les arêtes 
+		for (SerializableNode<String, MapAttribute> n: exclusiveMap.getAllNodes()){
+			Set <String> edges = this.sg.getEdges(n.getNodeId());
+			for(String s: edges){
+				
+				try {
+					exclusiveMap.addEdge("", n.getNodeId(),s);
+				} catch (NullPointerException e) {
+					System.out.println("Error adding edge " + n.getNodeId() + " -> " + s);
+				}
+			}
+		}
+		System.out.println("Exclusive map : " + exclusiveMap);
 
 		return exclusiveMap;
 	}

@@ -99,7 +99,7 @@ public class ExploCoopBehaviour extends OneShotBehaviour {
 			 * Just added here to let you see what the agent is doing, otherwise he will be too quick
 			 */
 			try {
-				this.myAgent.doWait(500);
+				this.myAgent.doWait(1000);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -158,17 +158,14 @@ public class ExploCoopBehaviour extends OneShotBehaviour {
 
 				((AgentFsm)this.myAgent).majList_spam();
 				System.out.println("List_spam de "+ this.myAgent.getLocalName() + " : " + list_spam);
-
+				((AgentFsm)this.myAgent).setMyMap(this.myMap);
 				if (!((AbstractDedaleAgent)this.myAgent).moveTo(new gsLocation(nextNodeId))) {
 					System.out.println("je suis bloqué");
 					Random rand = new Random();
 					int randomIndex = rand.nextInt(noeuds_observable.size());
 					nextNodeId = noeuds_observable.get(randomIndex).getLocationId();
 					((AbstractDedaleAgent) this.myAgent).moveTo(new gsLocation(nextNodeId));
-					
-					
 				}
-				((AgentFsm)this.myAgent).setMyMap(this.myMap);
 			}
 
 		}
@@ -235,6 +232,9 @@ public class ExploCoopBehaviour extends OneShotBehaviour {
 
 			this.myMap.mergeMap(subGraph);
 			((AgentFsm)this.myAgent).setMyMap(this.myMap);
+			SerializableSimpleGraph<String, MapAttribute> otherMap = ((AgentFsm)this.myAgent).getMap_friends_map(msgExNodes.getSender().getLocalName());
+			SerializableSimpleGraph<String, MapAttribute> mergedMap = this.getMergeGraph(otherMap, subGraph);
+            ((AgentFsm)this.myAgent).majList_friends_map(msgExNodes.getSender().getLocalName(), mergedMap);
 			return true;
 		}
 
@@ -278,21 +278,30 @@ public class ExploCoopBehaviour extends OneShotBehaviour {
 	}
 
 	public SerializableSimpleGraph<String, MapAttribute> getMergeGraph(SerializableSimpleGraph<String, MapAttribute> map1, SerializableSimpleGraph<String, MapAttribute> map2) {
-		SerializableSimpleGraph<String, MapAttribute> subGraph = copyGraph(map1);
+		//SerializableSimpleGraph<String, MapAttribute> subGraph = copyGraph(map1);
 		// Parcourir tous les nœuds 
+		//System.out.println("map1 : " + map1);
+		//System.out.println("map2 : " + map2);
+		if (map1 == null) {
+			return map2;
+		}
 		for (SerializableNode<String, MapAttribute> n : map2.getAllNodes()) {
 			// Ajouter le nœud à la carte copiée
-			subGraph.addNode(n.getNodeId(), n.getNodeContent());
+			map1.addNode(n.getNodeId(), n.getNodeContent());
 		}
 		//4 now that all nodes are added, we can add edges
 		for (SerializableNode<String, MapAttribute> n : map2.getAllNodes()) {
 			for (String s : map2.getEdges(n.getNodeId())) {
-				subGraph.addEdge(null, n.getNodeId(), s);
+				try {
+					map1.addEdge(null, n.getNodeId(), s);
+				} catch (NullPointerException e) {
+					System.out.println("Error adding edge " + n.getNodeId() + " -> " + s);
+				}
 			}
 		}
 
 		
-		return subGraph;
+		return map1;
 	}
 
 	@Override

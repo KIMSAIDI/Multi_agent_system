@@ -71,7 +71,7 @@ public class ShareMapBehaviour extends OneShotBehaviour {
 			e.printStackTrace();
 		}
 		((AbstractDedaleAgent)this.myAgent).sendMessage(msg);
-		block(3000);
+		this.myAgent.doWait(1000);
 	}	
 
 }

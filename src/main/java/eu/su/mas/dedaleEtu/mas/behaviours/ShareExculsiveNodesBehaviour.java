@@ -66,7 +66,7 @@ public class ShareExculsiveNodesBehaviour extends OneShotBehaviour {
                 break;
             }
         }
-        block(2000);
+        //block(2000);
     
         
     }
@@ -103,22 +103,31 @@ public class ShareExculsiveNodesBehaviour extends OneShotBehaviour {
 		return subGraph;
 	}
 
-    public SerializableSimpleGraph<String, MapAttribute> getMergeGraph(SerializableSimpleGraph<String, MapAttribute> map1, SerializableSimpleGraph<String, MapAttribute> map2) {
-		SerializableSimpleGraph<String, MapAttribute> subGraph = copyGraph(map1);
+	public SerializableSimpleGraph<String, MapAttribute> getMergeGraph(SerializableSimpleGraph<String, MapAttribute> map1, SerializableSimpleGraph<String, MapAttribute> map2) {
+		//SerializableSimpleGraph<String, MapAttribute> subGraph = copyGraph(map1);
 		// Parcourir tous les nœuds 
+		//System.out.println("map1 : " + map1);
+		//System.out.println("map2 : " + map2);
+		if (map1 == null) {
+			return map2;
+		}
 		for (SerializableNode<String, MapAttribute> n : map2.getAllNodes()) {
 			// Ajouter le nœud à la carte copiée
-			subGraph.addNode(n.getNodeId(), n.getNodeContent());
+			map1.addNode(n.getNodeId(), n.getNodeContent());
 		}
 		//4 now that all nodes are added, we can add edges
 		for (SerializableNode<String, MapAttribute> n : map2.getAllNodes()) {
 			for (String s : map2.getEdges(n.getNodeId())) {
-				subGraph.addEdge(null, n.getNodeId(), s);
+				try {
+					map1.addEdge(null, n.getNodeId(), s);
+				} catch (NullPointerException e) {
+					System.out.println("Error adding edge " + n.getNodeId() + " -> " + s);
+				}
 			}
 		}
 
 		
-		return subGraph;
+		return map1;
 	}
 
 }

@@ -57,6 +57,7 @@ public class PatrolBehaviour extends OneShotBehaviour{
         //     }
         // }
         checkMessage_position();
+        
         if (checkMessage_need_help()) {
             return;
         }
@@ -207,6 +208,22 @@ public class PatrolBehaviour extends OneShotBehaviour{
                 e.printStackTrace();
             }
         }
+
+        MessageTemplate msgTemplate2 = MessageTemplate.and(
+    				MessageTemplate.MatchProtocol("HelloProtocol"),
+    				MessageTemplate.MatchPerformative(ACLMessage.INFORM));
+        ACLMessage msgReceived2 = this.myAgent.receive(msgTemplate2);
+        if (msgReceived2 != null) {
+            try {
+                Location pos = (Location) msgReceived2.getContentObject();
+                // ajout de la position de l'agent dans la liste
+                liste_noeuds_agents.add(pos);
+                return true; 
+            }catch(UnreadableException e) {
+                e.printStackTrace();
+            }
+        }
+
         return false;
     }
 
@@ -227,22 +244,24 @@ public class PatrolBehaviour extends OneShotBehaviour{
             }catch(UnreadableException e) {
                 e.printStackTrace();
             }
+            
+            
         }
         
 //        // Message d'un agent qui bloque
-//        MessageTemplate msgTemplate3 = MessageTemplate.and(
-//        		MessageTemplate.MatchProtocol("I_Am_An_AgentBlockGolemProtocol"),
-//        		MessageTemplate.MatchPerformative(ACLMessage.INFORM));
-//        ACLMessage msgReceived3 = this.myAgent.receive(msgTemplate3);
-//		if (msgReceived3 != null) {
-//			try {
-//				((AgentFsm) this.myAgent).setPosition_golem((String) msgReceived3.getContentObject());
-//				this.exitValue = 0; 
-//				return true;
-//			} catch (UnreadableException e) {
-//				e.printStackTrace();
-//			}
-//		}
+        MessageTemplate msgTemplate3 = MessageTemplate.and(
+        		MessageTemplate.MatchProtocol("I_Am_An_AgentBlockGolemProtocol"),
+        		MessageTemplate.MatchPerformative(ACLMessage.INFORM));
+        ACLMessage msgReceived3 = this.myAgent.receive(msgTemplate3);
+		if (msgReceived3 != null) {
+			try {
+				((AgentFsm) this.myAgent).setPosition_golem((String) msgReceived3.getContentObject());
+				this.exitValue = 0; 
+				return true;
+			} catch (UnreadableException e) {
+				e.printStackTrace();
+			}
+		}
         
         return false;
     } 

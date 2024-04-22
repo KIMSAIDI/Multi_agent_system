@@ -27,7 +27,7 @@ public class ShareExculsiveNodesBehaviour extends OneShotBehaviour {
 
     public ShareExculsiveNodesBehaviour(Agent a,MapRepresentation myMap, String receiver) {
 		super(a);
-		this.myMap=myMap;
+		this.myMap=((AgentFsm)this.myAgent).getMyMap();
 		this.receiver=receiver;	
 	}
 

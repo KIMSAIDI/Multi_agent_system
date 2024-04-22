@@ -14,6 +14,7 @@ import eu.su.mas.dedale.env.gs.gsLocation;
 import jade.core.Agent;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.lang.acl.ACLMessage;
+import jade.lang.acl.MessageTemplate;
 import jade.core.AID;
 
 public class BlockGolemBehaviour extends OneShotBehaviour{
@@ -40,6 +41,14 @@ public class BlockGolemBehaviour extends OneShotBehaviour{
         
         //whichGolem(); // determine si je reste bien à ma place, pour le moment inutile
             
+    	
+//    	if (checkFalseInformation()) { // si on me prend pour un golem
+//    		return;
+//    	}
+//    	
+//    	if ( mistake() ){
+//    		return;// si je me suis trompé
+//    	}
         
         // je vérifie que je le bloque encore
         if (!checkStillBlockGolem()){
@@ -97,6 +106,59 @@ public class BlockGolemBehaviour extends OneShotBehaviour{
             return false;
         }
         return true;
+    }
+    
+    public boolean checkFalseInformation() {
+    	Location myPosition=((AbstractDedaleAgent)this.myAgent).getCurrentPosition();
+        
+    	MessageTemplate msgTemplate = MessageTemplate.and(
+				MessageTemplate.MatchProtocol("I_Am_An_AgentBlockGolemProtocol"),
+				MessageTemplate.MatchPerformative(ACLMessage.INFORM));
+        ACLMessage msgReceived = this.myAgent.receive(msgTemplate);
+        if (msgReceived != null) {
+            // je vérifie que l'agent ne me prend pas pour un golem
+        	try {
+        		String loc = (String) msgReceived.getContentObject();
+        		String maLoc = myPosition.getLocationId();
+        		System.out.println("JE NE SUIS PAS LE GOLEM AARRRG");
+        		if (loc == maLoc) {
+        			// je ne suis pas un golem
+        			ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
+        	        msg.setProtocol("Je_Ne_Suis_Pas_Un_GolemProtocol");
+        	        msg.setSender(this.myAgent.getAID());
+        	        for (String agentName : this.list_agentNames) {
+        				msg.addReceiver(new AID(agentName,AID.ISLOCALNAME));
+        				
+        			}
+					try {
+						msg.setContentObject(((AbstractDedaleAgent) this.myAgent).getCurrentPosition());
+						((AbstractDedaleAgent) this.myAgent).sendMessage(msg);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+        			this.exitValue = 4; // je retourne en patrouille
+        			
+        			return true;
+        		}
+        	}catch (Exception e) {
+        		e.printStackTrace();
+        	}
+        }
+    	return false;
+    }
+    
+    public boolean mistake() {
+    	MessageTemplate msgTemplate = MessageTemplate.and(
+				MessageTemplate.MatchProtocol("I_Am_An_AgentBlockGolemProtocol"),
+				MessageTemplate.MatchPerformative(ACLMessage.INFORM));
+        ACLMessage msgReceived = this.myAgent.receive(msgTemplate);
+        if (msgReceived != null) {
+        	System.out.println("MY BAD");
+        	this.exitValue = 4;
+        	return true;
+        }
+        return false;
+    	
     }
 
     @Override

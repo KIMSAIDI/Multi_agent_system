@@ -72,7 +72,7 @@ public class ExploCoopBehaviour extends OneShotBehaviour {
  */
 	public ExploCoopBehaviour(final AbstractDedaleAgent myagent, MapRepresentation myMap,List<String> agentNames, int nbActions, List<Couple<String,Integer>> list_spam, List<Couple<String, SerializableSimpleGraph<String, MapAttribute> >> list_friends_map) {
 		super(myagent);
-		this.myMap = myMap;
+		this.myMap = ((AgentFsm)this.myAgent).getMyMap();
 		this.list_agentNames = agentNames;
 		this.nbActions = nbActions;
 		this.list_spam = list_spam;
@@ -99,7 +99,7 @@ public class ExploCoopBehaviour extends OneShotBehaviour {
 			 * Just added here to let you see what the agent is doing, otherwise he will be too quick
 			 */
 			try {
-				this.myAgent.doWait(1000);
+				this.myAgent.doWait(500);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

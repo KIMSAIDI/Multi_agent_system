@@ -51,27 +51,27 @@ public class BlockGolemBehaviour extends OneShotBehaviour{
 //    	}
         
         // je vérifie que je le bloque encore
-        if (!checkStillBlockGolem()){
-            return;
-        }else{
-            // On envoie un message pour dire qu'on est un agent qui bloque un golem
-            ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
-            msg.setProtocol("I_Am_An_AgentBlockGolemProtocol");
-            msg.setSender(this.myAgent.getAID());
-            for (String agentName : this.list_agentNames) {
-                msg.addReceiver(new AID(agentName,AID.ISLOCALNAME));
-            }
-            try{
-                // On envoie la position du golem
-                msg.setContentObject(((AgentFsm)this.myAgent).getPosition_golem());
-                ((AbstractDedaleAgent)this.myAgent).sendMessage(msg);
-            }
-            catch (Exception e) {
-                e.printStackTrace();
-            }
-            System.out.println(this.myAgent.getLocalName() + " : ----Je bloque un golem, il est à la position : " + position_golem + "----	");
-            return;
+        checkStillBlockGolem();
+            
+        
+        // On envoie un message pour dire qu'on est un agent qui bloque un golem
+        ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
+        msg.setProtocol("I_Am_An_AgentBlockGolemProtocol");
+        msg.setSender(this.myAgent.getAID());
+        for (String agentName : this.list_agentNames) {
+            msg.addReceiver(new AID(agentName,AID.ISLOCALNAME));
         }
+        try{
+            // On envoie la position du golem
+            msg.setContentObject(((AgentFsm)this.myAgent).getPosition_golem());
+            ((AbstractDedaleAgent)this.myAgent).sendMessage(msg);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+        System.out.println(this.myAgent.getLocalName() + " : ----Je bloque un golem, il est à la position : " + position_golem + "----	");
+        
+        
         
     }
     
@@ -101,6 +101,8 @@ public class BlockGolemBehaviour extends OneShotBehaviour{
         // si je peux acceder à la position du golem alors je ne le bloque plus
         if (((AbstractDedaleAgent)this.myAgent).moveTo(new gsLocation(((AgentFsm)this.myAgent).getPosition_golem()))) {
             System.out.println("je ne le bloque plus");
+            System.out.println("le golem est la position : " + ((AgentFsm)this.myAgent).getPosition_golem());
+            //((AbstractDedaleAgent)this.myAgent).moveTo(new gsLocation(((AgentFsm)this.myAgent).getPosition_golem()));
         	((AgentFsm)this.myAgent).setPosition_golem(""); 
             this.exitValue = 4; // je retourne en patrouille
             return false;

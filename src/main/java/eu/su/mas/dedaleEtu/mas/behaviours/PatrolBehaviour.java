@@ -32,6 +32,7 @@ public class PatrolBehaviour extends OneShotBehaviour{
     private List<Location> liste_noeuds_agents = new ArrayList<Location>();
     private String position_golem;
     private MapRepresentation myMap;
+    private String previousNode = "";
 
     public PatrolBehaviour(final AbstractDedaleAgent myagent, List<String> list_agentNames, String position_golem, MapRepresentation myMap) {
 		super(myagent);
@@ -46,6 +47,7 @@ public class PatrolBehaviour extends OneShotBehaviour{
        
         this.myMap = ((AgentFsm)this.myAgent).getMyMap();
         this.position_golem = ((AgentFsm)this.myAgent).getPosition_golem();
+        previousNode = ((AbstractDedaleAgent)this.myAgent).getCurrentPosition().getLocationId();
     
         // ~~~~~~~~~~~~~~~~~~~~ Step 1 : On envoie sa position ~~~~~~~~~~~~~~~~~~~~
         this.exitValue = 2;
@@ -58,9 +60,9 @@ public class PatrolBehaviour extends OneShotBehaviour{
         // }
         checkMessage_position();
         
-        if (checkMessage_need_help()) {
-            return;
-        }
+        checkMessage_need_help();
+            
+        
         // ~~~~~~~~~~~~~~~~~~~~ Step 3 : On cherche où le golem pourrait être ~~~~~~~~~~~~~~~~~~~~
 
         // Liste des observables
@@ -119,6 +121,13 @@ public class PatrolBehaviour extends OneShotBehaviour{
 	        
 	        string_location_odeur.removeAll(string_location_agent); // on enlève les positions des agents
 	        string_location_observable.removeAll(string_location_agent); // on enlève les positions des agents
+	        // si possible j'enlève la position précédente
+			if (string_location_observable.size() > 1) {
+				string_location_observable.remove(previousNode);
+			}
+			if (string_location_odeur.size() > 1) {
+				string_location_odeur.remove(previousNode);
+			}
 	        
 	        // on reconvertit les positions des golems en location
 	        List<Location> liste_position_golem = new ArrayList<Location>();
@@ -131,10 +140,10 @@ public class PatrolBehaviour extends OneShotBehaviour{
 	            liste_position_observable.add(new gsLocation(loc)); 
 	                                                                
 	        }
-	        if (liste_position_observable.isEmpty()) {
-	        	// je reste sur place
-	        	return;
-	        }
+	        // if (liste_position_observable.isEmpty()) {
+	        // 	// je reste sur place
+	        // 	return;
+	        // }
 	
 	        // ~~~~~~~~~~~~~~~~~~~~ Step 4 : On se déplace ~~~~~~~~~~~~~~~~~~~~
 	
@@ -155,18 +164,20 @@ public class PatrolBehaviour extends OneShotBehaviour{
 			int randomIndex = rand.nextInt(noeuds_observable.size());
 			nextNodeId = noeuds_observable.get(randomIndex).getLocationId();
 		}
-
+        
+        
+        
         // Si je peux pas avancer alors c'est que j'ai trouvé un golem
         if (!((AbstractDedaleAgent)this.myAgent).moveTo(new gsLocation(nextNodeId))) {
         	
-        	MessageTemplate msgTemplate3 = MessageTemplate.and(
-            		MessageTemplate.MatchProtocol("I_Am_An_AgentBlockGolemProtocol"),
-            		MessageTemplate.MatchPerformative(ACLMessage.INFORM));
-            ACLMessage msgReceived3 = this.myAgent.receive(msgTemplate3);
-    		if (msgReceived3 != null) {
-    			// c'est un autre agent qui bloque
-                return;
-    		}
+        	// MessageTemplate msgTemplate3 = MessageTemplate.and(
+            // 		MessageTemplate.MatchProtocol("I_Am_An_AgentBlockGolemProtocol"),
+            // 		MessageTemplate.MatchPerformative(ACLMessage.INFORM));
+            // ACLMessage msgReceived3 = this.myAgent.receive(msgTemplate3);
+    		// if (msgReceived3 != null) {
+    		// 	// c'est un autre agent qui bloque
+            //     return;
+    		// }
             ((AgentFsm)this.myAgent).setPosition_golem(nextNodeId); // on enregistre la position du golem (pour les autres agents
             
             // j'envoie la position du golem pour de l'aide

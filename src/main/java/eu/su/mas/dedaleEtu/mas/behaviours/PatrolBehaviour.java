@@ -205,6 +205,9 @@ public class PatrolBehaviour extends OneShotBehaviour{
             try {
                 String pos = msgReceived.getContent();
                 // ajout de la position de l'agent dans la liste
+                if (pos == ""){
+                    return true;
+                }
                 liste_noeuds_agents.add(new gsLocation(pos));
                 return true; 
             }catch(Exception e) {

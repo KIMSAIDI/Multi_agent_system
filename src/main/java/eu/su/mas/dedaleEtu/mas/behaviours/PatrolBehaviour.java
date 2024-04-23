@@ -91,7 +91,7 @@ public class PatrolBehaviour extends OneShotBehaviour{
         }
         
         try {
-            this.myAgent.doWait(1000);
+            this.myAgent.doWait(500);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -226,8 +226,7 @@ public class PatrolBehaviour extends OneShotBehaviour{
         ACLMessage msgReceived2 = this.myAgent.receive(msgTemplate2);
         if (msgReceived2 != null) {
             try {
-                String m = msgReceived2.getContent();
-                String pos = getPosString(m);
+                String pos = msgReceived2.getContent();
                 // ajout de la position de l'agent dans la liste
                 liste_noeuds_agents.add(new gsLocation(pos));
                 return true; 
@@ -317,14 +316,6 @@ public class PatrolBehaviour extends OneShotBehaviour{
         
         return false;
     } 
-    public static String getPosString(String chaine) {
-        int indexVirgule = chaine.indexOf(',');
-        if (indexVirgule != -1) { // Si une virgule est trouvée
-            return chaine.substring(0, indexVirgule);
-        } else { // Si aucune virgule n'est trouvée
-            return "-1";
-        }
-    }
 
     @Override
 	public int onEnd() {

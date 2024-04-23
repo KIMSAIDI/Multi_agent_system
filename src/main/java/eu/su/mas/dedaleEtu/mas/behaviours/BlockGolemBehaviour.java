@@ -49,10 +49,17 @@ public class BlockGolemBehaviour extends OneShotBehaviour{
 //    	if ( mistake() ){
 //    		return;// si je me suis trompé
 //    	}
-        if (checkFalseInformation() ){
+        if (mistake()) { // si je me suis trompé
+        	((AgentFsm)this.myAgent).setPosition_golem(""); 
+			this.exitValue = 4;
+			return;
+		}
+        if (checkFalseInformation() ){ // si on me prend pour un golem
+        	((AgentFsm)this.myAgent).setPosition_golem(""); 
         	this.exitValue = 4;	
         	return;
         }
+		
         
         // je vérifie que je le bloque encore
         if (!checkStillBlockGolem()){
@@ -69,7 +76,7 @@ public class BlockGolemBehaviour extends OneShotBehaviour{
         }
         try{
             // On envoie la position du golem
-            msg.setContentObject(((AgentFsm)this.myAgent).getPosition_golem());
+            msg.setContent(((AgentFsm)this.myAgent).getPosition_golem());
             ((AbstractDedaleAgent)this.myAgent).sendMessage(msg);
         }
         catch (Exception e) {
@@ -83,27 +90,6 @@ public class BlockGolemBehaviour extends OneShotBehaviour{
         
     }
     
-    public boolean whichGolem(){
-        // 1) je vérifie qu'on parle bien de mon golem 
-        // Liste des observables
-		List<Couple<Location,List<Couple<Observation,Integer>>>> lobs=((AbstractDedaleAgent)this.myAgent).observe();
-		// Liste des noeuds observables
-        List<Location> noeuds_observable = new ArrayList<Location>();
-        for (Couple<Location, List<Couple<Observation, Integer>>> observable : lobs) {
-            noeuds_observable.add(observable.getLeft()); 
-        }
-        // on convertit en string
-        List<String> string_location_observable = new ArrayList<String>();
-        for (Location loc : noeuds_observable) {
-            string_location_observable.add(loc.getLocationId());
-        }
-        // 2) Si il s'agit d'un autre golem alors on ne fait rien
-        if (!string_location_observable.contains(((AgentFsm)this.myAgent).getPosition_golem())){
-            this.exitValue = 0;
-            return false;
-        }
-        return true;
-    }
 
     public boolean checkStillBlockGolem(){
         // si je peux acceder à la position du golem alors je ne le bloque plus
@@ -129,10 +115,11 @@ public class BlockGolemBehaviour extends OneShotBehaviour{
         if (msgReceived != null) {
             // je vérifie que l'agent ne me prend pas pour un golem
         	try {
-        		String loc = (String) msgReceived.getContentObject();
+        		String loc = msgReceived.getContent(); // loc du golem
         		String maLoc = myPosition.getLocationId();
-        		System.out.println("JE NE SUIS PAS LE GOLEM AARRRG");
-        		if (loc == maLoc) {
+        		
+        		if (loc.equals(maLoc)) {
+        			System.out.println(this.myAgent.getLocalName() + "JE NE SUIS PAS LE GOLEM AARRRG");
         			// je ne suis pas un golem
         			ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
         	        msg.setProtocol("Je_Ne_Suis_Pas_Un_GolemProtocol");
@@ -148,7 +135,7 @@ public class BlockGolemBehaviour extends OneShotBehaviour{
 						e.printStackTrace();
 					}
         			//this.exitValue = 4; // je retourne en patrouille
-        			
+					
         			return true;
         		}
         	}catch (Exception e) {
@@ -160,12 +147,11 @@ public class BlockGolemBehaviour extends OneShotBehaviour{
     
     public boolean mistake() {
     	MessageTemplate msgTemplate = MessageTemplate.and(
-				MessageTemplate.MatchProtocol("I_Am_An_AgentBlockGolemProtocol"),
+				MessageTemplate.MatchProtocol("Je_Ne_Suis_Pas_Un_GolemProtocol"),
 				MessageTemplate.MatchPerformative(ACLMessage.INFORM));
         ACLMessage msgReceived = this.myAgent.receive(msgTemplate);
         if (msgReceived != null) {
         	System.out.println("MY BAD");
-        	this.exitValue = 4;
         	return true;
         }
         return false;

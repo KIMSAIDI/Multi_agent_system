@@ -59,6 +59,7 @@ public class PatrolBehaviour extends OneShotBehaviour{
         checkMessage_position();
         
         checkMessage_need_help();
+        checkFalseInformation();
             
         
         // ~~~~~~~~~~~~~~~~~~~~ Step 3 : On cherche où le golem pourrait être ~~~~~~~~~~~~~~~~~~~~
@@ -132,10 +133,10 @@ public class PatrolBehaviour extends OneShotBehaviour{
 	            liste_position_observable.add(new gsLocation(loc)); 
 	                                                                
 	        }
-	        // if (liste_position_observable.isEmpty()) {
-	        // 	// je reste sur place
-	        // 	return;
-	        // }
+	         if (liste_position_observable.isEmpty()) {
+	         	// je reste sur place
+	         	return;
+	         }
 	
 	        // ~~~~~~~~~~~~~~~~~~~~ Step 4 : On se déplace ~~~~~~~~~~~~~~~~~~~~
 	
@@ -162,14 +163,18 @@ public class PatrolBehaviour extends OneShotBehaviour{
         // Si je peux pas avancer alors c'est que j'ai trouvé un golem
         if (!((AbstractDedaleAgent)this.myAgent).moveTo(new gsLocation(nextNodeId))) {
         	
-        	// MessageTemplate msgTemplate3 = MessageTemplate.and(
-            // 		MessageTemplate.MatchProtocol("I_Am_An_AgentBlockGolemProtocol"),
-            // 		MessageTemplate.MatchPerformative(ACLMessage.INFORM));
-            // ACLMessage msgReceived3 = this.myAgent.receive(msgTemplate3);
-    		// if (msgReceived3 != null) {
-    		// 	// c'est un autre agent qui bloque
-            //     return;
-    		// }
+        	 MessageTemplate msgTemplate3 = MessageTemplate.and(
+             		MessageTemplate.MatchProtocol("I_Am_An_AgentBlockGolemProtocol"),
+             		MessageTemplate.MatchPerformative(ACLMessage.INFORM));
+             ACLMessage msgReceived3 = this.myAgent.receive(msgTemplate3);
+    		 if (msgReceived3 != null) {
+    		 	// c'est un autre agent qui bloque
+    			Random rand = new Random();
+    			int randomIndex = rand.nextInt(noeuds_observable.size());
+    			nextNodeId = noeuds_observable.get(randomIndex).getLocationId();
+    			((AbstractDedaleAgent)this.myAgent).moveTo(new gsLocation(nextNodeId));
+                 return;
+    		 }
             ((AgentFsm)this.myAgent).setPosition_golem(nextNodeId); // on enregistre la position du golem (pour les autres agents
             
             // j'envoie la position du golem pour de l'aide
@@ -227,8 +232,48 @@ public class PatrolBehaviour extends OneShotBehaviour{
                 e.printStackTrace();
             }
         }
-
+ 
         return false;
+    }
+    
+    public boolean checkFalseInformation() {
+    	Location myPosition=((AbstractDedaleAgent)this.myAgent).getCurrentPosition();
+        
+    	MessageTemplate msgTemplate = MessageTemplate.and(
+				MessageTemplate.MatchProtocol("I_Am_An_AgentBlockGolemProtocol"),
+				MessageTemplate.MatchPerformative(ACLMessage.INFORM));
+        ACLMessage msgReceived = this.myAgent.receive(msgTemplate);
+        if (msgReceived != null) {
+            // je vérifie que l'agent ne me prend pas pour un golem
+        	try {
+        		String loc = msgReceived.getContent(); // loc du golem
+        		String maLoc = myPosition.getLocationId();
+        		
+        		if (loc.equals(maLoc)) {
+        			System.out.println(this.myAgent.getLocalName() + "JE NE SUIS PAS LE GOLEM AARRRG");
+        			// je ne suis pas un golem
+        			ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
+        	        msg.setProtocol("Je_Ne_Suis_Pas_Un_GolemProtocol");
+        	        msg.setSender(this.myAgent.getAID());
+        	        for (String agentName : this.list_agentNames) {
+        				msg.addReceiver(new AID(agentName,AID.ISLOCALNAME));
+        				
+        			}
+					try {
+						msg.setContentObject(((AbstractDedaleAgent) this.myAgent).getCurrentPosition());
+						((AbstractDedaleAgent) this.myAgent).sendMessage(msg);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+        			//this.exitValue = 4; // je retourne en patrouille
+					
+        			return true;
+        		}
+        	}catch (Exception e) {
+        		e.printStackTrace();
+        	}
+        }
+    	return false;
     }
 
     public boolean checkMessage_need_help(){
@@ -253,19 +298,19 @@ public class PatrolBehaviour extends OneShotBehaviour{
         }
         
 //        // Message d'un agent qui bloque
-        MessageTemplate msgTemplate3 = MessageTemplate.and(
-        		MessageTemplate.MatchProtocol("I_Am_An_AgentBlockGolemProtocol"),
-        		MessageTemplate.MatchPerformative(ACLMessage.INFORM));
-        ACLMessage msgReceived3 = this.myAgent.receive(msgTemplate3);
-		if (msgReceived3 != null) {
-			try {
-				((AgentFsm) this.myAgent).setPosition_golem((String) msgReceived3.getContentObject());
-				this.exitValue = 0; 
-				return true;
-			} catch (UnreadableException e) {
-				e.printStackTrace();
-			}
-		}
+//        MessageTemplate msgTemplate3 = MessageTemplate.and(
+//        		MessageTemplate.MatchProtocol("I_Am_An_AgentBlockGolemProtocol"),
+//        		MessageTemplate.MatchPerformative(ACLMessage.INFORM));
+//        ACLMessage msgReceived3 = this.myAgent.receive(msgTemplate3);
+//		if (msgReceived3 != null) {
+//			try {
+//				((AgentFsm) this.myAgent).setPosition_golem(msgReceived3.getContent());
+//				this.exitValue = 0; 
+//				return true;
+//			} catch (Exception e) {
+//				e.printStackTrace();
+//			}
+//		}
         
         return false;
     } 
@@ -274,7 +319,7 @@ public class PatrolBehaviour extends OneShotBehaviour{
         if (indexVirgule != -1) { // Si une virgule est trouvée
             return chaine.substring(0, indexVirgule);
         } else { // Si aucune virgule n'est trouvée
-            return "";
+            return "-1";
         }
     }
 

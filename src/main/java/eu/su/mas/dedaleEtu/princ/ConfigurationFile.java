@@ -53,8 +53,8 @@ public final class ConfigurationFile {
 	/**
 	 * The environment is either manually designed, or generated with a specific generator
 	 */
-	public static GeneratorType GENERATOR_TYPE=GeneratorType.GS_BARABASI_ALBERT;
-	//public static GeneratorType GENERATOR_TYPE=GeneratorType.GS_GRID;
+	//public static GeneratorType GENERATOR_TYPE=GeneratorType.GS_BARABASI_ALBERT;
+	public static GeneratorType GENERATOR_TYPE=GeneratorType.GS_GRID;
 	//public static GeneratorType GENERATOR_TYPE=GeneratorType.GS_DOROGOVTSEV;
 	
 	/**
@@ -118,7 +118,7 @@ public final class ConfigurationFile {
 	/**
 	 * Size of the generated environment, mandatory
 	 */
-	public static Integer ENVIRONMENT_SIZE=4;
+	public static Integer ENVIRONMENT_SIZE=8;
 	// Parameters required for some generators (see dedale.gitlab.io)
 	public static Integer OPTIONAL_ADDITIONAL_ENVGENERATOR_PARAM1=1;//used by the BARABASI_ALBERT generator to know the number of childs
 	public static Integer[] GENERATOR_PARAMETERS= {ENVIRONMENT_SIZE,OPTIONAL_ADDITIONAL_ENVGENERATOR_PARAM1};

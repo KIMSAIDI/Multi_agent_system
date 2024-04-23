@@ -29,7 +29,7 @@ public class CheckGolem extends OneShotBehaviour {
         }
 
         public void action(){
-        	// si la position du golem fait partie de mes noeuds observable, je bloque
+        	        	// si la position du golem fait partie de mes noeuds observable, je bloque
         	// Liste des observables
     		List<Couple<Location,List<Couple<Observation,Integer>>>> lobs=((AbstractDedaleAgent)this.myAgent).observe();
     		// Liste des noeuds observables
@@ -45,10 +45,13 @@ public class CheckGolem extends OneShotBehaviour {
             	
             if ((string_location_observable.contains(((AgentFsm)this.myAgent).getPosition_golem()))) {
             	this.exitValue = 7; // On va bloquer le golem
+            	return;
             }else {
             	((AgentFsm)this.myAgent).setPosition_golem(""); 
-            	this.exitValue = 6; // On va patrouiller
+            	this.exitValue = 0; // On va patrouiller
+            	return;
             }
+       
         }
             // On vérifie déjà si on a reçu un message
 //            MessageTemplate msgTemplate = MessageTemplate.and(

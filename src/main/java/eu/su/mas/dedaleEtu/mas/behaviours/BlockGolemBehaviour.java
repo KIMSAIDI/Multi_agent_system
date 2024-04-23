@@ -35,7 +35,7 @@ public class BlockGolemBehaviour extends OneShotBehaviour{
     public void action() {
     	this.position_golem = ((AgentFsm)this.myAgent).getPosition_golem();
         
-
+        System.out.println("Position Golem : " + this.position_golem);
         // ~~~~~~~~~ Step 1 : Je vérifie que je bloque toujours le golem ~~~~~~~~~
         
         
@@ -49,6 +49,10 @@ public class BlockGolemBehaviour extends OneShotBehaviour{
 //    	if ( mistake() ){
 //    		return;// si je me suis trompé
 //    	}
+        if (checkFalseInformation() ){
+        	this.exitValue = 4;	
+        	return;
+        }
         
         // je vérifie que je le bloque encore
         if (!checkStillBlockGolem()){
@@ -111,6 +115,7 @@ public class BlockGolemBehaviour extends OneShotBehaviour{
 
             return false;
         }
+        //this.myAgent.doWait(1000);
         return true;
     }
     
@@ -142,7 +147,7 @@ public class BlockGolemBehaviour extends OneShotBehaviour{
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
-        			this.exitValue = 4; // je retourne en patrouille
+        			//this.exitValue = 4; // je retourne en patrouille
         			
         			return true;
         		}

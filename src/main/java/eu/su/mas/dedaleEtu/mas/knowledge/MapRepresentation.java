@@ -411,7 +411,9 @@ public class MapRepresentation implements Serializable {
 		for (SerializableNode<String, MapAttribute> n: exclusiveMap.getAllNodes()){
 			Set <String> edges = this.sg.getEdges(n.getNodeId());
 			for(String s: edges){
-				
+				if (s == null || n == null) {
+					continue;
+				}
 				try {
 					exclusiveMap.addEdge("", n.getNodeId(),s);
 				} catch (NullPointerException e) {

@@ -189,7 +189,7 @@ public class PatrolBehaviour extends OneShotBehaviour{
                 msg.addReceiver(new AID(agentName,AID.ISLOCALNAME));
             }
             try {
-                msg.setContentObject(nextNodeId);
+                msg.setContent(nextNodeId);
                 ((AbstractDedaleAgent)this.myAgent).sendMessage(msg);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -211,11 +211,11 @@ public class PatrolBehaviour extends OneShotBehaviour{
         ACLMessage msgReceived = this.myAgent.receive(msgTemplate);
         if (msgReceived != null) {
             try {
-                Location pos = (Location) msgReceived.getContentObject();
+                String pos = msgReceived.getContent();
                 // ajout de la position de l'agent dans la liste
-                liste_noeuds_agents.add(pos);
+                liste_noeuds_agents.add(new gsLocation(pos));
                 return true; 
-            }catch(UnreadableException e) {
+            }catch(Exception e) {
                 e.printStackTrace();
             }
         }

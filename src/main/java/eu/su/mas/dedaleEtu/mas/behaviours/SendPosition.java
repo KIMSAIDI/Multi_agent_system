@@ -31,7 +31,7 @@ public class SendPosition extends OneShotBehaviour {
 			
 		}
         try {
-            msg.setContentObject(((AbstractDedaleAgent)this.myAgent).getCurrentPosition());
+            msg.setContent(((AbstractDedaleAgent)this.myAgent).getCurrentPosition().toString());
             ((AbstractDedaleAgent)this.myAgent).sendMessage(msg);
         } catch (Exception e) {
             e.printStackTrace();

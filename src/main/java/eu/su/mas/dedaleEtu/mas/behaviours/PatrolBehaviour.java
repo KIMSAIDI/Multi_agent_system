@@ -32,7 +32,6 @@ public class PatrolBehaviour extends OneShotBehaviour{
     private List<Location> liste_noeuds_agents = new ArrayList<Location>();
     private String position_golem;
     private MapRepresentation myMap;
-    private String previousNode = "";
 
     public PatrolBehaviour(final AbstractDedaleAgent myagent, List<String> list_agentNames, String position_golem, MapRepresentation myMap) {
 		super(myagent);
@@ -44,11 +43,10 @@ public class PatrolBehaviour extends OneShotBehaviour{
 
 
     public void action(){
-       
+    	
         this.myMap = ((AgentFsm)this.myAgent).getMyMap();
         this.position_golem = ((AgentFsm)this.myAgent).getPosition_golem();
-        previousNode = ((AbstractDedaleAgent)this.myAgent).getCurrentPosition().getLocationId();
-    
+       
         // ~~~~~~~~~~~~~~~~~~~~ Step 1 : On envoie sa position ~~~~~~~~~~~~~~~~~~~~
         this.exitValue = 2;
 
@@ -121,13 +119,7 @@ public class PatrolBehaviour extends OneShotBehaviour{
 	        
 	        string_location_odeur.removeAll(string_location_agent); // on enlève les positions des agents
 	        string_location_observable.removeAll(string_location_agent); // on enlève les positions des agents
-	        // si possible j'enlève la position précédente
-			if (string_location_observable.size() > 1) {
-				string_location_observable.remove(previousNode);
-			}
-			if (string_location_odeur.size() > 1) {
-				string_location_odeur.remove(previousNode);
-			}
+	        
 	        
 	        // on reconvertit les positions des golems en location
 	        List<Location> liste_position_golem = new ArrayList<Location>();
@@ -189,7 +181,7 @@ public class PatrolBehaviour extends OneShotBehaviour{
                 msg.addReceiver(new AID(agentName,AID.ISLOCALNAME));
             }
             try {
-                msg.setContentObject(nextNodeId);
+                msg.setContent(nextNodeId);
                 ((AbstractDedaleAgent)this.myAgent).sendMessage(msg);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -198,7 +190,7 @@ public class PatrolBehaviour extends OneShotBehaviour{
             this.exitValue = 3; // on va bloquer le golem
         }
         System.out.println(" ------------------- " + this.myAgent.getLocalName() + "PatrolBehaviour");
-    	
+        
         
     }
 
@@ -248,13 +240,13 @@ public class PatrolBehaviour extends OneShotBehaviour{
         if (msgReceived2 != null) {
             try {
             	System.out.println(this.myAgent.getLocalName() + " : J'ARRIVE AIDER !!!!!");
-                ((AgentFsm)this.myAgent).setPosition_golem((String) msgReceived2.getContentObject());
+                ((AgentFsm)this.myAgent).setPosition_golem((String) msgReceived2.getContent());
                 
                 this.exitValue = 5; // on va aider pour bloquer le golem, on va a CatchGolem
                 return true; 
-            }catch(UnreadableException e) {
-                e.printStackTrace();
-            }
+			} catch (Exception e) {
+				e.printStackTrace();
+			}	
             
             
         }

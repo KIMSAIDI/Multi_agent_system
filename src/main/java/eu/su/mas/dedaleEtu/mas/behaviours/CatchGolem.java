@@ -58,6 +58,7 @@ public class CatchGolem extends OneShotBehaviour{
                     }
                 }
             }
+			this.exitValue = 0;
 			System.out.println(this.myAgent.getLocalName() + " : ------ CATCHGOLEM ---- JE SUIS ARRIVE A DESTINATION");
 			
         }

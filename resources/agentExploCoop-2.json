@@ -2,7 +2,7 @@
 { 
   "agentType":"agentExplo",
   "agentName": "Tim",
-  "communicationRange": 2,
+  "communicationRange": 5,
   "initialLocation": "free",
   "backPackCapacityGold": -1,
   "backPackCapacityDiamond":-1, 
@@ -13,7 +13,7 @@
 { 
   "agentType":"agentExplo",
   "agentName": "Elsa",
-  "communicationRange": 2,
+  "communicationRange": 5,
   "initialLocation": "free",
   "backPackCapacityGold": -1,
   "backPackCapacityDiamond":-1, 
@@ -24,7 +24,7 @@
   { 
   "agentType":"agentExplo",
   "agentName": "Gon",
-  "communicationRange": 2,
+  "communicationRange": 5,
   "initialLocation": "free",
   "backPackCapacityGold": -1,
   "backPackCapacityDiamond":-1, 
@@ -35,7 +35,7 @@
   { 
   "agentType":"agentExplo",
   "agentName": "Frodon",
-  "communicationRange": 2,
+  "communicationRange": 5,
   "initialLocation": "free",
   "backPackCapacityGold": -1,
   "backPackCapacityDiamond":-1, 

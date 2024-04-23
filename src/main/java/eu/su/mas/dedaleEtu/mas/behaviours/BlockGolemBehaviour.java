@@ -35,7 +35,7 @@ public class BlockGolemBehaviour extends OneShotBehaviour{
     public void action() {
     	this.position_golem = ((AgentFsm)this.myAgent).getPosition_golem();
         
-
+        System.out.println("Position Golem : " + this.position_golem);
         // ~~~~~~~~~ Step 1 : Je vérifie que je bloque toujours le golem ~~~~~~~~~
         
         
@@ -49,11 +49,17 @@ public class BlockGolemBehaviour extends OneShotBehaviour{
 //    	if ( mistake() ){
 //    		return;// si je me suis trompé
 //    	}
+        if (checkFalseInformation() ){
+        	this.exitValue = 4;	
+        	return;
+        }
         
         // je vérifie que je le bloque encore
-        checkStillBlockGolem();
-            
-        
+        if (!checkStillBlockGolem()){
+            this.exitValue = 4;
+            return;
+        }
+        this.exitValue = 0;
         // On envoie un message pour dire qu'on est un agent qui bloque un golem
         ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
         msg.setProtocol("I_Am_An_AgentBlockGolemProtocol");
@@ -70,7 +76,9 @@ public class BlockGolemBehaviour extends OneShotBehaviour{
             e.printStackTrace();
         }
         System.out.println(this.myAgent.getLocalName() + " : ----Je bloque un golem, il est à la position : " + position_golem + "----	");
-        
+        // my position
+        Location myPosition=((AbstractDedaleAgent)this.myAgent).getCurrentPosition();
+        ((AbstractDedaleAgent)this.myAgent).moveTo(new gsLocation(myPosition.getLocationId()));
         
         
     }
@@ -104,9 +112,10 @@ public class BlockGolemBehaviour extends OneShotBehaviour{
             System.out.println("le golem est la position : " + ((AgentFsm)this.myAgent).getPosition_golem());
             //((AbstractDedaleAgent)this.myAgent).moveTo(new gsLocation(((AgentFsm)this.myAgent).getPosition_golem()));
         	((AgentFsm)this.myAgent).setPosition_golem(""); 
-            this.exitValue = 4; // je retourne en patrouille
+
             return false;
         }
+        //this.myAgent.doWait(1000);
         return true;
     }
     
@@ -138,7 +147,7 @@ public class BlockGolemBehaviour extends OneShotBehaviour{
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
-        			this.exitValue = 4; // je retourne en patrouille
+        			//this.exitValue = 4; // je retourne en patrouille
         			
         			return true;
         		}

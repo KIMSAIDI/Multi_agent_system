@@ -18,6 +18,7 @@ import eu.su.mas.dedaleEtu.mas.behaviours.CatchGolem;
 import eu.su.mas.dedaleEtu.mas.behaviours.PatrolBehaviour;
 import eu.su.mas.dedaleEtu.mas.behaviours.SendPosition;
 import eu.su.mas.dedaleEtu.mas.behaviours.CheckGolem;
+import eu.su.mas.dedaleEtu.mas.behaviours.WhoAreYou;
 
 import eu.su.mas.dedaleEtu.mas.knowledge.MapRepresentation.MapAttribute;
 import eu.su.mas.dedaleEtu.mas.knowledge.MapRepresentation;
@@ -51,7 +52,7 @@ public class AgentFsm extends AbstractDedaleAgent {
     private static final String STATE_SENDPOSITION = "STATE_SENDPOSITION";
     private static final String STATE_PATROL = "STATE_PATROL";
     private static final String STATE_CHECK_GOLEM = "STATE_CHECK_GOLEM";
-
+    private static final String STATE_WHO_ARE_YOU = "STATE_WHO_ARE_YOU";
 
 
     protected void setup(){
@@ -109,9 +110,13 @@ public class AgentFsm extends AbstractDedaleAgent {
         // ~~~~~~~~~~~~~~~~~~~ Hunt ~~~~~~~~~~~~~~~~~~~
         // SendPosition
         fsm.registerDefaultTransition(STATE_PATROL, STATE_PATROL);
-        fsm.registerTransition(STATE_PATROL, STATE_SENDPOSITION, 2); 
+        fsm.registerTransition(STATE_PATROL, STATE_SENDPOSITION, 2);
+        fsm.registerTransition(STATE_PATROL, STATE_SEND_MAP, 13);
         fsm.registerDefaultTransition(STATE_SENDPOSITION, STATE_PATROL);
-        
+        // WhoAreYou
+        fsm.registerTransition(STATE_PATROL, STATE_WHO_ARE_YOU, 9);
+        fsm.registerDefaultTransition(STATE_WHO_ARE_YOU, STATE_PATROL);
+
         // BlockGolem
         fsm.registerDefaultTransition(STATE_BLOCK_GOLEM, STATE_BLOCK_GOLEM);
         fsm.registerTransition(STATE_PATROL, STATE_BLOCK_GOLEM, 3);
@@ -124,6 +129,7 @@ public class AgentFsm extends AbstractDedaleAgent {
         // CheckGolem
         fsm.registerTransition(STATE_CATCH_GOLEM, STATE_CHECK_GOLEM, 6);
         fsm.registerTransition(STATE_CHECK_GOLEM, STATE_BLOCK_GOLEM, 7);
+        fsm.registerTransition(STATE_PATROL, STATE_CHECK_GOLEM, 10);
         fsm.registerDefaultTransition(STATE_CHECK_GOLEM, STATE_PATROL);
         
 

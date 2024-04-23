@@ -45,7 +45,7 @@ public class SayHelloBehaviour extends OneShotBehaviour{
 			
 		}
 		
-		msg.setContent("Hello World, I'm at "+myPosition + " I am "+this.myAgent.getAID().getLocalName());
+		msg.setContent(myPosition + ","+this.myAgent.getAID().getLocalName());
 		((AbstractDedaleAgent)this.myAgent).sendMessage(msg);
 		
 		System.out.println("----------- " + this.myAgent.getLocalName()+" sent a message to its friend");

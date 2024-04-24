@@ -390,6 +390,9 @@ public class MapRepresentation implements Serializable {
 		System.out.println("My map : " + this.sg);
 		System.out.println("other map: " + otherMap);
 		// Récupérer les nœuds et les arêtes exclusifs à ma carte
+		if (this.sg == null) {
+			this.serializeGraphTopology();
+		}
 		for (SerializableNode<String, MapAttribute> node : this.sg.getAllNodes()) {
 			SerializableNode<String, MapAttribute> other_node = otherMap.getNode(node.getNodeId());			
 			// Vérification si le nœud n'existe pas dans l'autre carte	

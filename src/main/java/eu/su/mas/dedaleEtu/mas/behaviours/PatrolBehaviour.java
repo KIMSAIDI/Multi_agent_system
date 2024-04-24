@@ -251,8 +251,7 @@ public class PatrolBehaviour extends OneShotBehaviour{
         ACLMessage msgReceived2 = this.myAgent.receive(msgTemplate2);
         if (msgReceived2 != null) {
             try {
-                String m = msgReceived2.getContent();
-                String pos = getPosString(m);
+                String pos = msgReceived2.getContent();
                 // ajout de la position de l'agent dans la liste
                 liste_noeuds_agents.add(new gsLocation(pos));
                 this.exitValue = 13; // on va répondre

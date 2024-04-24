@@ -29,7 +29,7 @@ public class CheckGolem extends OneShotBehaviour {
         }
 
         public void action(){
-        	        	// si la position du golem fait partie de mes noeuds observable, je bloque
+        	// si la position du golem fait partie de mes noeuds observable, je bloque
         	// Liste des observables
     		List<Couple<Location,List<Couple<Observation,Integer>>>> lobs=((AbstractDedaleAgent)this.myAgent).observe();
     		// Liste des noeuds observables
@@ -53,52 +53,10 @@ public class CheckGolem extends OneShotBehaviour {
             }
        
         }
-            // On vérifie déjà si on a reçu un message
-//            MessageTemplate msgTemplate = MessageTemplate.and(
-//				MessageTemplate.MatchProtocol("I_Am_An_AgentBlockGolemProtocol"),
-//				MessageTemplate.MatchPerformative(ACLMessage.INFORM));
-//            ACLMessage msgReceived = this.myAgent.receive(msgTemplate);
-//            if (msgReceived != null) {
-//                // Un agent est arrivé avant moi, je retourne patrouiller
-////            	System.out.println(this.myAgent.getLocalName() + " : Un agent est arrivé avant moi, je retourne patrouiller");
-////            	((AgentFsm)this.myAgent).setPosition_golem(""); 
-//            	try {
-//					String loc = (String) msgReceived.getContentObject();
-//					// je l'a compare
-//				} catch (UnreadableException e) {
-//					// TODO Auto-generated catch block
-//					e.printStackTrace();
-//				}
-//            	return;
-//            	
-//            }else{
-//                // On renvoie un message de controle
-////                 ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
-////                 msg.setProtocol("CheckGolemProtocol");
-////                 msg.setSender(this.myAgent.getAID());
-////                 for (String agentName : this.list_agentNames) {
-////                     msg.addReceiver(new AID(agentName,AID.ISLOCALNAME));
-////                 }
-////                 try {
-////                     ((AbstractDedaleAgent)this.myAgent).sendMessage(msg);
-////                 } catch (Exception e) {
-////                     e.printStackTrace();
-////                 }
-////                 this.myAgent.doWait(500);
-//
-//                // On vérifie si on a reçu un message
-//
-//               // msgReceived = this.myAgent.receive(msgTemplate);
-//
-//                // Si on reçoit rien alors c'est un golem
-//            	
-//                this.exitValue = 7; // On va bloquer le golem
-//            }
-//            System.out.println(this.myAgent.getLocalName() + " : ------ CHECKGOLEM ----");
-//        }
 
-        public int onEnd(){
-            return this.exitValue;
-        }
+        
+    public int onEnd(){
+        return this.exitValue;
+    }
     
 }

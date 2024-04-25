@@ -49,7 +49,7 @@ public class SayHelloBehaviour extends OneShotBehaviour{
 		((AbstractDedaleAgent)this.myAgent).sendMessage(msg);
 		
 		System.out.println("----------- " + this.myAgent.getLocalName()+" sent a message to its friend");
-		block(1000);
+		//block(1000);
 		
 	}
 	

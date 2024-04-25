@@ -380,33 +380,40 @@ public class MapRepresentation implements Serializable {
 		if (otherMap == null) {
 			return this.getSerializableGraph();
 		}
+		this.serializeGraphTopology();
+
 		SerializableSimpleGraph<String, MapAttribute> exclusiveMap = new SerializableSimpleGraph<>();
 		Set<SerializableNode<String, MapAttribute>> nodes_otherMap = otherMap.getAllNodes();
 		// recuperer que les ids des noeuds de l'autre carte
 		List<String> nodesId_otherMap = new ArrayList<>();
+		List<String> openNodesId_otherMap = new ArrayList<>();
 		for (SerializableNode<String, MapAttribute> node : nodes_otherMap) {
 			nodesId_otherMap.add(node.getNodeId());
+			if (node.getNodeContent().toString() == MapAttribute.open.toString()) {
+				openNodesId_otherMap.add(node.getNodeId());
+			}
+
 		}
 		//System.out.println("My map : " + this.sg);
 		//System.out.println("other map: " + otherMap);
 		// Récupérer les nœuds et les arêtes exclusifs à ma carte
-		if (this.sg == null) {
-			this.serializeGraphTopology();
-		}
+		
 		for (SerializableNode<String, MapAttribute> node : this.sg.getAllNodes()) {
-			SerializableNode<String, MapAttribute> other_node = otherMap.getNode(node.getNodeId());			
+			//SerializableNode<String, MapAttribute> other_node = otherMap.getNode(node.getNodeId());			
 			// Vérification si le nœud n'existe pas dans l'autre carte	
-			if ( !nodesId_otherMap.contains(node.getNodeId())) {
+			// ou si le nœud est fermé dans l'autre carte et ouvert dans la carte actuelle
+			if ( !nodesId_otherMap.contains(node.getNodeId()) || (openNodesId_otherMap.contains(node.getNodeId()) && node.getNodeContent().toString() == MapAttribute.closed.toString())){
 				exclusiveMap.addNode(node.getNodeId(), node.getNodeContent());
 			} 
-			else {
+			else { // Si le nœud existe dans l'autre carte mais qu'il ne dispose pas de toutes les arêtes
 				Set<String> edges = this.sg.getEdges(node.getNodeId());
 				//System.out.println("Edges: " + edges);
 				Set<String> edges_otherMap = otherMap.getEdges(node.getNodeId());
 				//System.out.println("Edges other map: " + edges_otherMap);
 
 				// Vérification si les arêtes du nœud n'existent pas dans l'autre carte
-				if (!edges.equals(edges_otherMap) || edges.size() > edges_otherMap.size()) {
+				// et si le noeud a plus d'arêtes que dans l'autre carte
+				if (!edges.equals(edges_otherMap) && edges.size() >= edges_otherMap.size()) {
 					exclusiveMap.addNode(node.getNodeId(), node.getNodeContent());
 				}
 			}

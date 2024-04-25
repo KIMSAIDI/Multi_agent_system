@@ -61,18 +61,18 @@ public class PatrolBehaviour extends OneShotBehaviour{
 		
 		
 		//checkMessage_position();
-//        if (mistake()) {
-//            ((AgentFsm)this.myAgent).setPosition_golem(""); 
-//			return;
-//        }
-//       
-//        if (checkMessage_need_help()) { // j'ai reçu un appel à l'aide
-//            // la position du golem n'est pas un agent dont j'ai reçu la position
-//            this.exitValue = 5; // on va aider pour bloquer le golem, on va a CatchGolem               
-//            return; 
-//        }
+        if (mistake()) {
+            ((AgentFsm)this.myAgent).setPosition_golem(""); 
+			return;
+        }
+       
+        if (checkMessage_need_help()) { // j'ai reçu un appel à l'aide
+            // la position du golem n'est pas un agent dont j'ai reçu la position
+            this.exitValue = 5; // on va aider pour bloquer le golem, on va a CatchGolem               
+            return; 
+        }
 //        
-        System.out.println("-----position des autres agents : " + liste_noeuds_agents);
+        //System.out.println("-----position des autres agents : " + liste_noeuds_agents);
         
         // ~~~~~~~~~~~~~~~~~~~~ Step 3 : On cherche où le golem pourrait être ~~~~~~~~~~~~~~~~~~~~
 
@@ -170,13 +170,13 @@ public class PatrolBehaviour extends OneShotBehaviour{
 			nextNodeId = noeuds_observable.get(randomIndex).getLocationId();
 		}
         
-       
+        ((AbstractDedaleAgent)this.myAgent).moveTo(new gsLocation(nextNodeId));
         // Si je peux pas avancer alors c'est que j'ai trouvé un golem
         if (!((AbstractDedaleAgent)this.myAgent).moveTo(new gsLocation(nextNodeId))) {
 
 //            
             if (!checkFalseInformation()) {
-        		//  on me prend pour un golem -> je doit bouger 
+//        		//  on me prend pour un golem -> je doit bouger 
         		Random rand = new Random();
         		int randomIndex = rand.nextInt(noeuds_observable.size());
         		nextNodeId = noeuds_observable.get(randomIndex).getLocationId();
@@ -185,7 +185,6 @@ public class PatrolBehaviour extends OneShotBehaviour{
                 // un agent bloque le golem, peut être que ma position est inutile
         		// si oui je vais au moins essayer de catch le golem
         		// si non je vais bloquer
-                System.out.println("---- this.exitvalue : " + this.exitValue);
                 return;
             }
         	
@@ -222,23 +221,18 @@ public class PatrolBehaviour extends OneShotBehaviour{
 				MessageTemplate.MatchPerformative(ACLMessage.INFORM));
     	
         ACLMessage msgReceived = this.myAgent.receive(msgTemplate);
-        while (msgReceived != null) {
-            try {
-                String pos = msgReceived.getContent();
-                // ajout de la position de l'agent dans la liste
-                if (pos == ""){
-                    return;
-                }
-                liste_noeuds_agents.add(new gsLocation(pos));
-              
-            }catch(Exception e) {
-                e.printStackTrace();
-            }
-            msgTemplate = MessageTemplate.and(
-    				MessageTemplate.MatchProtocol("SendPositionProtocol"),
-    				MessageTemplate.MatchPerformative(ACLMessage.INFORM));
-            msgReceived = this.myAgent.receive(msgTemplate);
-           
+        for (int i= 0; i < this.list_agentNames.size(); i++) {
+			if (msgReceived != null && msgReceived.getSender().getLocalName().equals(this.list_agentNames.get(i))) {
+				try {
+					String pos = msgReceived.getContent();
+					// ajout de la position de l'agent dans la liste
+					liste_noeuds_agents.add(new gsLocation(pos));
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				msgReceived = this.myAgent.receive(msgTemplate);	
+			}		
+        	
         }
        
     }
@@ -280,7 +274,7 @@ public class PatrolBehaviour extends OneShotBehaviour{
         		String maLoc = myPosition.getLocationId();
         		
         		if (loc.equals(maLoc)) { // on me prend pour un golem
-        			System.out.println(this.myAgent.getLocalName() + "JE NE SUIS PAS LE GOLEM AARRRG");
+        			//System.out.println(this.myAgent.getLocalName() + "JE NE SUIS PAS LE GOLEM AARRRG");
         			// je ne suis pas un golem
         			ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
         	        msg.setProtocol("Je_Ne_Suis_Pas_Un_GolemProtocol");
@@ -350,7 +344,7 @@ public class PatrolBehaviour extends OneShotBehaviour{
 					// je ne fais rien
 					return false;
 				}else {   	
-                   // System.out.println(this.myAgent.getLocalName() + " : J'ARRIVE AIDER !!!!!");
+                    System.out.println(this.myAgent.getLocalName() + " : J'ARRIVE AIDER !!!!!");
                 
 	            	((AgentFsm)this.myAgent).setPosition_golem((String) msgReceived2.getContent());
 	                return true; 
@@ -381,7 +375,7 @@ public class PatrolBehaviour extends OneShotBehaviour{
 				MessageTemplate.MatchPerformative(ACLMessage.INFORM));
         ACLMessage msgReceived = this.myAgent.receive(msgTemplate);
         if (msgReceived != null) {
-        	System.out.println("MY BAD");
+        	//System.out.println("MY BAD");
         	return true;
         }
         return false;
@@ -439,6 +433,6 @@ public class PatrolBehaviour extends OneShotBehaviour{
 
     @Override
 	public int onEnd() {
-		return exitValue;
+		return this.exitValue;
 	}
 }

@@ -47,6 +47,8 @@ public class BlockGolemBehaviour extends OneShotBehaviour{
 //    	}
 //    	
    	if ( mistake() ){
+   		this.exitValue = 4; 
+   		((AgentFsm)this.myAgent).setPosition_golem(""); 
    		return;// si je me suis trompé
    	}
         // if (mistake()) { // si je me suis trompé
@@ -82,7 +84,7 @@ public class BlockGolemBehaviour extends OneShotBehaviour{
         catch (Exception e) {
             e.printStackTrace();
         }
-       // System.out.println(this.myAgent.getLocalName() + " : ----Je bloque un golem, il est à la position : " + position_golem + "----	");
+       System.out.println(this.myAgent.getLocalName() + " : ----Je bloque un golem, il est à la position : " + position_golem + "----	");
         // my position
         Location myPosition=((AbstractDedaleAgent)this.myAgent).getCurrentPosition();
         ((AbstractDedaleAgent)this.myAgent).moveTo(new gsLocation(myPosition.getLocationId()));
@@ -160,6 +162,6 @@ public class BlockGolemBehaviour extends OneShotBehaviour{
 
     @Override
 	public int onEnd() {
-		return exitValue;
+		return this.exitValue;
 	}
 }

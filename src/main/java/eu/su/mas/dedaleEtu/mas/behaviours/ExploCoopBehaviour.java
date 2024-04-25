@@ -24,6 +24,7 @@ import jade.core.behaviours.SimpleBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
+import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.OneShotBehaviour;
 import eu.su.mas.dedaleEtu.mas.agents.dummies.explo.AgentFsm;
@@ -99,11 +100,13 @@ public class ExploCoopBehaviour extends OneShotBehaviour {
 			 * Just added here to let you see what the agent is doing, otherwise he will be too quick
 			 */
 			try {
-				this.myAgent.doWait(500);
+				this.myAgent.doWait(10);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 			try {
+				// Check if the agent has received a message
+				checkFalseInformation();
 				if (checkReceivedMessage()) {
 					return;
 				}
@@ -172,6 +175,45 @@ public class ExploCoopBehaviour extends OneShotBehaviour {
 		System.out.println(" ------------------- " + this.myAgent.getLocalName() + "ExploCoopBehaviour");
 	}
 	
+    public boolean checkFalseInformation() {
+    	Location myPosition=((AbstractDedaleAgent)this.myAgent).getCurrentPosition();
+        
+    	MessageTemplate msgTemplate = MessageTemplate.and(
+				MessageTemplate.MatchProtocol("I_Am_An_AgentBlockGolemProtocol"),
+				MessageTemplate.MatchPerformative(ACLMessage.INFORM));
+        ACLMessage msgReceived = this.myAgent.receive(msgTemplate);
+        if (msgReceived != null) {
+            // je vérifie que l'agent ne me prend pas pour un golem
+        	try {
+        		String loc = msgReceived.getContent(); // loc du golem
+        		String maLoc = myPosition.getLocationId();
+        		
+        		if (loc.equals(maLoc)) { // on me prend pour un golem
+        			System.out.println(this.myAgent.getLocalName() + "JE NE SUIS PAS LE GOLEM AARRRG");
+        			// je ne suis pas un golem
+        			ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
+        	        msg.setProtocol("Je_Ne_Suis_Pas_Un_GolemProtocol");
+        	        msg.setSender(this.myAgent.getAID());
+        	        for (String agentName : this.list_agentNames) {
+        				msg.addReceiver(new AID(agentName,AID.ISLOCALNAME));
+        				
+        			}
+					try {
+						msg.setContentObject(((AbstractDedaleAgent) this.myAgent).getCurrentPosition());
+						((AbstractDedaleAgent) this.myAgent).sendMessage(msg);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+        			//this.exitValue = 4; // je retourne en patrouille
+					
+        			return true;
+				}
+			}catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		return false;
+	}		
 
 	// Check les messages reçus
 	@SuppressWarnings("unchecked")
@@ -215,6 +257,10 @@ public class ExploCoopBehaviour extends OneShotBehaviour {
 			// renvoyer les noeuds non visités de l'agent expéditeur si ils ne sont pas dans notre map
 			//((AgentFsm)this.myAgent).setReceiver(msgShareMap.getSender().getLocalName());
 			//this.exitValue = 3;
+
+
+			// changer de chemin si on a reçu une map ?????
+			Boolean changePath = true;
 			return true;
 		}
 

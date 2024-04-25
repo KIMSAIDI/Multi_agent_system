@@ -24,6 +24,7 @@ import eu.su.mas.dedaleEtu.mas.knowledge.MapRepresentation.MapAttribute;
 import eu.su.mas.dedaleEtu.mas.knowledge.MapRepresentation;
 import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.FSMBehaviour;
+import weka.core.pmml.jaxbbindings.False;
 
 public class AgentFsm extends AbstractDedaleAgent {
     private static final long serialVersionUID = 8567689731496787661L;
@@ -39,7 +40,7 @@ public class AgentFsm extends AbstractDedaleAgent {
     private String receiver = ""; // pour le partage des noeuds exclusifs
 	private static final int SPAM = 6; // pour limiter les conversations avec un agent
     private String position_golem = "";
-
+    private Boolean exploDone = false;
 
     private static final String STATE_INIT = "STATE_INIT";
     private static final String STATE_EXPLORE = "STATE_EXPLORE";
@@ -111,7 +112,8 @@ public class AgentFsm extends AbstractDedaleAgent {
         // SendPosition
         fsm.registerDefaultTransition(STATE_PATROL, STATE_PATROL);
         fsm.registerTransition(STATE_PATROL, STATE_SENDPOSITION, 2);
-        fsm.registerTransition(STATE_PATROL, STATE_SEND_MAP, 13);
+        fsm.registerTransition(STATE_PATROL, STATE_SHARE_EXCLUSIVE_NODES, 13);
+        fsm.registerTransition(STATE_SHARE_EXCLUSIVE_NODES, STATE_PATROL, 14);
         fsm.registerDefaultTransition(STATE_SENDPOSITION, STATE_PATROL);
         // WhoAreYou
         fsm.registerTransition(STATE_PATROL, STATE_WHO_ARE_YOU, 9);
@@ -273,6 +275,13 @@ public class AgentFsm extends AbstractDedaleAgent {
         return receiver;
     }
     
+    public void setExploDone(Boolean exploDone) {
+        this.exploDone = exploDone;
+    }
+
+    public Boolean getExploDone() {
+        return exploDone;
+    }
     
     
 }

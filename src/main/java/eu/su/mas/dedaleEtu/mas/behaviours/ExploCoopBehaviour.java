@@ -140,6 +140,7 @@ public class ExploCoopBehaviour extends OneShotBehaviour {
 			if (!this.myMap.hasOpenNode()){
 				//Explo finished
 				this.exitValue = 10;
+				((AgentFsm)this.myAgent).setExploDone(true);
 				System.out.println(this.myAgent.getLocalName()+" - Exploration successufully done, behaviour removed.");
 			}else{
 				//4) select next move.

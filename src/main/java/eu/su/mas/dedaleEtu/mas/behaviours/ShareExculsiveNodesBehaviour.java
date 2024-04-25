@@ -25,6 +25,8 @@ public class ShareExculsiveNodesBehaviour extends OneShotBehaviour {
     private MapRepresentation myMap;
 	private String receiver;
 
+    private int exitValue = 0; // on ne fait rien par défaut
+
     public ShareExculsiveNodesBehaviour(Agent a,MapRepresentation myMap, String receiver) {
 		super(a);
 		this.myMap=((AgentFsm)this.myAgent).getMyMap();
@@ -35,6 +37,7 @@ public class ShareExculsiveNodesBehaviour extends OneShotBehaviour {
     public void action() {
         this.myMap=((AgentFsm)this.myAgent).getMyMap();
         this.receiver = ((AgentFsm)this.myAgent).getReceiver();
+        this.exitValue = 0;
         System.out.println("Agent "+this.myAgent.getLocalName()+ " is trying to share its exclusive nodes with agent: "+receiver);
 
 
@@ -71,6 +74,10 @@ public class ShareExculsiveNodesBehaviour extends OneShotBehaviour {
                 break;
             }
         }
+        if (((AgentFsm)this.myAgent).getExploDone()) {
+            this.exitValue = 14;
+        }
+        
         //block(2000);
     
         
@@ -135,4 +142,8 @@ public class ShareExculsiveNodesBehaviour extends OneShotBehaviour {
 		return map1;
 	}
 
+    @Override
+	public int onEnd() {
+		return this.exitValue;
+	}
 }

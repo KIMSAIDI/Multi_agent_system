@@ -387,8 +387,8 @@ public class MapRepresentation implements Serializable {
 		for (SerializableNode<String, MapAttribute> node : nodes_otherMap) {
 			nodesId_otherMap.add(node.getNodeId());
 		}
-		System.out.println("My map : " + this.sg);
-		System.out.println("other map: " + otherMap);
+		//System.out.println("My map : " + this.sg);
+		//System.out.println("other map: " + otherMap);
 		// Récupérer les nœuds et les arêtes exclusifs à ma carte
 		if (this.sg == null) {
 			this.serializeGraphTopology();
@@ -404,6 +404,8 @@ public class MapRepresentation implements Serializable {
 				//System.out.println("Edges: " + edges);
 				Set<String> edges_otherMap = otherMap.getEdges(node.getNodeId());
 				//System.out.println("Edges other map: " + edges_otherMap);
+
+				// Vérification si les arêtes du nœud n'existent pas dans l'autre carte
 				if (!edges.equals(edges_otherMap) || edges.size() > edges_otherMap.size()) {
 					exclusiveMap.addNode(node.getNodeId(), node.getNodeContent());
 				}
@@ -414,7 +416,7 @@ public class MapRepresentation implements Serializable {
 		for (SerializableNode<String, MapAttribute> n: exclusiveMap.getAllNodes()){
 			Set <String> edges = this.sg.getEdges(n.getNodeId());
 			for(String s: edges){
-				if (s == null || n == null) {
+				if (s == "" || n == null) {
 					continue;
 				}
 				try {

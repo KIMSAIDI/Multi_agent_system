@@ -56,11 +56,11 @@ public class CatchGolem extends OneShotBehaviour{
                             
                         }
                     }
-                    try {
-                        this.myAgent.doWait(1000);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+//                    try {
+//                        this.myAgent.doWait(1000);
+//                    } catch (Exception e) {
+//                        e.printStackTrace();
+//                    }
                 }
             }
 			//this.exitValue = 0;

@@ -168,7 +168,7 @@ public class PatrolBehaviour extends OneShotBehaviour{
 			nextNodeId = noeuds_observable.get(randomIndex).getLocationId();
 		}
         
-        ((AbstractDedaleAgent)this.myAgent).moveTo(new gsLocation(nextNodeId));
+       // ((AbstractDedaleAgent)this.myAgent).moveTo(new gsLocation(nextNodeId));
         // Si je peux pas avancer alors c'est que j'ai trouvé un golem
         if (!((AbstractDedaleAgent)this.myAgent).moveTo(new gsLocation(nextNodeId))) {
 

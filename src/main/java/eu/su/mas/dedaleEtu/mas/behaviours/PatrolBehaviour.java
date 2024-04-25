@@ -213,26 +213,27 @@ public class PatrolBehaviour extends OneShotBehaviour{
     }
 
     public void checkMessage_position(){
-        // Message de position
-        MessageTemplate msgTemplate = MessageTemplate.and(
-				MessageTemplate.MatchProtocol("SendPositionProtocol"),
-				MessageTemplate.MatchPerformative(ACLMessage.INFORM));
-    	
-        ACLMessage msgReceived = this.myAgent.receive(msgTemplate);
-        for (int i= 0; i < this.list_agentNames.size(); i++) {
-			if (msgReceived != null && msgReceived.getSender().getLocalName().equals(this.list_agentNames.get(i))) {
-				try {
-					String pos = msgReceived.getContent();
-					// ajout de la position de l'agent dans la liste
-					liste_noeuds_agents.add(new gsLocation(pos));
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-				msgReceived = this.myAgent.receive(msgTemplate);	
-			}		
-        	
-        }
-       
+        ACLMessage msgReceived;
+        do {
+            // Message de position
+            MessageTemplate msgTemplate = MessageTemplate.and(
+                    MessageTemplate.MatchProtocol("SendPositionProtocol"),
+                    MessageTemplate.MatchPerformative(ACLMessage.INFORM));
+            
+            msgReceived = this.myAgent.receive(msgTemplate);
+            //for (int i= 0; i < this.list_agentNames.size(); i++) {
+            if (msgReceived != null) {
+                try {
+                    String pos = msgReceived.getContent();
+                    // ajout de la position de l'agent dans la liste
+                    liste_noeuds_agents.add(new gsLocation(pos));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }		
+                
+            //}
+        } while (msgReceived != null);
     }
     
     public boolean checkMessage_position2() {    

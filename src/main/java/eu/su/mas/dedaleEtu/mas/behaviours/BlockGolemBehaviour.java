@@ -44,7 +44,7 @@ public class BlockGolemBehaviour extends OneShotBehaviour{
     	
     	if (checkFalseInformation()) { // si on me prend pour un golem
     		this.exitValue = 4; 
-       		((AgentFsm)this.myAgent).setPosition_golem(""); 
+       		//((AgentFsm)this.myAgent).setPosition_golem(""); 
     		return;
     	}
     	

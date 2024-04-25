@@ -98,9 +98,7 @@ public class PatrolBehaviour extends OneShotBehaviour{
         if (!noeuds_observable.isEmpty()) {
             noeuds_observable.remove(0); 
         }
-        if (!liste_position_odeur.isEmpty()) {
-            liste_position_odeur.remove(0);
-        }
+        
         
         try {
             this.myAgent.doWait(1000);

@@ -129,7 +129,7 @@ public class AgentFsm extends AbstractDedaleAgent {
         // CheckGolem
         fsm.registerTransition(STATE_CATCH_GOLEM, STATE_CHECK_GOLEM, 6);
         fsm.registerTransition(STATE_CHECK_GOLEM, STATE_BLOCK_GOLEM, 7);
-        fsm.registerTransition(STATE_PATROL, STATE_CHECK_GOLEM, 10);
+        fsm.registerTransition(STATE_PATROL, STATE_CHECK_GOLEM, 15);
         fsm.registerDefaultTransition(STATE_CHECK_GOLEM, STATE_PATROL);
         
 

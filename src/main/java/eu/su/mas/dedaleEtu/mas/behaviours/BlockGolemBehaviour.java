@@ -42,26 +42,18 @@ public class BlockGolemBehaviour extends OneShotBehaviour{
         //whichGolem(); // determine si je reste bien à ma place, pour le moment inutile
             
     	
-//    	if (checkFalseInformation()) { // si on me prend pour un golem
-//    		return;
-//    	}
-//    	
+    	if (checkFalseInformation()) { // si on me prend pour un golem
+    		this.exitValue = 4; 
+       		((AgentFsm)this.myAgent).setPosition_golem(""); 
+    		return;
+    	}
+    	
    	if ( mistake() ){
    		this.exitValue = 4; 
    		((AgentFsm)this.myAgent).setPosition_golem(""); 
    		return;// si je me suis trompé
    	}
-        // if (mistake()) { // si je me suis trompé
-        // 	((AgentFsm)this.myAgent).setPosition_golem(""); 
-		// 	this.exitValue = 4;
-		// 	return;
-		// }
-        // if (checkFalseInformation() ){ // si on me prend pour un golem
-        // 	((AgentFsm)this.myAgent).setPosition_golem(""); 
-        // 	this.exitValue = 4;	
-        // 	return;
-        // }
-		
+        
         
         // je vérifie que je le bloque encore
         if (!checkStillBlockGolem()){
@@ -107,45 +99,45 @@ public class BlockGolemBehaviour extends OneShotBehaviour{
         return true;
     }
     
-    // public boolean checkFalseInformation() {
-    // 	Location myPosition=((AbstractDedaleAgent)this.myAgent).getCurrentPosition();
+     public boolean checkFalseInformation() {
+     	Location myPosition=((AbstractDedaleAgent)this.myAgent).getCurrentPosition();
         
-    // 	MessageTemplate msgTemplate = MessageTemplate.and(
-	// 			MessageTemplate.MatchProtocol("I_Am_An_AgentBlockGolemProtocol"),
-	// 			MessageTemplate.MatchPerformative(ACLMessage.INFORM));
-    //     ACLMessage msgReceived = this.myAgent.receive(msgTemplate);
-    //     if (msgReceived != null) {
-    //         // je vérifie que l'agent ne me prend pas pour un golem
-    //     	try {
-    //     		String loc = msgReceived.getContent(); // loc du golem
-    //     		String maLoc = myPosition.getLocationId();
+     	MessageTemplate msgTemplate = MessageTemplate.and(
+	 			MessageTemplate.MatchProtocol("I_Am_An_AgentBlockGolemProtocol"),
+	 			MessageTemplate.MatchPerformative(ACLMessage.INFORM));
+         ACLMessage msgReceived = this.myAgent.receive(msgTemplate);
+         if (msgReceived != null) {
+             // je vérifie que l'agent ne me prend pas pour un golem
+         	try {
+         		String loc = msgReceived.getContent(); // loc du golem
+         		String maLoc = myPosition.getLocationId();
         		
-    //     		if (loc.equals(maLoc)) {
-    //     			System.out.println(this.myAgent.getLocalName() + "JE NE SUIS PAS LE GOLEM AARRRG");
-    //     			// je ne suis pas un golem
-    //     			ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
-    //     	        msg.setProtocol("Je_Ne_Suis_Pas_Un_GolemProtocol");
-    //     	        msg.setSender(this.myAgent.getAID());
-    //     	        for (String agentName : this.list_agentNames) {
-    //     				msg.addReceiver(new AID(agentName,AID.ISLOCALNAME));
+         		if (loc.equals(maLoc)) {
+         			System.out.println(this.myAgent.getLocalName() + "JE NE SUIS PAS LE GOLEM AARRRG");
+         			// je ne suis pas un golem
+         			ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
+         	        msg.setProtocol("Je_Ne_Suis_Pas_Un_GolemProtocol");
+         	        msg.setSender(this.myAgent.getAID());
+         	        for (String agentName : this.list_agentNames) {
+         				msg.addReceiver(new AID(agentName,AID.ISLOCALNAME));
         				
-    //     			}
-	// 				try {
-	// 					msg.setContentObject(((AbstractDedaleAgent) this.myAgent).getCurrentPosition());
-	// 					((AbstractDedaleAgent) this.myAgent).sendMessage(msg);
-	// 				} catch (Exception e) {
-	// 					e.printStackTrace();
-	// 				}
-    //     			//this.exitValue = 4; // je retourne en patrouille
+         			}
+	 				try {
+	 					msg.setContentObject(((AbstractDedaleAgent) this.myAgent).getCurrentPosition());
+	 					((AbstractDedaleAgent) this.myAgent).sendMessage(msg);
+	 				} catch (Exception e) {
+	 					e.printStackTrace();
+	 				}
+         			//this.exitValue = 4; // je retourne en patrouille
 					
-    //     			return true;
-    //     		}
-    //     	}catch (Exception e) {
-    //     		e.printStackTrace();
-    //     	}
-    //     }
-    // 	return false;
-    // }
+         			return true;
+         		}
+         	}catch (Exception e) {
+         		e.printStackTrace();
+         	}
+         }
+     	return false;
+     }
     
     public boolean mistake() {
     	MessageTemplate msgTemplate = MessageTemplate.and(

@@ -44,10 +44,10 @@ public class BlockGolemBehaviour extends OneShotBehaviour{
     	// 	return;
     	// }
     	
-   	if ( mistake() ){
-   		this.exitValue = 4; 
-   		return;// si je me suis trompé
-   	}
+        if ( mistake() ){
+            this.exitValue = 4; 
+            return;// si je me suis trompé
+        }
         
         
         // je vérifie que je le bloque encore
@@ -56,6 +56,7 @@ public class BlockGolemBehaviour extends OneShotBehaviour{
             this.exitValue = 4;
             return;
         }
+
         this.exitValue = 0;
         // On envoie un message pour dire qu'on est un agent qui bloque un golem
         ACLMessage msg = new ACLMessage(ACLMessage.INFORM);

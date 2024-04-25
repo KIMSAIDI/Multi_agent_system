@@ -99,7 +99,7 @@ public class PatrolBehaviour extends OneShotBehaviour{
        // System.out.println(" ----- liste_position_odeur : " + liste_position_odeur);
         
         try {
-            this.myAgent.doWait(1000);
+            this.myAgent.doWait(100);
         } catch (Exception e) {
             e.printStackTrace();
         }

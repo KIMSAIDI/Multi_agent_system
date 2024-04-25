@@ -18,7 +18,6 @@ import eu.su.mas.dedaleEtu.mas.behaviours.CatchGolem;
 import eu.su.mas.dedaleEtu.mas.behaviours.PatrolBehaviour;
 import eu.su.mas.dedaleEtu.mas.behaviours.SendPosition;
 import eu.su.mas.dedaleEtu.mas.behaviours.CheckGolem;
-import eu.su.mas.dedaleEtu.mas.behaviours.WhoAreYou;
 
 import eu.su.mas.dedaleEtu.mas.knowledge.MapRepresentation.MapAttribute;
 import eu.su.mas.dedaleEtu.mas.knowledge.MapRepresentation;

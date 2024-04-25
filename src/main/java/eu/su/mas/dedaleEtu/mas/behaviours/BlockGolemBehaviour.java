@@ -34,29 +34,25 @@ public class BlockGolemBehaviour extends OneShotBehaviour{
 
     public void action() {
     	this.position_golem = ((AgentFsm)this.myAgent).getPosition_golem();
+        Location myPosition=((AbstractDedaleAgent)this.myAgent).getCurrentPosition();
         
-       // System.out.println("Position Golem : " + this.position_golem);
         // ~~~~~~~~~ Step 1 : Je vérifie que je bloque toujours le golem ~~~~~~~~~
         
-        
-        //whichGolem(); // determine si je reste bien à ma place, pour le moment inutile
-            
-    	
-    	if (checkFalseInformation()) { // si on me prend pour un golem
-    		this.exitValue = 4; 
-       		//((AgentFsm)this.myAgent).setPosition_golem(""); 
-    		return;
-    	}
+    	// if (checkFalseInformation()) { // si on me prend pour un golem
+    	// 	this.exitValue = 4; 
+       	// 	//((AgentFsm)this.myAgent).setPosition_golem(""); 
+    	// 	return;
+    	// }
     	
    	if ( mistake() ){
    		this.exitValue = 4; 
-   		((AgentFsm)this.myAgent).setPosition_golem(""); 
    		return;// si je me suis trompé
    	}
         
         
         // je vérifie que je le bloque encore
         if (!checkStillBlockGolem()){
+        	System.out.println("je ne le bloque plus");
             this.exitValue = 4;
             return;
         }
@@ -69,16 +65,17 @@ public class BlockGolemBehaviour extends OneShotBehaviour{
             msg.addReceiver(new AID(agentName,AID.ISLOCALNAME));
         }
         try{
-            // On envoie la position du golem
-            msg.setContent(((AgentFsm)this.myAgent).getPosition_golem());
+            // On envoie la position du golem et sa position
+            String content = ((AgentFsm)this.myAgent).getPosition_golem() + "|" + myPosition;
+            msg.setContent(content);
             ((AbstractDedaleAgent)this.myAgent).sendMessage(msg);
         }
         catch (Exception e) {
             e.printStackTrace();
         }
-       //System.out.println(this.myAgent.getLocalName() + " : ----Je bloque un golem, il est à la position : " + position_golem + "----	");
+       System.out.println(this.myAgent.getLocalName() + " : ----Je bloque un golem, il est à la position : " + position_golem + "----	");
         // my position
-        Location myPosition=((AbstractDedaleAgent)this.myAgent).getCurrentPosition();
+        
         ((AbstractDedaleAgent)this.myAgent).moveTo(new gsLocation(myPosition.getLocationId()));
         
         
@@ -95,7 +92,6 @@ public class BlockGolemBehaviour extends OneShotBehaviour{
 
             return false;
         }
-        //this.myAgent.doWait(1000);
         return true;
     }
     
@@ -107,9 +103,16 @@ public class BlockGolemBehaviour extends OneShotBehaviour{
 	 			MessageTemplate.MatchPerformative(ACLMessage.INFORM));
          ACLMessage msgReceived = this.myAgent.receive(msgTemplate);
          if (msgReceived != null) {
+            String content = msgReceived.getContent();
+            // Séparation des informations
+            String[] parts = content.split("\\|");
+            // Récupération des informations distinctes
+            String posGolem = parts[0];
+            //String positionAgent = parts[1];
+
              // je vérifie que l'agent ne me prend pas pour un golem
          	try {
-         		String loc = msgReceived.getContent(); // loc du golem
+         		String loc = posGolem; // loc du golem
          		String maLoc = myPosition.getLocationId();
         		
          		if (loc.equals(maLoc)) {
@@ -145,11 +148,17 @@ public class BlockGolemBehaviour extends OneShotBehaviour{
 				MessageTemplate.MatchPerformative(ACLMessage.INFORM));
         ACLMessage msgReceived = this.myAgent.receive(msgTemplate);
         if (msgReceived != null) {
-        	System.out.println("MY BAD");
-        	return true;
+            // je compare si la position de l'agent est bien la position de mon golem
+            String posAgent = (String) msgReceived.getContent();
+            String posGolem = ((AgentFsm)this.myAgent).getPosition_golem();
+            if (posAgent.equals(posGolem)){
+                // je me suis trompé
+                ((AgentFsm)this.myAgent).setPosition_golem(""); 
+                return true;
+            }
         }
         return false;
-    	
+
     }
 
     @Override

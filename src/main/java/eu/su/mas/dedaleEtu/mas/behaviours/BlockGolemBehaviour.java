@@ -76,7 +76,7 @@ public class BlockGolemBehaviour extends OneShotBehaviour{
         catch (Exception e) {
             e.printStackTrace();
         }
-       System.out.println(this.myAgent.getLocalName() + " : ----Je bloque un golem, il est à la position : " + position_golem + "----	");
+       //System.out.println(this.myAgent.getLocalName() + " : ----Je bloque un golem, il est à la position : " + position_golem + "----	");
         // my position
         Location myPosition=((AbstractDedaleAgent)this.myAgent).getCurrentPosition();
         ((AbstractDedaleAgent)this.myAgent).moveTo(new gsLocation(myPosition.getLocationId()));

@@ -47,7 +47,7 @@ public class PatrolBehaviour extends OneShotBehaviour{
     	this.liste_noeuds_agents = new ArrayList<Location>();
         this.myMap = ((AgentFsm)this.myAgent).getMyMap();
         this.position_golem = ((AgentFsm)this.myAgent).getPosition_golem();
-       
+        Location myPosition=((AbstractDedaleAgent)this.myAgent).getCurrentPosition();
         // ~~~~~~~~~~~~~~~~~~~~ Step 1 : On envoie sa position ~~~~~~~~~~~~~~~~~~~~
         this.exitValue = 2;
 
@@ -317,6 +317,7 @@ public class PatrolBehaviour extends OneShotBehaviour{
                     	this.exitValue = 7; 
                     }else {
                     	// j'essaye d'aller catch le golem
+                    	System.out.println(" || J'essaye de  catch le golem ||");
                     	this.exitValue = 5;
                     }
         			

@@ -38,11 +38,6 @@ public class BlockGolemBehaviour extends OneShotBehaviour{
         
         // ~~~~~~~~~ Step 1 : Je vérifie que je bloque toujours le golem ~~~~~~~~~
         
-    	// if (checkFalseInformation()) { // si on me prend pour un golem
-    	// 	this.exitValue = 4; 
-       	// 	//((AgentFsm)this.myAgent).setPosition_golem(""); 
-    	// 	return;
-    	// }
     	
         if ( mistake() ){
             this.exitValue = 4; 
@@ -132,8 +127,7 @@ public class BlockGolemBehaviour extends OneShotBehaviour{
 	 				} catch (Exception e) {
 	 					e.printStackTrace();
 	 				}
-         			//this.exitValue = 4; // je retourne en patrouille
-					
+         			
          			return true;
          		}
          	}catch (Exception e) {

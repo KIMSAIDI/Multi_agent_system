@@ -147,6 +147,7 @@ public class PatrolBehaviour extends OneShotBehaviour{
         	// si la liste est de taille 1 je reste sur place sinon je ne prend pas en compte ma position
 			if (liste_position_golem.size() == 1) {
 				nextNodeId = liste_position_golem.get(0).getLocationId();
+				
 			}else {
 				liste_position_golem.remove(0); // on enlève notre position
 				Random rand = new Random();

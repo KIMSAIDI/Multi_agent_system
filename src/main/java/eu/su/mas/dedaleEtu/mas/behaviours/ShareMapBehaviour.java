@@ -51,7 +51,7 @@ public class ShareMapBehaviour extends OneShotBehaviour {
 		// If it was written properly, this sharing action should be in a dedicated behaviour set, the receivers be automatically computed, and only a subgraph would be shared.
 		this.myMap = ((AgentFsm)this.myAgent).getMyMap();
 		this.receiver = ((AgentFsm)this.myAgent).getReceiver();
-		System.out.println("Agent "+this.myAgent.getLocalName()+ " is trying to share its map with agent: "+receiver);
+		//System.out.println("Agent "+this.myAgent.getLocalName()+ " is trying to share its map with agent: "+receiver);
 		ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
 		msg.setProtocol("SHARE-ALL-MAP");
 		msg.setSender(this.myAgent.getAID());

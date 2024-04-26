@@ -161,7 +161,6 @@ public class ExploCoopBehaviour extends OneShotBehaviour {
 				}
 
 				((AgentFsm)this.myAgent).majList_spam();
-				//System.out.println("List_spam de "+ this.myAgent.getLocalName() + " : " + list_spam);
 				((AgentFsm)this.myAgent).setMyMap(this.myMap);
 				if (!((AbstractDedaleAgent)this.myAgent).moveTo(new gsLocation(nextNodeId))) {
 					//System.out.println("je suis bloqué");
@@ -191,7 +190,7 @@ public class ExploCoopBehaviour extends OneShotBehaviour {
         		String maLoc = myPosition.getLocationId();
         		
         		if (loc.equals(maLoc)) { // on me prend pour un golem
-        			System.out.println(this.myAgent.getLocalName() + "JE NE SUIS PAS LE GOLEM AARRRG");
+        			//System.out.println(this.myAgent.getLocalName() + "JE NE SUIS PAS LE GOLEM AARRRG");
         			// je ne suis pas un golem
         			ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
         	        msg.setProtocol("Je_Ne_Suis_Pas_Un_GolemProtocol");

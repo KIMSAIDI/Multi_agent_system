@@ -42,7 +42,6 @@ public class CheckGolem extends OneShotBehaviour {
             for (Location loc : noeuds_observable) {
                 string_location_observable.add(loc.getLocationId());
             }
-            	
             if ((string_location_observable.contains(((AgentFsm)this.myAgent).getPosition_golem()))) {
                 
             	this.exitValue = 7; // On va bloquer le golem

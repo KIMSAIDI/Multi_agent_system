@@ -38,7 +38,7 @@ public class ShareExculsiveNodesBehaviour extends OneShotBehaviour {
         this.myMap=((AgentFsm)this.myAgent).getMyMap();
         this.receiver = ((AgentFsm)this.myAgent).getReceiver();
         this.exitValue = 0;
-        System.out.println("Agent "+this.myAgent.getLocalName()+ " is trying to share its exclusive nodes with agent: "+receiver);
+        //System.out.println("Agent "+this.myAgent.getLocalName()+ " is trying to share its exclusive nodes with agent: "+receiver);
 
 
 		List<Couple<String, SerializableSimpleGraph<String, MapAttribute>>> list_friends_map = ((AgentFsm)this.myAgent).getList_friends_map();
@@ -55,7 +55,7 @@ public class ShareExculsiveNodesBehaviour extends OneShotBehaviour {
                 //System.out.println("Exclusive nodes to share with agent: "+exclusiveNodes);
                 SerializableSimpleGraph<String, MapAttribute> subGraph = this.myMap.getExclusiveMap(otherMap);
                 if (subGraph.getAllNodes().isEmpty()) {
-                    System.out.println("No exclusive nodes to share with agent: "+receiver);
+                    //System.out.println("No exclusive nodes to share with agent: "+receiver);
                     break;
                 }
                 ACLMessage msg = new ACLMessage(ACLMessage.INFORM);

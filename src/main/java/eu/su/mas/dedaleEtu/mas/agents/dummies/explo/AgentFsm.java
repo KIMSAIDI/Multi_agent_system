@@ -51,8 +51,6 @@ public class AgentFsm extends AbstractDedaleAgent {
     private static final String STATE_SENDPOSITION = "STATE_SENDPOSITION";
     private static final String STATE_PATROL = "STATE_PATROL";
     private static final String STATE_CHECK_GOLEM = "STATE_CHECK_GOLEM";
-    private static final String STATE_WHO_ARE_YOU = "STATE_WHO_ARE_YOU";
-
 
     protected void setup(){
         super.setup();
@@ -113,10 +111,7 @@ public class AgentFsm extends AbstractDedaleAgent {
         fsm.registerTransition(STATE_PATROL, STATE_SHARE_EXCLUSIVE_NODES, 13);
         fsm.registerTransition(STATE_SHARE_EXCLUSIVE_NODES, STATE_PATROL, 14);
         fsm.registerDefaultTransition(STATE_SENDPOSITION, STATE_PATROL);
-        // WhoAreYou
-        fsm.registerTransition(STATE_PATROL, STATE_WHO_ARE_YOU, 9);
-        fsm.registerDefaultTransition(STATE_WHO_ARE_YOU, STATE_PATROL);
-
+        
         // BlockGolem
         fsm.registerDefaultTransition(STATE_BLOCK_GOLEM, STATE_BLOCK_GOLEM);
         fsm.registerTransition(STATE_PATROL, STATE_BLOCK_GOLEM, 3);

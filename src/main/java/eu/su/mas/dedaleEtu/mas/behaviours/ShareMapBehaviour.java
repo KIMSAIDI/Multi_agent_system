@@ -54,7 +54,7 @@ public class ShareMapBehaviour extends OneShotBehaviour {
 		//4) At each time step, the agent blindly send all its graph to its surrounding to illustrate how to share its knowledge (the topology currently) with the the others agents. 	
 		// If it was written properly, this sharing action should be in a dedicated behaviour set, the receivers be automatically computed, and only a subgraph would be shared.
 		this.myMap = ((AgentFsm)this.myAgent).getMyMap();
-		System.out.println("Agent "+this.myAgent.getLocalName()+ " is trying to share its map with agents: "+receivers);
+		//System.out.println("Agent "+this.myAgent.getLocalName()+ " is trying to share its map with agents: "+receivers);
 		ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
 		msg.setProtocol("SHARE-TOPO");
 		msg.setSender(this.myAgent.getAID());

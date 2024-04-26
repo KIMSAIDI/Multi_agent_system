@@ -429,11 +429,11 @@ public class MapRepresentation implements Serializable {
 				try {
 					exclusiveMap.addEdge("", n.getNodeId(),s);
 				} catch (NullPointerException e) {
-					System.out.println("Error adding edge " + n.getNodeId() + " -> " + s);
+					//System.out.println("Error adding edge " + n.getNodeId() + " -> " + s);
 				}
 			}
 		}
-		System.out.println("Exclusive map : " + exclusiveMap);
+		//System.out.println("Exclusive map : " + exclusiveMap);
 
 		return exclusiveMap;
 	}

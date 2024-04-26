@@ -402,20 +402,23 @@ public class MapRepresentation implements Serializable {
 			//SerializableNode<String, MapAttribute> other_node = otherMap.getNode(node.getNodeId());			
 			// Vérification si le nœud n'existe pas dans l'autre carte	
 			// ou si le nœud est fermé dans l'autre carte et ouvert dans la carte actuelle
-			if ( !nodesId_otherMap.contains(node.getNodeId()) || (openNodesId_otherMap.contains(node.getNodeId()) && node.getNodeContent().toString() == MapAttribute.closed.toString())){
+			if ( !nodesId_otherMap.contains(node.getNodeId())){
 				exclusiveMap.addNode(node.getNodeId(), node.getNodeContent());
 			} 
-			else { // Si le nœud existe dans l'autre carte mais qu'il ne dispose pas de toutes les arêtes
-				Set<String> edges = this.sg.getEdges(node.getNodeId());
-				//System.out.println("Edges: " + edges);
-				Set<String> edges_otherMap = otherMap.getEdges(node.getNodeId());
-				//System.out.println("Edges other map: " + edges_otherMap);
+			// else { // Si le nœud existe dans l'autre carte mais qu'il ne dispose pas de toutes les arêtes
+			// 	Set<String> edges = this.sg.getEdges(node.getNodeId());
+			// 	//System.out.println("Edges: " + edges);
+			// 	Set<String> edges_otherMap = otherMap.getEdges(node.getNodeId());
+			// 	//System.out.println("Edges other map: " + edges_otherMap);
 
-				// Vérification si les arêtes du nœud n'existent pas dans l'autre carte
-				// et si le noeud a plus d'arêtes que dans l'autre carte
-				if (!edges.equals(edges_otherMap) && edges.size() >= edges_otherMap.size()) {
-					exclusiveMap.addNode(node.getNodeId(), node.getNodeContent());
-				}
+			// 	// Vérification si les arêtes du nœud n'existent pas dans l'autre carte
+			// 	// et si le noeud a plus d'arêtes que dans l'autre carte
+			// 	if (!edges.equals(edges_otherMap) && edges.size() >= edges_otherMap.size()) {
+			// 		exclusiveMap.addNode(node.getNodeId(), node.getNodeContent());
+			// 	}
+			else if (node.getNodeContent().toString() == MapAttribute.closed.toString() && openNodesId_otherMap.contains(node.getNodeId())) {
+				exclusiveMap.addNode(node.getNodeId(), node.getNodeContent());
+				// }
 			}
 		}
 
@@ -423,11 +426,9 @@ public class MapRepresentation implements Serializable {
 		for (SerializableNode<String, MapAttribute> n: exclusiveMap.getAllNodes()){
 			Set <String> edges = this.sg.getEdges(n.getNodeId());
 			for(String s: edges){
-				if (s == "" || n == null) {
-					continue;
-				}
+				String nId = n.getNodeId();
 				try {
-					exclusiveMap.addEdge("", n.getNodeId(),s);
+					exclusiveMap.addEdge("", nId,s);
 				} catch (NullPointerException e) {
 					System.out.println("Error adding edge " + n.getNodeId() + " -> " + s);
 				}

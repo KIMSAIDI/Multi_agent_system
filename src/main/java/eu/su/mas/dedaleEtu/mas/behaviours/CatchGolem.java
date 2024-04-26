@@ -42,9 +42,8 @@ public class CatchGolem extends OneShotBehaviour{
 				for (String nodeId : path){
                     if (!((AbstractDedaleAgent) this.myAgent).moveTo(new gsLocation(nodeId))) {
                         this.exitValue = 6; // On check si c'est un golem ou un agent qui bloque
-                        System.out.println("je check c'est quoi");
                         return; 
-                        //break;
+                        
                     }else {
                         myPosition=((AbstractDedaleAgent)this.myAgent).getCurrentPosition();
                         // on recalcule le chemin le plus court à partir de notre nouvelle position
@@ -56,14 +55,9 @@ public class CatchGolem extends OneShotBehaviour{
                             
                         }
                     }
-//                    try {
-//                        this.myAgent.doWait(1000);
-//                    } catch (Exception e) {
-//                        e.printStackTrace();
-//                    }
+
                 }
             }
-			//this.exitValue = 0;
 			System.out.println(this.myAgent.getLocalName() + " : ------ CATCHGOLEM ---- JE SUIS ARRIVE A DESTINATION");
 			
         }

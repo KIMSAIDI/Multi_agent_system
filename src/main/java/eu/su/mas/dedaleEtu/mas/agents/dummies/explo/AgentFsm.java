@@ -23,7 +23,6 @@ import eu.su.mas.dedaleEtu.mas.knowledge.MapRepresentation.MapAttribute;
 import eu.su.mas.dedaleEtu.mas.knowledge.MapRepresentation;
 import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.FSMBehaviour;
-import weka.core.pmml.jaxbbindings.False;
 
 public class AgentFsm extends AbstractDedaleAgent {
     private static final long serialVersionUID = 8567689731496787661L;

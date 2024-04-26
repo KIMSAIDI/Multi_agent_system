@@ -230,7 +230,7 @@ public class ExploCoopBehaviour extends OneShotBehaviour {
 		// recu: protocol SHARE-TOPO
 		ACLMessage msgShareMap;
 		do {
-			MessageTemplate mtSM = MessageTemplate.and(MessageTemplate.MatchPerformative(ACLMessage.INFORM), MessageTemplate.MatchProtocol("SHARE-TOPO"));
+			MessageTemplate mtSM = MessageTemplate.and(MessageTemplate.MatchPerformative(ACLMessage.INFORM), MessageTemplate.MatchProtocol("SHARE-ALL-MAP"));
 			msgShareMap = this.myAgent.receive(mtSM);
 			if (msgShareMap != null) {
 				changePath = true; // changer de chemin si on a reçu une map

@@ -53,7 +53,7 @@ public class ShareMapBehaviour extends OneShotBehaviour {
 		this.receiver = ((AgentFsm)this.myAgent).getReceiver();
 		System.out.println("Agent "+this.myAgent.getLocalName()+ " is trying to share its map with agent: "+receiver);
 		ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
-		msg.setProtocol("SHARE-TOPO");
+		msg.setProtocol("SHARE-ALL-MAP");
 		msg.setSender(this.myAgent.getAID());
 		
 		msg.addReceiver(new AID(receiver,AID.ISLOCALNAME));

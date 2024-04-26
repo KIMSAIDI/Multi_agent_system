@@ -227,6 +227,7 @@ public class PatrolBehaviour extends OneShotBehaviour{
                 String pos = msgReceived2.getContent();
                 // ajout de la position de l'agent dans la liste
                 liste_noeuds_agents.add(new gsLocation(pos));
+                ((AgentFsm)this.myAgent).setReceiver(msgReceived2.getSender().getLocalName());
                 this.exitValue = 13; // on va répondre
                 return true; 
             }catch(Exception e) {

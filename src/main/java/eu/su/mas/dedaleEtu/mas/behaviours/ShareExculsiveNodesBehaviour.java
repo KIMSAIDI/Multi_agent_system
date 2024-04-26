@@ -56,7 +56,9 @@ public class ShareExculsiveNodesBehaviour extends OneShotBehaviour {
                 SerializableSimpleGraph<String, MapAttribute> subGraph = this.myMap.getExclusiveMap(otherMap);
                 if (subGraph.getAllNodes().isEmpty()) {
                     System.out.println("No exclusive nodes to share with agent: "+receiver);
-                    break;
+                    if (!((AgentFsm)this.myAgent).getExploDone()) {
+                        break;
+                    }
                 }
                 ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
                 msg.setProtocol("SHARE-EXCLUSIVE-NODES");

@@ -271,7 +271,11 @@ public class ExploCoopBehaviour extends OneShotBehaviour {
 					e.printStackTrace();
 				}
 				//System.out.println(this.myAgent.getLocalName() + " received exclu map " + subGraph + "from " + msgExNodes.getSender().getLocalName());
-
+				if (subGraph.getAllNodes().isEmpty()) {
+					this.myMap.CloseAllOpenNodes();
+					break;
+				}
+					
 				this.myMap.mergeMap(subGraph);
 				((AgentFsm)this.myAgent).setMyMap(this.myMap);
 				SerializableSimpleGraph<String, MapAttribute> otherMap = ((AgentFsm)this.myAgent).getMap_friends_map(msgExNodes.getSender().getLocalName());

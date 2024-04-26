@@ -381,7 +381,6 @@ public class MapRepresentation implements Serializable {
 		for (SerializableNode<String, MapAttribute> node : this.sg.getAllNodes()) {
 			//SerializableNode<String, MapAttribute> other_node = otherMap.getNode(node.getNodeId());			
 			// Vérification si le nœud n'existe pas dans l'autre carte	
-			// ou si le nœud est fermé dans l'autre carte et ouvert dans la carte actuelle
 			if ( !nodesId_otherMap.contains(node.getNodeId())){
 				exclusiveMap.addNode(node.getNodeId(), node.getNodeContent());
 			} 
@@ -419,7 +418,11 @@ public class MapRepresentation implements Serializable {
 		return exclusiveMap;
 	}
 
-	
+	public void CloseAllOpenNodes() {
+		this.g.nodes()
+				.filter(n -> n.getAttribute("ui.class")==MapAttribute.open.toString())
+				.forEach(n -> n.setAttribute("ui.class", MapAttribute.closed.toString()));
+	}
 	
 	
 	

@@ -346,7 +346,7 @@ public class MapRepresentation implements Serializable {
 				copiedMap.addEdge(null, n.getNodeId(),s);
 			}
 		}
-		System.out.println("Map" + copiedMap);
+		//System.out.println("Map" + copiedMap);
 		return copiedMap;
 	}
 
@@ -410,11 +410,11 @@ public class MapRepresentation implements Serializable {
 				try {
 					exclusiveMap.addEdge("", nId,s);
 				} catch (NullPointerException e) {
-					System.out.println("Error adding edge " + n.getNodeId() + " -> " + s);
+					//System.out.println("Error adding edge " + n.getNodeId() + " -> " + s);
 				}
 			}
 		}
-		System.out.println("Exclusive map : " + exclusiveMap);
+		//System.out.println("Exclusive map : " + exclusiveMap);
 
 		return exclusiveMap;
 	}

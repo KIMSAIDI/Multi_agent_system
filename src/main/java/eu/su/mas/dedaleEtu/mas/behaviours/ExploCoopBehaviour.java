@@ -244,7 +244,7 @@ public class ExploCoopBehaviour extends OneShotBehaviour {
 				//System.out.println(this.myAgent.getLocalName() + " received a map from " + msgShareMap.getSender().getLocalName());
 				this.myMap.mergeMap(autreMap);
 				((AgentFsm)this.myAgent).setMyMap(this.myMap);
-				SerializableSimpleGraph<String, MapAttribute> mergedMap = this.copyGraph(autreMap);
+				//SerializableSimpleGraph<String, MapAttribute> mergedMap = this.copyGraph(autreMap);
 				// ajouter la map de l'agent expéditeur à la liste des maps des amis (mergées)
 				((AgentFsm)this.myAgent).addList_friends_map(msgShareMap.getSender().getLocalName(), autreMap); 
 				// renvoyer les noeuds non visités de l'agent expéditeur si ils ne sont pas dans notre map

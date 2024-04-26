@@ -98,23 +98,7 @@ public class ShareExculsiveNodesBehaviour extends OneShotBehaviour {
 		return copyMap;
 	}
 
-	public SerializableSimpleGraph<String, MapAttribute> getSubGraph(List<Couple<String, List<String>>> nodes) {
-		SerializableSimpleGraph<String, MapAttribute> subGraph = new SerializableSimpleGraph<>();
-		// Parcourir tous les nœuds 
-		for (Couple<String, List<String>> n : nodes) {
-			// Ajouter le nœud à la carte copiée
-			subGraph.addNode(n.getLeft());
-		}
-		//4 now that all nodes are added, we can add edges
-		for (Couple<String, List<String>> n : nodes) {
-			for (String s : n.getRight()) {
-				subGraph.addEdge(null, n.getLeft(), s);
-			}
-		}
-		
-		return subGraph;
-	}
-
+    
 	public SerializableSimpleGraph<String, MapAttribute> getMergeGraph(SerializableSimpleGraph<String, MapAttribute> map1, SerializableSimpleGraph<String, MapAttribute> map2) {
 		//SerializableSimpleGraph<String, MapAttribute> subGraph = copyGraph(map1);
 		// Parcourir tous les nœuds 

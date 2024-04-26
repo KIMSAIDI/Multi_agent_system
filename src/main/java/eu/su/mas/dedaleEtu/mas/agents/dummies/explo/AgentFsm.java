@@ -36,7 +36,7 @@ public class AgentFsm extends AbstractDedaleAgent {
     private List<Couple<String,Integer>> list_spam = new ArrayList<>();
     private List<Couple<String, SerializableSimpleGraph<String, MapAttribute>>> list_friends_map = new ArrayList<>();
     private String receiver = ""; // pour le partage des noeuds exclusifs
-	private static final int SPAM = 6; // pour limiter les conversations avec un agent
+	private static final int SPAM = 10; // pour limiter les conversations avec un agent
     private String position_golem = "";
     private Boolean exploDone = false;
 
@@ -78,7 +78,7 @@ public class AgentFsm extends AbstractDedaleAgent {
         // Definition des etats
         fsm.registerFirstState(new InitBehaviour(), STATE_INIT);
         fsm.registerState(new ExploCoopBehaviour(this, myMap, this.list_agentNames, nbActions, list_spam, list_friends_map), STATE_EXPLORE);
-        fsm.registerState(new ShareMapBehaviour(this, myMap, list_agentNames), STATE_SEND_MAP);
+        fsm.registerState(new ShareMapBehaviour(this, myMap, receiver), STATE_SEND_MAP);
         fsm.registerState(new ReceiveMapBehaviour(this), STATE_RECEIVE_MAP);
         fsm.registerState(new SayHelloBehaviour(this, this.list_agentNames), STATE_SAYHELLO);
         fsm.registerState(new ShareExculsiveNodesBehaviour(this, myMap, receiver), STATE_SHARE_EXCLUSIVE_NODES);      
@@ -245,6 +245,16 @@ public class AgentFsm extends AbstractDedaleAgent {
             Couple<String, SerializableSimpleGraph<String, MapAttribute>> couple = this.list_friends_map.get(i);
             if (couple.getLeft().equals(agent)) {
                 return couple.getRight();
+            }
+        }
+        return null;
+    }
+
+    public String getAgent_friends_map(String agent) {
+        for (int i = 0; i < this.list_friends_map.size(); i++) {
+            Couple<String, SerializableSimpleGraph<String, MapAttribute>> couple = this.list_friends_map.get(i);
+            if (couple.getLeft().equals(agent)) {
+                return couple.getLeft();
             }
         }
         return null;

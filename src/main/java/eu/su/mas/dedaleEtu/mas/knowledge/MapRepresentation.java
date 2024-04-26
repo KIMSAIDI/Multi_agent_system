@@ -6,6 +6,7 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -173,9 +174,22 @@ public class MapRepresentation implements Serializable {
 
 		return getShortestPath(myPosition,closest.get().getLeft());
 	}
-
-
-
+	public List<String> getShortestPathToRandomOpenNode(String myPosition) {
+		// 1) Get all openNodes
+		List<String> opennodes = getOpenNodes();
+		
+		// 2) Select a random open node
+		Random rand = new Random();
+		String randomOpenNode = opennodes.get(rand.nextInt(opennodes.size()));
+	
+		// 3) Compute the shortest path to the randomly selected open node
+		List <String> shortestPath = getShortestPath(myPosition, randomOpenNode);
+		if (shortestPath == null) {
+			return getShortestPathToClosestOpenNode(myPosition);
+		}
+		return shortestPath;
+	}
+	
 	public List<String> getOpenNodes(){
 		return this.g.nodes()
 				.filter(x ->x .getAttribute("ui.class")==MapAttribute.open.toString()) 
@@ -317,46 +331,6 @@ public class MapRepresentation implements Serializable {
 	}
 
 	
-	/**
-	 * 
-	 * récupérer les noeuds et les arêtes exclusifs à ma carte (les noeuds et les arêtes qui n'existent pas dans l'autre carte)
-	 */
-	public List<Couple<String, List<String>>> getNodesAndEdgesExclusiveToMyMap(SerializableSimpleGraph<String, MapAttribute> autreMap) {
-		List<Couple<String, List<String>>> exclusiveNodesAndEdges = new ArrayList<>();
-		Set<SerializableNode<String, MapAttribute>> nodes_autreMap = autreMap.getAllNodes();
-		if (nodes_autreMap.isEmpty()) {
-			// Si l'autre carte est vide, tous les nœuds et arêtes de la carte actuelle sont exclusifs
-			for (SerializableNode<String, MapAttribute> node : this.sg.getAllNodes()) {
-				exclusiveNodesAndEdges.add(new Couple<>(node.getNodeId(), new ArrayList<>(this.sg.getEdges(node.getNodeId()))));
-			}
-			return exclusiveNodesAndEdges;
-		}
-		// Parcours des noeuds de la map actuelle
-		for (SerializableNode<String, MapAttribute> node : this.sg.getAllNodes()) {
-			// Vérification si le nœud n'existe pas dans l'autre carte
-			if (!nodes_autreMap.contains(node)) {
-				// Si le nœud est exclusif, toutes ses arêtes sont également exclusives
-				exclusiveNodesAndEdges.add(new Couple<>(node.getNodeId(), new ArrayList<>(this.sg.getEdges(node.getNodeId()))));
-			}
-		}
-	
-		return exclusiveNodesAndEdges;
-	}
-	
-	public void mergeNodes(List<Couple<String, List<String>>> nodes) {
-		// Parcours de la liste des couples
-		for (Couple<String, List<String>> node : nodes) {
-			// Ajout du nœud à la carte
-			String nodeId = node.getLeft();
-			this.addNode(nodeId, MapAttribute.open);
-	
-			// Ajout des arêtes associées au noeud
-			List<String> edges = node.getRight();
-			for (String edge : edges) {
-				this.addEdge(nodeId, edge);
-			}
-		}
-	}
 		
 	public SerializableSimpleGraph<String, MapAttribute> copySerializableMap() {
 		SerializableSimpleGraph<String, MapAttribute> copiedMap = new SerializableSimpleGraph<>();
@@ -372,9 +346,15 @@ public class MapRepresentation implements Serializable {
 				copiedMap.addEdge(null, n.getNodeId(),s);
 			}
 		}
-		System.out.println("Map" + copiedMap);
+		//System.out.println("Map" + copiedMap);
 		return copiedMap;
 	}
+
+	/**
+	 * 
+	 * récupérer les noeuds et les arêtes exclusifs à ma carte (les noeuds et les arêtes qui n'existent pas dans l'autre carte)
+	 */
+
 	
 	public SerializableSimpleGraph<String, MapAttribute> getExclusiveMap(SerializableSimpleGraph<String, MapAttribute> otherMap) {
 		if (otherMap == null) {
@@ -402,7 +382,7 @@ public class MapRepresentation implements Serializable {
 			//SerializableNode<String, MapAttribute> other_node = otherMap.getNode(node.getNodeId());			
 			// Vérification si le nœud n'existe pas dans l'autre carte	
 			// ou si le nœud est fermé dans l'autre carte et ouvert dans la carte actuelle
-			if ( !nodesId_otherMap.contains(node.getNodeId()) || (openNodesId_otherMap.contains(node.getNodeId()) && node.getNodeContent().toString() == MapAttribute.closed.toString())){
+			if ( !nodesId_otherMap.contains(node.getNodeId())){
 				exclusiveMap.addNode(node.getNodeId(), node.getNodeContent());
 			} 
 			else { // Si le nœud existe dans l'autre carte mais qu'il ne dispose pas de toutes les arêtes
@@ -416,6 +396,9 @@ public class MapRepresentation implements Serializable {
 				if (!edges.equals(edges_otherMap) && edges.size() >= edges_otherMap.size()) {
 					exclusiveMap.addNode(node.getNodeId(), node.getNodeContent());
 				}
+			// else if (node.getNodeContent().toString() == MapAttribute.closed.toString() && openNodesId_otherMap.contains(node.getNodeId())) {
+			// 	exclusiveMap.addNode(node.getNodeId(), node.getNodeContent());
+			// 	// }
 			}
 		}
 
@@ -423,11 +406,9 @@ public class MapRepresentation implements Serializable {
 		for (SerializableNode<String, MapAttribute> n: exclusiveMap.getAllNodes()){
 			Set <String> edges = this.sg.getEdges(n.getNodeId());
 			for(String s: edges){
-				if (s == "" || n == null) {
-					continue;
-				}
+				String nId = n.getNodeId();
 				try {
-					exclusiveMap.addEdge("", n.getNodeId(),s);
+					exclusiveMap.addEdge("", nId,s);
 				} catch (NullPointerException e) {
 					//System.out.println("Error adding edge " + n.getNodeId() + " -> " + s);
 				}

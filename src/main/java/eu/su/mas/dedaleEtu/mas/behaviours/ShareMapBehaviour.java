@@ -27,21 +27,17 @@ import jade.lang.acl.ACLMessage;
 public class ShareMapBehaviour extends OneShotBehaviour {
 	
 	private MapRepresentation myMap;
-	private List<String> receivers;
+	private String receiver;
 	/**
-	 * The agent periodically share its map.
-	 * It blindly tries to send all its graph to its friend(s)  	
-	 * If it was written properly, this sharing action would NOT be in a ticker behaviour and only a subgraph would be shared.
-
 	 * @param a the agent
 	 * @param period the periodicity of the behaviour (in ms)
 	 * @param mymap (the map to share)
-	 * @param receivers the list of agents to send the map to
+	 * @param receiver the list of agents to send the map to
 	 */
-	public ShareMapBehaviour(Agent a,MapRepresentation mymap, List<String> receivers) {
+	public ShareMapBehaviour(Agent a,MapRepresentation mymap, String receiver) {
 		super(a);
 		this.myMap=mymap;
-		this.receivers=receivers;	
+		this.receiver=receiver;	
 	}
 
 	/**
@@ -54,15 +50,13 @@ public class ShareMapBehaviour extends OneShotBehaviour {
 		//4) At each time step, the agent blindly send all its graph to its surrounding to illustrate how to share its knowledge (the topology currently) with the the others agents. 	
 		// If it was written properly, this sharing action should be in a dedicated behaviour set, the receivers be automatically computed, and only a subgraph would be shared.
 		this.myMap = ((AgentFsm)this.myAgent).getMyMap();
-		//System.out.println("Agent "+this.myAgent.getLocalName()+ " is trying to share its map with agents: "+receivers);
+		this.receiver = ((AgentFsm)this.myAgent).getReceiver();
+		//System.out.println("Agent "+this.myAgent.getLocalName()+ " is trying to share its map with agent: "+receiver);
 		ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
-		msg.setProtocol("SHARE-TOPO");
+		msg.setProtocol("SHARE-ALL-MAP");
 		msg.setSender(this.myAgent.getAID());
 		
-		for (String agentName : receivers) {
-			msg.addReceiver(new AID(agentName,AID.ISLOCALNAME));
-			
-		}
+		msg.addReceiver(new AID(receiver,AID.ISLOCALNAME));
 			
 		SerializableSimpleGraph<String, MapAttribute> sg=this.myMap.getSerializableGraph();
 		try {					
@@ -70,8 +64,14 @@ public class ShareMapBehaviour extends OneShotBehaviour {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		if (((AgentFsm)this.myAgent).getAgent_friends_map(receiver) == null){
+			((AgentFsm)this.myAgent).addList_friends_map(receiver, sg);
+		}
+		else{
+			((AgentFsm)this.myAgent).majList_friends_map(receiver, sg);
+		}
 		((AbstractDedaleAgent)this.myAgent).sendMessage(msg);
-		this.myAgent.doWait(1000);
+		this.myAgent.doWait(400);
 	}	
 
 }

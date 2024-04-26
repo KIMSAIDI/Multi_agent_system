@@ -45,6 +45,7 @@ public class SayHelloBehaviour extends OneShotBehaviour{
 			
 		}
 		
+		
 		msg.setContent(myPosition.toString());
 		((AbstractDedaleAgent)this.myAgent).sendMessage(msg);
 		

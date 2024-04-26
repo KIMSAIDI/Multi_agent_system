@@ -22,6 +22,7 @@ public final class ConfigurationFile {
 	 * 
 	 ***********************************/
 	
+	 
 	//Distributed or not, and is the current computer in charge of the main-container
 	public static boolean PLATFORMisDISTRIBUTED= false;
 	public static boolean COMPUTERisMAIN= true;

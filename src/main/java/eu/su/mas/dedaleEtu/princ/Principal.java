@@ -27,6 +27,7 @@ import org.junit.Assert;
 import jade.wrapper.AgentContainer;
 
 
+
 /**
  * This class is used to start the platform and the agents. 
  * To launch your agents in the environment you desire you will have to :

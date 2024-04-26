@@ -133,7 +133,7 @@ public class ShareExculsiveNodesBehaviour extends OneShotBehaviour {
 				try {
 					map1.addEdge(null, n.getNodeId(), s);
 				} catch (NullPointerException e) {
-					System.out.println("Error adding edge " + n.getNodeId() + " -> " + s);
+					//System.out.println("Error adding edge " + n.getNodeId() + " -> " + s);
 				}
 			}
 		}

@@ -161,10 +161,10 @@ public class ExploCoopBehaviour extends OneShotBehaviour {
 				}
 
 				((AgentFsm)this.myAgent).majList_spam();
-				System.out.println("List_spam de "+ this.myAgent.getLocalName() + " : " + list_spam);
+				//System.out.println("List_spam de "+ this.myAgent.getLocalName() + " : " + list_spam);
 				((AgentFsm)this.myAgent).setMyMap(this.myMap);
 				if (!((AbstractDedaleAgent)this.myAgent).moveTo(new gsLocation(nextNodeId))) {
-					System.out.println("je suis bloqué");
+					//System.out.println("je suis bloqué");
 					Random rand = new Random();
 					int randomIndex = rand.nextInt(noeuds_observable.size());
 					nextNodeId = noeuds_observable.get(randomIndex).getLocationId();
@@ -226,7 +226,7 @@ public class ExploCoopBehaviour extends OneShotBehaviour {
 		ACLMessage msgHello = this.myAgent.receive(mtH);
 		if (msgHello != null && !isInList_spam(msgHello.getSender().getLocalName())) {
 			((AgentFsm)this.myAgent).addList_spam(msgHello.getSender().getLocalName());
-			System.out.println(this.myAgent.getLocalName() + " received a message from " + msgHello.getSender().getLocalName() + " : " + msgHello.getContent());
+			//System.out.println(this.myAgent.getLocalName() + " received a message from " + msgHello.getSender().getLocalName() + " : " + msgHello.getContent());
 			((AgentFsm)this.myAgent).setReceiver(msgHello.getSender().getLocalName());
 			// si l'agent n'est pas dans la liste des amis, on partage toute la map
 			if (!((AgentFsm)this.myAgent).isInList_friends_map(msgHello.getSender().getLocalName())) {
@@ -250,7 +250,7 @@ public class ExploCoopBehaviour extends OneShotBehaviour {
 				e.printStackTrace();
 			}
 			((AgentFsm)this.myAgent).addList_spam(msgShareMap.getSender().getLocalName());
-			System.out.println(this.myAgent.getLocalName() + " received a map from " + msgShareMap.getSender().getLocalName());
+			//System.out.println(this.myAgent.getLocalName() + " received a map from " + msgShareMap.getSender().getLocalName());
 			this.myMap.mergeMap(autreMap);
 			((AgentFsm)this.myAgent).setMyMap(this.myMap);
 			SerializableSimpleGraph<String, MapAttribute> mergedMap = this.copyGraph(autreMap);
@@ -276,7 +276,7 @@ public class ExploCoopBehaviour extends OneShotBehaviour {
 			} catch (UnreadableException e) {
 				e.printStackTrace();
 			}
-			System.out.println(this.myAgent.getLocalName() + " received exclu map " + subGraph + "from " + msgExNodes.getSender().getLocalName());
+			//System.out.println(this.myAgent.getLocalName() + " received exclu map " + subGraph + "from " + msgExNodes.getSender().getLocalName());
 
 			this.myMap.mergeMap(subGraph);
 			((AgentFsm)this.myAgent).setMyMap(this.myMap);
@@ -343,7 +343,7 @@ public class ExploCoopBehaviour extends OneShotBehaviour {
 				try {
 					map1.addEdge(null, n.getNodeId(), s);
 				} catch (NullPointerException e) {
-					System.out.println("Error adding edge " + n.getNodeId() + " -> " + s);
+					//System.out.println("Error adding edge " + n.getNodeId() + " -> " + s);
 				}
 			}
 		}

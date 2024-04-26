@@ -61,6 +61,7 @@ public class ExploCoopBehaviour extends OneShotBehaviour {
 	private MapRepresentation myMap;
 	private int nbActions;
 	private List<String> list_agentNames;
+	private Boolean changePath = false;
 
 /**
  * 
@@ -149,7 +150,12 @@ public class ExploCoopBehaviour extends OneShotBehaviour {
 				if (nextNodeId==null){
 					//no directly accessible openNode
 					//chose one, compute the path and take the first step.
-					nextNodeId=this.myMap.getShortestPathToClosestOpenNode(myPosition.getLocationId()).get(0);//getShortestPath(myPosition,this.openNodes.get(0)).get(0);
+					if (changePath) {
+						nextNodeId=this.myMap.getShortestPathToRandomOpenNode(myPosition.getLocationId()).get(0);
+						changePath = false;
+					}else {
+						nextNodeId=this.myMap.getShortestPathToClosestOpenNode(myPosition.getLocationId()).get(0);//getShortestPath(myPosition,this.openNodes.get(0)).get(0);
+					}
 					//System.out.println(this.myAgent.getLocalName()+"-- list= "+this.myMap.getOpenNodes()+"| nextNode: "+nextNode);
 				}else {
 					//System.out.println("nextNode notNUll - "+this.myAgent.getLocalName()+"-- list= "+this.myMap.getOpenNodes()+"\n -- nextNode: "+nextNode);
@@ -227,6 +233,7 @@ public class ExploCoopBehaviour extends OneShotBehaviour {
 			MessageTemplate mtSM = MessageTemplate.and(MessageTemplate.MatchPerformative(ACLMessage.INFORM), MessageTemplate.MatchProtocol("SHARE-TOPO"));
 			msgShareMap = this.myAgent.receive(mtSM);
 			if (msgShareMap != null) {
+				changePath = true; // changer de chemin si on a reçu une map
 				SerializableSimpleGraph<String, MapAttribute> autreMap=null;
 				try {
 					autreMap = (SerializableSimpleGraph<String, MapAttribute>) msgShareMap.getContentObject();
@@ -256,6 +263,7 @@ public class ExploCoopBehaviour extends OneShotBehaviour {
 			MessageTemplate mtExNods = MessageTemplate.and(MessageTemplate.MatchPerformative(ACLMessage.INFORM), MessageTemplate.MatchProtocol("SHARE-EXCLUSIVE-NODES"));
 			msgExNodes = this.myAgent.receive(mtExNods);
 			if (msgExNodes != null) {
+				changePath = true; // changer de chemin si on a reçu des noeuds exclusifs
 				SerializableSimpleGraph<String, MapAttribute> subGraph = null;
 				try {
 					subGraph = (SerializableSimpleGraph<String, MapAttribute>) msgExNodes.getContentObject();

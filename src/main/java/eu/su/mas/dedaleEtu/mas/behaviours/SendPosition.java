@@ -22,7 +22,7 @@ public class SendPosition extends OneShotBehaviour {
     @Override
     public void action() {
     
-        this.myAgent.doWait(400);
+
         ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
         msg.setProtocol("SendPositionProtocol");
         msg.setSender(this.myAgent.getAID());

@@ -51,7 +51,7 @@ public class PatrolBehaviour extends OneShotBehaviour{
         
         // ~~~~~~~~~~~~~~~~~~~~ Step 1 : On envoie sa position ~~~~~~~~~~~~~~~~~~~~
         this.exitValue = 2;
-        this.myAgent.doWait(400);
+
         // ~~~~~~~~~~~~~~~~~~~~ Step 2 : On check ses messages ~~~~~~~~~~~~~~~~~~~~
         if (checkMessage_PosfromExplo()) {
         	return; // pour les explorateurs
@@ -60,18 +60,10 @@ public class PatrolBehaviour extends OneShotBehaviour{
         checkMessage_PosfromHunter();
 		
         if (checkMessage_need_help()) { // j'ai reçu un appel à l'aide
-            System.out.println("j'ai reçu un appel à l'aide");		
-        	this.exitValue = 5; // on va a CatchGolem               
+            this.exitValue = 5; // on va a CatchGolem               
             return; 
         }
-//        if (checkMessage_need_help2()) { // j'ai reçu un appel à l'aide
-//        	System.out.println("j'ai reçu un appel à l'aide2");	
-//        	this.exitValue = 5; // on va a CatchGolem               
-//            return; 
-//        }
-        if (!((AgentFsm)this.myAgent).getExploDone()) {
-            this.exitValue = 20; // on va explorer
-        }
+        
          
         // ~~~~~~~~~~~~~~~~~~~~ Step 3 : On cherche où le golem pourrait être ~~~~~~~~~~~~~~~~~~~~
 
@@ -97,11 +89,11 @@ public class PatrolBehaviour extends OneShotBehaviour{
             noeuds_observable.remove(0); 
         }
         
-        // try {
-        //     this.myAgent.doWait(400);
-        // } catch (Exception e) {
-        //     e.printStackTrace();
-        // }
+        try {
+            this.myAgent.doWait(100);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 			
@@ -249,90 +241,21 @@ public class PatrolBehaviour extends OneShotBehaviour{
 
     public boolean checkMessage_need_help(){
         // Message de blocage de golem
-    	Location myPosition=((AbstractDedaleAgent)this.myAgent).getCurrentPosition();
-        
         MessageTemplate msgTemplate2 = MessageTemplate.and(
 				MessageTemplate.MatchProtocol("NeedHelpProtocol"),
 				MessageTemplate.MatchPerformative(ACLMessage.INFORM));
         ACLMessage msgReceived2 = this.myAgent.receive(msgTemplate2);
         if (msgReceived2 != null) {
             try {
-            
-            	if (msgReceived2.getContent().equals( myPosition.getLocationId())) {
-            		ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
-                    msg.setProtocol("Je_Ne_Suis_Pas_Un_GolemProtocol");
-                    msg.setSender(this.myAgent.getAID());
-                    for (String agentName : this.list_agentNames) {
-                        msg.addReceiver(new AID(agentName,AID.ISLOCALNAME));	
-                    }
-                    try {
-                        msg.setContent(((AbstractDedaleAgent) this.myAgent).getCurrentPosition().getLocationId());
-                        ((AbstractDedaleAgent) this.myAgent).sendMessage(msg);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-            	}else {
-	            	// On va aider       
-	                ((AgentFsm)this.myAgent).setPosition_golem((String) msgReceived2.getContent());
-	                return true; 
-            	}
+            	// On va aider       
+                ((AgentFsm)this.myAgent).setPosition_golem((String) msgReceived2.getContent());
+                return true; 
 			} catch (Exception e) {
 				e.printStackTrace();
 			}	
             
         }
         return false;
-        }
-        
-    public boolean checkMessage_need_help2() {
-    	Location myPosition=((AbstractDedaleAgent)this.myAgent).getCurrentPosition();
-        
-        MessageTemplate msgTemplate = MessageTemplate.and(
-				MessageTemplate.MatchProtocol("I_Am_An_AgentBlockGolemProtocol"),
-				MessageTemplate.MatchPerformative(ACLMessage.INFORM));
-        ACLMessage msgReceived = this.myAgent.receive(msgTemplate);
-        // je peux peut etre aider
-        if (msgReceived != null) {
-        	String content = msgReceived.getContent();
-            // Séparation des informations
-            String[] parts = content.split("\\|");
-            // Récupération des informations distinctes
-            String posGolem = parts[0];
-            String positionAgent = parts[1];
-
-            // 1. je vérifie si l'agent me prend pour un golem
-            try {
-                String loc = posGolem; // loc du golem
-                String maLoc = myPosition.getLocationId(); // ma loc
-                
-                if (loc.equals(maLoc)) { // on me prend pour un golem
-                    // j'envoie un message pour dire que je ne suis pas un golem
-                    ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
-                    msg.setProtocol("Je_Ne_Suis_Pas_Un_GolemProtocol");
-                    msg.setSender(this.myAgent.getAID());
-                    for (String agentName : this.list_agentNames) {
-                        msg.addReceiver(new AID(agentName,AID.ISLOCALNAME));	
-                    }
-                    try {
-                        msg.setContent(((AbstractDedaleAgent) this.myAgent).getCurrentPosition().getLocationId());
-                        ((AbstractDedaleAgent) this.myAgent).sendMessage(msg);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }else {
-					//this.exitValue = 5; // on va a CatchGolem
-                	((AgentFsm)this.myAgent).setPosition_golem(posGolem);
-					return true; //
-					
-                }
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-        	
-        }
-        return false;
-        
-        
     } 
 
     
@@ -396,7 +319,6 @@ public class PatrolBehaviour extends OneShotBehaviour{
                         if (positionAgent.equals(Maposition_golem)){
                             // 2. Un agent bloque le golem et ma position PEUT être utile -> CatchGolem
                             ((AgentFsm)this.myAgent).setPosition_golem(posGolem);
-                            System.out.println("je vais à CatchGolem");
                             this.exitValue = 5;
                         }else{
                             // 5. je chasse un autre golem
@@ -409,8 +331,6 @@ public class PatrolBehaviour extends OneShotBehaviour{
             }catch (Exception e) {
                 e.printStackTrace();
             }    
-        }else {
-        	return false;
         }
     	return true;
     }

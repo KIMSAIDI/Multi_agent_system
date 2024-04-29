@@ -35,7 +35,6 @@ public class ShareExculsiveNodesBehaviour extends OneShotBehaviour {
 
     @Override
     public void action() {
-        this.myAgent.doWait(400);
         this.myMap=((AgentFsm)this.myAgent).getMyMap();
         this.receiver = ((AgentFsm)this.myAgent).getReceiver();
         this.exitValue = 0;

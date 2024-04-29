@@ -29,7 +29,6 @@ public class CheckGolem extends OneShotBehaviour {
         }
 
         public void action(){
-            this.myAgent.doWait(400);
         	// si la position du golem fait partie de mes noeuds observable, je bloque
         	// Liste des observables
     		List<Couple<Location,List<Couple<Observation,Integer>>>> lobs=((AbstractDedaleAgent)this.myAgent).observe();

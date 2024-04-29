@@ -104,7 +104,6 @@ public class AgentFsm extends AbstractDedaleAgent {
         //fsm.registerDefaultTransition(STATE_RECEIVE_MAP, STATE_EXPLORE);
         // ect
         fsm.registerTransition(STATE_EXPLORE, STATE_PATROL, 10);
-        fsm.registerTransition(STATE_PATROL, STATE_EXPLORE, 20);
         // ~~~~~~~~~~~~~~~~~~~ Hunt ~~~~~~~~~~~~~~~~~~~
         // SendPosition
         fsm.registerDefaultTransition(STATE_PATROL, STATE_PATROL);

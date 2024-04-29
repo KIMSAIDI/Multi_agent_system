@@ -38,6 +38,7 @@ public class AgentFsm extends AbstractDedaleAgent {
     private String receiver = ""; // pour le partage des noeuds exclusifs
 	private static final int SPAM = 10; // pour limiter les conversations avec un agent
     private String position_golem = "";
+    private List<String> list_pos_agents_block = new ArrayList<>();
     private Boolean exploDone = false;
 
     private static final String STATE_INIT = "STATE_INIT";
@@ -82,11 +83,11 @@ public class AgentFsm extends AbstractDedaleAgent {
         fsm.registerState(new ReceiveMapBehaviour(this), STATE_RECEIVE_MAP);
         fsm.registerState(new SayHelloBehaviour(this, this.list_agentNames), STATE_SAYHELLO);
         fsm.registerState(new ShareExculsiveNodesBehaviour(this, myMap, receiver), STATE_SHARE_EXCLUSIVE_NODES);      
-        fsm.registerState(new PatrolBehaviour(this, list_agentNames, this.position_golem , this.myMap), STATE_PATROL);
+        fsm.registerState(new PatrolBehaviour(this, list_agentNames, this.position_golem , this.myMap, this.list_pos_agents_block), STATE_PATROL);
         fsm.registerState(new BlockGolemBehaviour(this, list_agentNames, this.position_golem), STATE_BLOCK_GOLEM);
         fsm.registerState(new SendPosition(this, list_agentNames), STATE_SENDPOSITION);
-        fsm.registerState(new CatchGolem(this, this.position_golem, this.myMap), STATE_CATCH_GOLEM);
-        fsm.registerState(new CheckGolem(this, this.list_agentNames), STATE_CHECK_GOLEM);
+        fsm.registerState(new CatchGolem(this, this.position_golem, this.myMap, this.list_pos_agents_block), STATE_CATCH_GOLEM);
+        fsm.registerState(new CheckGolem(this, this.list_agentNames, this.myMap), STATE_CHECK_GOLEM);
         // behaviour tracking jusqu'au golem / position utile (?)
         
         // Definition des transitions
@@ -287,5 +288,25 @@ public class AgentFsm extends AbstractDedaleAgent {
         return exploDone;
     }
     
+    public void setList_pos_agents_block(List<String> list_pos_agents_block) {
+        this.list_pos_agents_block = list_pos_agents_block;
+    }
+
+    public List<String> getList_pos_agents_block() {
+        return list_pos_agents_block;
+    }
+
+    public void addList_pos_agents_block(String agent) {
+        this.list_pos_agents_block.add(agent);
+    }
+
+    public void removeList_pos_agents_block(String agent) {
+        this.list_pos_agents_block.remove(agent);
+    }
+
+    public void clearList_pos_agents_block() {
+        this.list_pos_agents_block.clear();
+    }
+
     
 }

@@ -96,7 +96,9 @@ public class MapRepresentation implements Serializable {
 		n.setAttribute("ui.class", mapAttribute.toString());
 		n.setAttribute("ui.label",id);
 	}
-
+	public synchronized Boolean isNode (String id) {
+		return this.g.getNode(id) != null;
+	}
 	/**
 	 * Add a node to the graph. Do nothing if the node already exists.
 	 * If new, it is labeled as open (non-visited)
@@ -424,6 +426,8 @@ public class MapRepresentation implements Serializable {
 				.forEach(n -> n.setAttribute("ui.class", MapAttribute.closed.toString()));
 	}
 	
-	
+	public void removeNode(String id) {
+		this.g.removeNode(id);
+	}
 	
 }

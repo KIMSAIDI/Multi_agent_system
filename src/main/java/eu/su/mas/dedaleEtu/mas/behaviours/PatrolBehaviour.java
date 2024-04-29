@@ -32,14 +32,15 @@ public class PatrolBehaviour extends OneShotBehaviour{
     private int exitValue = 0; // on ne fait rien par défaut
     private List<Location> liste_noeuds_agents;
     private String position_golem;
+    private List<String> list_pos_agents_block;
     private MapRepresentation myMap;
 
-    public PatrolBehaviour(final AbstractDedaleAgent myagent, List<String> list_agentNames, String position_golem, MapRepresentation myMap) {
+    public PatrolBehaviour(final AbstractDedaleAgent myagent, List<String> list_agentNames, String position_golem, MapRepresentation myMap, List<String> liste_pos_agents_block) {
 		super(myagent);
 		this.list_agentNames = list_agentNames;
         this.position_golem = ((AgentFsm)this.myAgent).getPosition_golem();
         this.myMap = ((AgentFsm)this.myAgent).getMyMap();
-		
+        this.list_pos_agents_block = ((AgentFsm)this.myAgent).getList_pos_agents_block();
 	}
 
 
@@ -47,13 +48,14 @@ public class PatrolBehaviour extends OneShotBehaviour{
     	this.liste_noeuds_agents = new ArrayList<Location>();
         this.myMap = ((AgentFsm)this.myAgent).getMyMap();
         this.position_golem = ((AgentFsm)this.myAgent).getPosition_golem();
-        
+        this.list_pos_agents_block = ((AgentFsm)this.myAgent).getList_pos_agents_block();
         
         // ~~~~~~~~~~~~~~~~~~~~ Step 1 : On envoie sa position ~~~~~~~~~~~~~~~~~~~~
         this.exitValue = 2;
         this.myAgent.doWait(400);
         // ~~~~~~~~~~~~~~~~~~~~ Step 2 : On check ses messages ~~~~~~~~~~~~~~~~~~~~
-        if (checkMessage_PosfromExplo()) {
+        if (checkMessage_PosfromExplo() && ((AgentFsm)this.myAgent).getExploDone()) {
+            this.exitValue = 13; // on va répondre
         	return; // pour les explorateurs
         }
 		
@@ -237,7 +239,7 @@ public class PatrolBehaviour extends OneShotBehaviour{
                 // ajout de la position de l'agent dans la liste
                 liste_noeuds_agents.add(new gsLocation(pos));
                 ((AgentFsm)this.myAgent).setReceiver(msgReceived2.getSender().getLocalName());
-                this.exitValue = 13; // on va répondre
+                //this.exitValue = 13; // on va répondre
                 return true; 
             }catch(Exception e) {
                 e.printStackTrace();
@@ -322,6 +324,7 @@ public class PatrolBehaviour extends OneShotBehaviour{
                 }else {
 					//this.exitValue = 5; // on va a CatchGolem
                 	((AgentFsm)this.myAgent).setPosition_golem(posGolem);
+                    ((AgentFsm)this.myAgent).addList_pos_agents_block(positionAgent);
 					return true; //
 					
                 }
@@ -394,12 +397,15 @@ public class PatrolBehaviour extends OneShotBehaviour{
                     }else {
                         // je vérifie qui me bloque
                         if (positionAgent.equals(Maposition_golem)){
+
                             // 2. Un agent bloque le golem et ma position PEUT être utile -> CatchGolem
+                            ((AgentFsm)this.myAgent).addList_pos_agents_block(positionAgent);
                             ((AgentFsm)this.myAgent).setPosition_golem(posGolem);
                             System.out.println("je vais à CatchGolem");
                             this.exitValue = 5;
                         }else{
                             // 5. je chasse un autre golem
+                            this.exitValue = 5;
                             return false; 
                         }
                         

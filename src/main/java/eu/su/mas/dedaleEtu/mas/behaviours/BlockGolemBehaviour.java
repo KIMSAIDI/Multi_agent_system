@@ -42,6 +42,7 @@ public class BlockGolemBehaviour extends OneShotBehaviour{
         if ( mistake() ){
         	System.out.println("je me suis trompé");
             this.exitValue = 4; 
+            //((AgentFsm)this.myAgent).getMyMap().removeNode(this.position_golem);
             return;// si je me suis trompé
         }
         

@@ -107,7 +107,7 @@ public class ExploCoopBehaviour extends OneShotBehaviour {
 			}
 			try {
 				// Check if the agent has received a message
-				checkFalseInformation();
+				//checkFalseInformation();
 				if (checkReceivedMessage()) {
 					return;
 				}
@@ -170,15 +170,14 @@ public class ExploCoopBehaviour extends OneShotBehaviour {
 				((AgentFsm)this.myAgent).setMyMap(this.myMap);
 				if (!((AbstractDedaleAgent)this.myAgent).moveTo(new gsLocation(nextNodeId))) {
 					System.out.println("je suis bloqué");
-					// if (checkFalseInformation()) {
-					// 	System.out.println("je ne suis pas un golem");
-					// 	Random rand = new Random();
-					// 	int randomIndex = rand.nextInt(noeuds_observable.size());
-					// 	nextNodeId = noeuds_observable.get(randomIndex).getLocationId();
-					// 	((AbstractDedaleAgent) this.myAgent).moveTo(new gsLocation(nextNodeId));
-					// 	return;
-					// }
-					//((AgentFsm)this.myAgent).setPosition_golem(nextNodeId); 
+					//checkFalseInformation();
+						//System.out.println("je ne suis pas un golem");
+						// Random rand = new Random();
+						// int randomIndex = rand.nextInt(noeuds_observable.size());
+						// nextNodeId = noeuds_observable.get(randomIndex).getLocationId();
+						// ((AbstractDedaleAgent) this.myAgent).moveTo(new gsLocation(nextNodeId));
+						//return;
+					((AgentFsm)this.myAgent).setPosition_golem(nextNodeId);
 					this.exitValue = 10;
 				}
 			}
@@ -191,42 +190,54 @@ public class ExploCoopBehaviour extends OneShotBehaviour {
     public boolean checkFalseInformation() {
     	Location myPosition=((AbstractDedaleAgent)this.myAgent).getCurrentPosition();
         
-    	MessageTemplate msgTemplate = MessageTemplate.and(
+        MessageTemplate msgTemplate = MessageTemplate.and(
 				MessageTemplate.MatchProtocol("I_Am_An_AgentBlockGolemProtocol"),
 				MessageTemplate.MatchPerformative(ACLMessage.INFORM));
         ACLMessage msgReceived = this.myAgent.receive(msgTemplate);
+        // je peux peut etre aider
         if (msgReceived != null) {
-            // je vérifie que l'agent ne me prend pas pour un golem
-        	try {
-        		String loc = msgReceived.getContent(); // loc du golem
-        		String maLoc = myPosition.getLocationId();
-        		
-        		if (loc.equals(maLoc)) { // on me prend pour un golem
-        			//System.out.println(this.myAgent.getLocalName() + "JE NE SUIS PAS LE GOLEM AARRRG");
-        			// je ne suis pas un golem
-        			ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
-        	        msg.setProtocol("Je_Ne_Suis_Pas_Un_GolemProtocol");
-        	        msg.setSender(this.myAgent.getAID());
-        	        for (String agentName : this.list_agentNames) {
-        				msg.addReceiver(new AID(agentName,AID.ISLOCALNAME));
-        				
-        			}
-					try {
-						msg.setContentObject(((AbstractDedaleAgent) this.myAgent).getCurrentPosition());
-						((AbstractDedaleAgent) this.myAgent).sendMessage(msg);
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-        			//this.exitValue = 4; // je retourne en patrouille
+        	String content = msgReceived.getContent();
+            // Séparation des informations
+            String[] parts = content.split("\\|");
+            // Récupération des informations distinctes
+            String posGolem = parts[0];
+            String positionAgent = parts[1];
+
+            // 1. je vérifie si l'agent me prend pour un golem
+            try {
+                String loc = posGolem; // loc du golem
+                String maLoc = myPosition.getLocationId(); // ma loc
+                
+                if (loc.equals(maLoc)) { // on me prend pour un golem
+                    // j'envoie un message pour dire que je ne suis pas un golem
+                    ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
+                    msg.setProtocol("Je_Ne_Suis_Pas_Un_GolemProtocol");
+                    msg.setSender(this.myAgent.getAID());
+                    for (String agentName : this.list_agentNames) {
+                        msg.addReceiver(new AID(agentName,AID.ISLOCALNAME));	
+                    }
+                    try {
+                        msg.setContent(((AbstractDedaleAgent) this.myAgent).getCurrentPosition().getLocationId());
+                        ((AbstractDedaleAgent) this.myAgent).sendMessage(msg);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }else {
+					//this.exitValue = 5; // on va a CatchGolem
+					this.exitValue = 10;
+                	((AgentFsm)this.myAgent).setPosition_golem(posGolem);
+					return true; //
 					
-        			return true;
-				}
-			}catch (Exception e) {
+                }
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
-		}
-		return false;
-	}		
+        	
+        }
+        return false;
+        
+        
+    } 
 
 	// Check les messages reçus
 	@SuppressWarnings("unchecked")

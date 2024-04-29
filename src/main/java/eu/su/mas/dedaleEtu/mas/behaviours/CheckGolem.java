@@ -9,10 +9,12 @@ import eu.su.mas.dedale.env.Location;
 import eu.su.mas.dedale.env.Observation;
 import eu.su.mas.dedale.mas.AbstractDedaleAgent;
 import eu.su.mas.dedaleEtu.mas.agents.dummies.explo.AgentFsm;
+import eu.su.mas.dedaleEtu.mas.knowledge.MapRepresentation;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
+import jade.util.leap.Map;
 import jade.core.AID;
 
 public class CheckGolem extends OneShotBehaviour {
@@ -21,15 +23,17 @@ public class CheckGolem extends OneShotBehaviour {
     
         private int exitValue = 0; // on ne fait rien par défaut
         private List<String> list_agentNames;
-    
-        public CheckGolem(final AbstractDedaleAgent myagent, List<String> list_agentNames) {
+        private MapRepresentation myMap;
+
+        public CheckGolem(final AbstractDedaleAgent myagent, List<String> list_agentNames, MapRepresentation myMap){
             super(myagent);
             this.list_agentNames = list_agentNames;
-            
+            this.myMap = ((AgentFsm)this.myAgent).getMyMap();
         }
 
         public void action(){
             this.myAgent.doWait(400);
+            this.myMap = ((AgentFsm)this.myAgent).getMyMap();
         	// si la position du golem fait partie de mes noeuds observable, je bloque
         	// Liste des observables
     		List<Couple<Location,List<Couple<Observation,Integer>>>> lobs=((AbstractDedaleAgent)this.myAgent).observe();
@@ -44,11 +48,17 @@ public class CheckGolem extends OneShotBehaviour {
                 string_location_observable.add(loc.getLocationId());
             }
             if ((string_location_observable.contains(((AgentFsm)this.myAgent).getPosition_golem()))) {
-                
+                ((AgentFsm)this.myAgent).clearList_pos_agents_block();  
             	this.exitValue = 7; // On va bloquer le golem
             	return;
             }else {
-            	((AgentFsm)this.myAgent).setPosition_golem(""); 
+            	((AgentFsm)this.myAgent).setPosition_golem("");
+                if (((AgentFsm)this.myAgent).getList_pos_agents_block().isEmpty()) {
+                    this.exitValue = 0; // On va patrouiller
+                    return;
+                }
+                this.myMap.addNewNode(((AgentFsm)this.myAgent).getList_pos_agents_block().get(0));
+                ((AgentFsm)this.myAgent).clearList_pos_agents_block();
             	this.exitValue = 0; // On va patrouiller
             	return;
             }

@@ -21,11 +21,13 @@ public class CatchGolem extends OneShotBehaviour{
         private String position_golem;
         private MapRepresentation myMap;
         private int exitValue = 0; 
+        private List<String> list_pos_agents_block;
 
-        public CatchGolem(final AbstractDedaleAgent myagent, String position_golem, MapRepresentation myMap) {
+        public CatchGolem(final AbstractDedaleAgent myagent, String position_golem, MapRepresentation myMap, List<String> list_pos_agents_block) {
             super(myagent);
             this.position_golem = ((AgentFsm)this.myAgent).getPosition_golem();
             this.myMap = ((AgentFsm)this.myAgent).getMyMap();
+            this.list_pos_agents_block = ((AgentFsm)this.myAgent).getList_pos_agents_block();
         }
 
         public void action(){
@@ -33,10 +35,20 @@ public class CatchGolem extends OneShotBehaviour{
         	this.exitValue = 0;
             this.position_golem = ((AgentFsm)this.myAgent).getPosition_golem();
         	this.myMap = ((AgentFsm)this.myAgent).getMyMap();
-        	
+            this.list_pos_agents_block = ((AgentFsm)this.myAgent).getList_pos_agents_block();
             Location myPosition=((AbstractDedaleAgent)this.myAgent).getCurrentPosition();
             
             // On trouve le chemin le plus court pour aller aider
+            if (this.position_golem == "" || this.position_golem.isEmpty() || !this.myMap.isNode(this.position_golem)) {
+                //this.exitValue = 5; // On a pas de golem à aider
+                return;
+            }
+            try{
+                this.myMap.removeNode(this.list_pos_agents_block.get(0));
+            }catch(Exception e){
+                return;
+                //System.out.println("Erreur lors de la suppression du noeud");
+            }
             List<String> path = this.myMap.getShortestPath(myPosition.getLocationId() , ((AgentFsm)this.myAgent).getPosition_golem());
 			if (path != null && !path.isEmpty()){
                 

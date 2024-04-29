@@ -180,6 +180,11 @@
 			<artifactId>tools</artifactId>
 			<version>-SNAPSHOT</version>
 		</dependency>
+		<dependency>
+			<groupId>eu.upmc.mas.fosyma.startjade</groupId>
+			<artifactId>startjade</artifactId>
+			<version>0.1</version>
+		</dependency>
 	</dependencies>
 
 	<build>

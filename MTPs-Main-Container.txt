@@ -1,1 +1,1 @@
-http://localhost:7778/acc
+http://KIM:7778/acc

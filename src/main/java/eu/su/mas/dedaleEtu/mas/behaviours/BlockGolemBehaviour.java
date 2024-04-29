@@ -35,14 +35,17 @@ public class BlockGolemBehaviour extends OneShotBehaviour{
     public void action() {
     	this.position_golem = ((AgentFsm)this.myAgent).getPosition_golem();
         Location myPosition=((AbstractDedaleAgent)this.myAgent).getCurrentPosition();
-        
+        this.myAgent.doWait(400);
         // ~~~~~~~~~ Step 1 : Je vérifie que je bloque toujours le golem ~~~~~~~~~
         
     	
         if ( mistake() ){
+        	System.out.println("je me suis trompé");
             this.exitValue = 4; 
             return;// si je me suis trompé
         }
+        
+        checkFalseInformation();
         
         
         // je vérifie que je le bloque encore
@@ -122,8 +125,9 @@ public class BlockGolemBehaviour extends OneShotBehaviour{
         				
          			}
 	 				try {
-	 					msg.setContentObject(((AbstractDedaleAgent) this.myAgent).getCurrentPosition());
+	 					msg.setContent(((AbstractDedaleAgent) this.myAgent).getCurrentPosition().getLocationId());
 	 					((AbstractDedaleAgent) this.myAgent).sendMessage(msg);
+                    
 	 				} catch (Exception e) {
 	 					e.printStackTrace();
 	 				}
@@ -144,9 +148,11 @@ public class BlockGolemBehaviour extends OneShotBehaviour{
         ACLMessage msgReceived = this.myAgent.receive(msgTemplate);
         if (msgReceived != null) {
             // je compare si la position de l'agent est bien la position de mon golem
-            String posAgent = (String) msgReceived.getContent();
-            String posGolem = ((AgentFsm)this.myAgent).getPosition_golem();
-            if (posAgent.equals(posGolem)){
+            //String posAgent = (String) msgReceived.getContent();
+            //String posGolem = ((AgentFsm)this.myAgent).getPosition_golem();
+            System.out.println(this.myAgent.getLocalName() + " posAgent : " + msgReceived.getContent() + " posGolem : " + ((AgentFsm)this.myAgent).getPosition_golem());
+            if (msgReceived.getContent().equals(((AgentFsm)this.myAgent).getPosition_golem())){
+            	System.out.println("je me suis trompé");
                 // je me suis trompé
                 ((AgentFsm)this.myAgent).setPosition_golem(""); 
                 return true;

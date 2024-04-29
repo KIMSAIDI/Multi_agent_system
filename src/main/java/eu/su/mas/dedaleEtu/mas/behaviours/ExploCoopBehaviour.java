@@ -101,7 +101,7 @@ public class ExploCoopBehaviour extends OneShotBehaviour {
 			 * Just added here to let you see what the agent is doing, otherwise he will be too quick
 			 */
 			try {
-				this.myAgent.doWait(100);
+				this.myAgent.doWait(400);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -169,16 +169,22 @@ public class ExploCoopBehaviour extends OneShotBehaviour {
 				((AgentFsm)this.myAgent).majList_spam();
 				((AgentFsm)this.myAgent).setMyMap(this.myMap);
 				if (!((AbstractDedaleAgent)this.myAgent).moveTo(new gsLocation(nextNodeId))) {
-					//System.out.println("je suis bloqué");
-					Random rand = new Random();
-					int randomIndex = rand.nextInt(noeuds_observable.size());
-					nextNodeId = noeuds_observable.get(randomIndex).getLocationId();
-					((AbstractDedaleAgent) this.myAgent).moveTo(new gsLocation(nextNodeId));
+					System.out.println("je suis bloqué");
+					// if (checkFalseInformation()) {
+					// 	System.out.println("je ne suis pas un golem");
+					// 	Random rand = new Random();
+					// 	int randomIndex = rand.nextInt(noeuds_observable.size());
+					// 	nextNodeId = noeuds_observable.get(randomIndex).getLocationId();
+					// 	((AbstractDedaleAgent) this.myAgent).moveTo(new gsLocation(nextNodeId));
+					// 	return;
+					// }
+					//((AgentFsm)this.myAgent).setPosition_golem(nextNodeId); 
+					this.exitValue = 10;
 				}
 			}
 
 		}
-		this.myAgent.doWait(100);
+		//this.myAgent.doWait(100);
 		System.out.println(" ------------------- " + this.myAgent.getLocalName() + "ExploCoopBehaviour");
 	}
 	

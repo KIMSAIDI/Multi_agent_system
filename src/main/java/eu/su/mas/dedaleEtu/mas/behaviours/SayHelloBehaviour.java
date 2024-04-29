@@ -35,6 +35,7 @@ public class SayHelloBehaviour extends OneShotBehaviour{
 
 	@Override
 	public void action() {
+        this.myAgent.doWait(400);
 		Location myPosition=((AbstractDedaleAgent)this.myAgent).getCurrentPosition();
 		
 		ACLMessage msg=new ACLMessage(ACLMessage.INFORM);
@@ -50,7 +51,6 @@ public class SayHelloBehaviour extends OneShotBehaviour{
 		((AbstractDedaleAgent)this.myAgent).sendMessage(msg);
 		
 		System.out.println("----------- " + this.myAgent.getLocalName()+" sent a message to its friend");
-		this.myAgent.doWait(200);
 		
 	}
 	

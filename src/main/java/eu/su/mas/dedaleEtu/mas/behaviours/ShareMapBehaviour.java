@@ -47,6 +47,8 @@ public class ShareMapBehaviour extends OneShotBehaviour {
 
 	@Override
 	public void action() {
+		this.myAgent.doWait(400);
+
 		//4) At each time step, the agent blindly send all its graph to its surrounding to illustrate how to share its knowledge (the topology currently) with the the others agents. 	
 		// If it was written properly, this sharing action should be in a dedicated behaviour set, the receivers be automatically computed, and only a subgraph would be shared.
 		this.myMap = ((AgentFsm)this.myAgent).getMyMap();
@@ -71,7 +73,6 @@ public class ShareMapBehaviour extends OneShotBehaviour {
 			((AgentFsm)this.myAgent).majList_friends_map(receiver, sg);
 		}
 		((AbstractDedaleAgent)this.myAgent).sendMessage(msg);
-		this.myAgent.doWait(400);
 	}	
 
 }

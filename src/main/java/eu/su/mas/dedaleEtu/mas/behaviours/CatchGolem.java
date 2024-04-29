@@ -29,6 +29,7 @@ public class CatchGolem extends OneShotBehaviour{
         }
 
         public void action(){
+            this.myAgent.doWait(400);
         	this.exitValue = 0;
             this.position_golem = ((AgentFsm)this.myAgent).getPosition_golem();
         	this.myMap = ((AgentFsm)this.myAgent).getMyMap();

@@ -68,6 +68,8 @@ public class CatchGolem extends OneShotBehaviour{
                             
                         }
                     }
+                    this.myAgent.doWait(400);
+
 
                 }
             }

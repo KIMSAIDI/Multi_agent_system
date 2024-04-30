@@ -1,12 +1,15 @@
 package eu.su.mas.dedaleEtu.mas.behaviours;
 
 import java.util.List;
+
+import dataStructures.serializableGraph.SerializableSimpleGraph;
 import eu.su.mas.dedale.env.Location;
 
 import eu.su.mas.dedale.env.gs.gsLocation;
 import eu.su.mas.dedale.mas.AbstractDedaleAgent;
 import eu.su.mas.dedaleEtu.mas.agents.dummies.explo.AgentFsm;
 import eu.su.mas.dedaleEtu.mas.knowledge.MapRepresentation;
+import eu.su.mas.dedaleEtu.mas.knowledge.MapRepresentation.MapAttribute;
 import jade.core.behaviours.OneShotBehaviour;
 
 
@@ -43,13 +46,16 @@ public class CatchGolem extends OneShotBehaviour{
                 //this.exitValue = 5; // On a pas de golem à aider
                 return;
             }
+            List<String> path;
+            SerializableSimpleGraph<String,MapAttribute> graph_temp = this.myMap.getSerializableGraph();
             try{
                 this.myMap.removeNode(this.list_pos_agents_block.get(0));
+                path = this.myMap.getShortestPath(myPosition.getLocationId() , ((AgentFsm)this.myAgent).getPosition_golem());
+                this.myMap.mergeMap(graph_temp);
             }catch(Exception e){
                 return;
                 //System.out.println("Erreur lors de la suppression du noeud");
             }
-            List<String> path = this.myMap.getShortestPath(myPosition.getLocationId() , ((AgentFsm)this.myAgent).getPosition_golem());
 			if (path != null && !path.isEmpty()){
                 
 				for (String nodeId : path){

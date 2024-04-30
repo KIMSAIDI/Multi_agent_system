@@ -49,7 +49,7 @@ public class ExploCoopBehaviour extends OneShotBehaviour {
 
 	private static final long serialVersionUID = 8567689731496787661L;
 
-    private static final int sayHello = 5; // pour limiter le nombre de ping, un ping toutes les X actions
+    private static final int sayHello = 3; // pour limiter le nombre de ping, un ping toutes les X actions
 
 	private boolean finished = false;
 	private int exitValue;

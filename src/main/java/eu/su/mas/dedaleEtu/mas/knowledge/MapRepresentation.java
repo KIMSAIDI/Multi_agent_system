@@ -426,8 +426,16 @@ public class MapRepresentation implements Serializable {
 				.forEach(n -> n.setAttribute("ui.class", MapAttribute.closed.toString()));
 	}
 	
+	public MapAttribute getAttribute(String id) {
+		return MapAttribute.valueOf((String)this.g.getNode(id).getAttribute("ui.class"));
+	}
 	public void removeNode(String id) {
 		this.g.removeNode(id);
 	}
 	
+	public MapRepresentation copyGraph() {
+		MapRepresentation copiedGraph = new MapRepresentation();
+		copiedGraph.mergeMap(this.getSerializableGraph());
+		return copiedGraph;
+	}
 }

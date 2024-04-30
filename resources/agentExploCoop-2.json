@@ -6,14 +6,14 @@
     "initialLocation": "119",
     "backPackCapacityGold": -1,
     "backPackCapacityDiamond":-1, 
-    "detectionRadius": 2,
+    "detectionRadius": 3,
     "strengthExpertise": 1,
     "lockPickingExpertise":1
     },
   { 
     "agentType":"agentExplo",
     "agentName": "H1",
-    "communicationRange": 9,
+    "communicationRange": 2,
     "initialLocation": "107",
     "backPackCapacityGold": -1,
     "backPackCapacityDiamond":-1, 
@@ -24,7 +24,7 @@
     { 
     "agentType":"agentExplo",
     "agentName": "H2",
-    "communicationRange": 9,
+    "communicationRange": 2,
     "initialLocation": "95",
     "backPackCapacityGold": -1,
     "backPackCapacityDiamond":-1, 
@@ -35,7 +35,7 @@
     { 
     "agentType":"agentExplo",
     "agentName": "H3",
-    "communicationRange": 9,
+    "communicationRange": 2,
     "initialLocation": "96",
     "backPackCapacityGold": -1,
     "backPackCapacityDiamond":-1, 
